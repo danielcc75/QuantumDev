@@ -8,11 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('usuario_habilidades', function (Blueprint $table) {
+        Schema::create('experiencias_laborales', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('usuarios')->onDelete('cascade');
-            $table->string('nombre', 100);
-            $table->enum('nivel', ['Junior', 'Mid', 'Senior']);
+            $table->string('posicion', 150);
+            $table->string('empresa', 150);
+            $table->date('fecha_inicio');
+            $table->date('fecha_fin')->nullable();
+            $table->boolean('es_trabajo_actual')->default(false);
+            $table->text('descripcion')->nullable();
             $table->integer('orden')->default(0);
             $table->timestamps();
         });
@@ -20,6 +24,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('usuario_habilidades');
+        Schema::dropIfExists('experiencias_laborales');
     }
 };

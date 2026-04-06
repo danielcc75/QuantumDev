@@ -1,4 +1,5 @@
 <?php
+// app/Models/UsuarioHabilidad.php
 
 namespace App\Models;
 
@@ -6,16 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class UsuarioHabilidad extends Model
 {
-    protected $table = 'habilidades';
+    protected $table = 'usuario_habilidades';  // ← Corregido
 
     protected $fillable = [
+        'user_id',
         'nombre',
-        'categoria',
-        'descripcion'
+        'nivel',
+        'orden'
     ];
 
-    public function usuarios() {
-        return $this->belongsToMany(Usuario::class, 'usuario_habilidades')
-                    ->withPivot('anios_experiencia');
+    protected $casts = [
+        'nivel' => 'string',
+    ];
+
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class, 'user_id');
     }
 }

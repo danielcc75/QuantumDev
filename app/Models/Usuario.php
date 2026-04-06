@@ -1,4 +1,5 @@
 <?php
+// app/Models/Usuario.php
 
 namespace App\Models;
 
@@ -6,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Usuario extends Model
 {
-
     protected $table = 'usuarios';
 
     protected $fillable = [
@@ -19,20 +19,29 @@ class Usuario extends Model
 
     // RELACIONES
     public function perfil() 
-{
-    return $this->hasOne(Perfil::class, 'user_id'); 
-}
+    {
+        return $this->hasOne(Perfil::class, 'user_id'); 
+    }
 
-    public function proyectos() {
+    public function proyectos() 
+    {
         return $this->hasMany(Proyecto::class);
     }
 
-    public function educaciones() {
+    public function educaciones() 
+    {
         return $this->hasMany(Educacion::class);
     }
 
-    public function habilidades() {
-        return $this->belongsToMany(Habilidad::class, 'usuario_habilidades')
-                    ->withPivot('anios_experiencia');
+    // ✅ CORREGIDA - Relación con habilidades del usuario
+    public function habilidades()
+    {
+        return $this->hasMany(UsuarioHabilidad::class, 'user_id')->orderBy('orden');
+    }
+
+    // ✅ NUEVA - Relación con experiencias laborales
+    public function experienciasLaborales()
+    {
+        return $this->hasMany(ExperienciaLaboral::class, 'user_id')->orderBy('orden');
     }
 }

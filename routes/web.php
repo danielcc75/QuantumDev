@@ -36,3 +36,7 @@ Route::delete('/usuarios/{id}', [UsuarioWebController::class, 'destroy'])->name(
 // Rutas para el perfil
 Route::get('/usuarios/{id}/perfil', [UsuarioWebController::class, 'editPerfil'])->name('usuarios.perfil');
 Route::put('/usuarios/{id}/perfil', [UsuarioWebController::class, 'updatePerfil'])->name('usuarios.updatePerfil');
+Route::post('/usuarios/{id}/perfil', [UsuarioWebController::class, 'updatePerfil']);
+Route::get('/', function () {
+    return view('dashboard');
+})->name('dashboard');

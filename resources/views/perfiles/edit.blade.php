@@ -44,8 +44,10 @@
                         Links (Formato JSON)
                     </label>
                     <textarea name="links" rows="4"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-mono text-sm"
-                        placeholder='{"github": "https://github.com/usuario", "linkedin": "https://linkedin.com/in/usuario"}'>{{ $usuario->perfil->links ?? '' }}</textarea>
+    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-mono text-sm"
+    placeholder='{"github": "https://github.com/usuario", "linkedin": "https://linkedin.com/in/usuario"}'>
+    {{ old('links', json_encode($usuario->perfil->links ?? [])) }}
+</textarea>
                     <p class="text-xs text-gray-500 mt-1">Ejemplo: {"github": "https://...", "twitter": "https://..."}</p>
                 </div>
             </div>

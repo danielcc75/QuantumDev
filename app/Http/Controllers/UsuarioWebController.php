@@ -109,23 +109,57 @@ class UsuarioWebController extends Controller
         return view('perfiles.edit', compact('usuario'));
     }
 
-    // Actualizar perfil
-    public function updatePerfil(Request $request, $id)
-    {
-        $perfil = Perfil::where('user_id', $id)->firstOrFail();
+   public function updatePerfil(Request $request, $id)
+{
+    try {
+        // Actualizar nombre y apellido en la tabla usuarios
+        $usuario = Usuario::findOrFail($id);
+        
+        if ($request->filled('nombre')) {
+            $usuario->nombre = $request->nombre;
+        }
+        if ($request->filled('apellido')) {
+            $usuario->apellido = $request->apellido;
+        }
+        $usuario->save();
 
-        $request->validate([
-            'foto' => 'nullable|url|max:255',
-            'biografia' => 'nullable|string|max:1000',
-            'links' => 'nullable|json'
-        ]);
-
-        $perfil->foto = $request->foto;
-        $perfil->biografia = $request->biografia;
-        $perfil->links = $request->links;
+        if ($request->filled('email')) {
+            $usuario->email = $request->email;
+        }
+        $usuario->save();
+        
+        // Actualizar perfil (biografia y links)
+        $perfil = Perfil::where('user_id', $id)->first();
+        
+        if (!$perfil) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Perfil no encontrado'
+            ], 404);
+        }
+        
+        if ($request->filled('biografia')) {
+            $perfil->biografia = $request->biografia;
+        }
+        
+        if ($request->filled('links')) {
+            $perfil->links = $request->links;
+        }
+        
         $perfil->save();
-
-        return redirect()->route('usuarios.show', $id)
-            ->with('success', 'Perfil actualizado exitosamente');
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Perfil actualizado correctamente'
+        ]);
+        
+    } catch (\Exception $e) {
+        Log::error('Error en updatePerfil: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
     }
+}
+
 }
