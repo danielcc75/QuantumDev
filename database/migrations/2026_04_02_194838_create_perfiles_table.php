@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_usuario');
             $table->string('foto_perfil', 255)->nullable();
             $table->text('biografia')->nullable();
+            $table->string('ubicacion', 100)->nullable();
             $table->timestamps();
 
             $table->foreign('id_usuario')->references('id_usuario')->on('usuario')->onDelete('cascade');
