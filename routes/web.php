@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UsuarioWebController;
+use App\Http\Controllers\ProyectoController;
 use Illuminate\Support\Facades\Route;
 
 // Ruta principal
@@ -40,3 +41,9 @@ Route::post('/usuarios/{id}/perfil', [UsuarioWebController::class, 'updatePerfil
 Route::get('/', function () {
     return view('dashboard');
 })->name('dashboard');
+
+// CRUD Proyectos (usado por AJAX desde el dashboard)
+Route::get('/proyectos/{id}',    [ProyectoController::class, 'show']);
+Route::post('/proyectos',        [ProyectoController::class, 'store']);
+Route::put('/proyectos/{id}',    [ProyectoController::class, 'update']);
+Route::delete('/proyectos/{id}', [ProyectoController::class, 'destroy']);

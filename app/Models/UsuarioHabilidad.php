@@ -1,5 +1,4 @@
 <?php
-// app/Models/UsuarioHabilidad.php
 
 namespace App\Models;
 
@@ -7,21 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class UsuarioHabilidad extends Model
 {
-    protected $table = 'usuario_habilidades';  // ← Corregido
+    protected $table = 'habilidades';
+    protected $primaryKey = 'id_habilidad';
 
     protected $fillable = [
-        'user_id',
+        'id_perfil',
+        'id_categoria',
         'nombre',
-        'nivel',
-        'orden'
+        'anios_experiencia',
+        'descripcion'
     ];
 
-    protected $casts = [
-        'nivel' => 'string',
-    ];
-
-    public function usuario()
+    public function perfil()
     {
-        return $this->belongsTo(Usuario::class, 'user_id');
+        return $this->belongsTo(Perfil::class, 'id_perfil');
     }
 }

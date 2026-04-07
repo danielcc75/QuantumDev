@@ -1,5 +1,4 @@
 <?php
-// app/Models/ExperienciaLaboral.php
 
 namespace App\Models;
 
@@ -7,27 +6,27 @@ use Illuminate\Database\Eloquent\Model;
 
 class ExperienciaLaboral extends Model
 {
-    protected $table = 'experiencias_laborales';
+    protected $table = 'experiencia_laboral';
+    protected $primaryKey = 'id_experiencia';
 
     protected $fillable = [
-        'user_id',
-        'posicion',
+        'id_perfil',
         'empresa',
-        'fecha_inicio',
-        'fecha_fin',
-        'es_trabajo_actual',
+        'cargo',
         'descripcion',
-        'orden'
+        'fecha_ini',
+        'fecha_fin',
+        'trabajo_actual'
     ];
 
     protected $casts = [
-        'fecha_inicio' => 'date',
+        'fecha_ini' => 'date',
         'fecha_fin' => 'date',
-        'es_trabajo_actual' => 'boolean',
+        'trabajo_actual' => 'boolean',
     ];
 
-    public function usuario()
+    public function perfil()
     {
-        return $this->belongsTo(Usuario::class, 'user_id');
+        return $this->belongsTo(Perfil::class, 'id_perfil');
     }
 }

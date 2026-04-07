@@ -12,11 +12,13 @@
 
         <!-- Stats Grid -->
         @php
-            $totalProyectos = isset($userId) ? DB::table('proyectos')->where('user_id', $userId)->count() : 0;
+            $perfilResumen = isset($userId) ? DB::table('perfil')->where('id_usuario', $userId)->first() : null;
+            $perfilId = $perfilResumen->id_perfil ?? null;
+            $totalProyectos = $perfilId ? DB::table('proyectos')->where('id_perfil', $perfilId)->count() : 0;
             $stats = [
                 'repos' => $totalProyectos,
                 'commits' => $totalProyectos * 45,
-                'estudios' => DB::table('proyectos')->where('nivel', '!=', '')->count(),
+                'estudios' => $perfilId ? DB::table('formacion_academica')->where('id_perfil', $perfilId)->count() : 0,
                 'codigo_limpio' => 95
             ];
         @endphp
@@ -45,8 +47,8 @@
             <h3 class="font-semibold text-gray-800 mb-4">Proyectos recientes</h3>
             <div class="space-y-4">
                 @php
-                    $proyectosRecientes = isset($userId) ? DB::table('proyectos')
-                        ->where('user_id', $userId)
+                    $proyectosRecientes = $perfilId ? DB::table('proyectos')
+                        ->where('id_perfil', $perfilId)
                         ->orderBy('created_at', 'desc')
                         ->limit(3)
                         ->get() : collect();
@@ -55,14 +57,13 @@
                 @forelse($proyectosRecientes as $proyecto)
                 <div class="flex justify-between items-center py-3 border-b border-gray-100 last:border-0">
                     <div>
-                        <p class="font-medium text-gray-800">{{ $proyecto->titulo }}</p>
+                        <p class="font-medium text-gray-800">{{ $proyecto->nombre }}</p>
                         <div class="flex space-x-3 text-xs text-gray-500 mt-1">
-                            <span><i class="fas fa-university mr-1"></i>{{ $proyecto->institucion }}</span>
-                            <span><i class="fas fa-graduation-cap mr-1"></i>{{ $proyecto->nivel }}</span>
+                            <span><i class="fas fa-circle mr-1"></i>{{ $proyecto->estado }}</span>
                         </div>
                     </div>
                     <div class="text-right text-sm">
-                        <p class="text-gray-600">{{ \Carbon\Carbon::parse($proyecto->fecha_inicio)->format('Y') }}</p>
+                        <p class="text-gray-600">{{ \Carbon\Carbon::parse($proyecto->fecha_ini)->format('Y') }}</p>
                         <p class="text-gray-400 text-xs">{{ $proyecto->descripcion ? substr($proyecto->descripcion, 0, 50) : 'Sin descripción' }}</p>
                     </div>
                 </div>
@@ -79,10 +80,12 @@
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
             <h3 class="font-semibold text-gray-800 mb-4">Habilidades técnicas</h3>
             @php
-                $habilidades = DB::table('usuario_habilidades')
-                    ->orderBy('categoria')
+                $habilidades = $perfilId ? DB::table('habilidades')
+                    ->join('categoria', 'habilidades.id_categoria', '=', 'categoria.id_categoria')
+                    ->where('habilidades.id_perfil', $perfilId)
+                    ->select('habilidades.*', 'categoria.nombre as nombre_categoria')
                     ->get()
-                    ->groupBy('categoria');
+                    ->groupBy('nombre_categoria') : collect();
             @endphp
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">

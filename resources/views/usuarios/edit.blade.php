@@ -10,7 +10,7 @@
             </h3>
         </div>
         
-        <form action="{{ route('usuarios.update', $usuario->id) }}" method="POST" class="p-6">
+        <form action="{{ route('usuarios.update', $usuario->id_usuario) }}" method="POST" class="p-6">
             @csrf
             @method('PUT')
             
@@ -29,7 +29,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-                    <input type="email" name="email" value="{{ old('email', $usuario->email) }}" required
+                    <input type="email" name="correo_electronico" value="{{ old('correo_electronico', $usuario->correo_electronico) }}" required
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
                 </div>
 
@@ -43,7 +43,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         Nueva Contraseña (opcional)
                     </label>
-                    <input type="password" name="password"
+                    <input type="password" name="contrasenia"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
                         placeholder="Dejar en blanco para mantener la actual">
                 </div>

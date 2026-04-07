@@ -5,23 +5,26 @@
     <main class="p-8">
         @php
             // Obtener datos del usuario y su perfil
-            $usuario = DB::table('usuarios')->where('id', $userId)->first();
-            $perfil = DB::table('perfiles')->where('user_id', $userId)->first();
-            
-            // Decodificar links JSON a un array
+            $usuario = DB::table('usuario')->where('id_usuario', $userId)->first();
+            $perfil = DB::table('perfil')->where('id_usuario', $userId)->first();
+
+            // Obtener links desde la tabla perfil_links
             $links = [];
-            if ($perfil && $perfil->links) {
-                $links = json_decode($perfil->links, true) ?? [];
+            if ($perfil) {
+                $linksRows = DB::table('perfil_links')->where('id_perfil', $perfil->id_perfil)->get();
+                foreach ($linksRows as $link) {
+                    $links[$link->tipo] = $link->url;
+                }
             }
-            
+
             // Nombre completo
             $nombreCompleto = trim(($usuario->nombre ?? '') . ' ' . ($usuario->apellido ?? ''));
             if (empty($nombreCompleto)) {
                 $nombreCompleto = 'Usuario';
             }
-            
+
             // URL de la foto
-            $fotoUrl = $perfil->foto ?? null;
+            $fotoUrl = $perfil->foto_perfil ?? null;
         @endphp
 
         <!-- Perfil - Diseño tipo CV -->
@@ -53,7 +56,7 @@
                 </span>
                 <span class="flex items-center">
                     <i class="fas fa-envelope w-4 h-4 mr-1 text-gray-400"></i>
-                    {{ $usuario->email ?? '___' }}
+                    {{ $usuario->correo_electronico ?? '___' }}
                 </span>
             </div>
             
@@ -165,7 +168,7 @@
         <!-- Foto URL -->
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-1">URL de la foto</label>
-            <input type="url" name="foto" id="edit_foto" value="{{ $perfil->foto ?? '' }}" 
+            <input type="url" name="foto" id="edit_foto" value="{{ $perfil->foto_perfil ?? '' }}"
                 class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
         </div>
         <!-- Nombre Completo -->
@@ -183,7 +186,7 @@
         <!-- Email -->
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-            <input type="email" name="email" id="edit_email" value="{{ $usuario->email ?? '' }}" 
+            <input type="email" name="email" id="edit_email" value="{{ $usuario->correo_electronico ?? '' }}"
                 class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="usuario@ejemplo.com">
         </div>
@@ -288,8 +291,8 @@ function actualizarVistaPerfil(datos) {
         nombreElement.textContent = datos.nombre + ' ' + datos.apellido;
     }
     const emailElement = document.querySelector('.flex.items-center .fa-envelope')?.parentElement?.querySelector('span:not(.fa-envelope)');
-    if (emailElement && datos.email) {
-        emailElement.textContent = datos.email;
+    if (emailElement && datos.correo_electronico) {
+        emailElement.textContent = datos.correo_electronico;
     }
     // Actualizar biografía en la vista principal
     const bioElement = document.querySelector('.bg-white.rounded-2xl.shadow-sm p.text-gray-600');
@@ -379,10 +382,10 @@ document.getElementById('formEditarPerfil').addEventListener('submit', function(
     const formData = new FormData();
     formData.append('_token', document.querySelector('input[name="_token"]').value);
     formData.append('_method', 'PUT');
-    formData.append('foto', document.getElementById('edit_foto').value);
+    formData.append('foto_perfil', document.getElementById('edit_foto').value);
     formData.append('nombre', document.getElementById('edit_nombre').value);
     formData.append('apellido', document.getElementById('edit_apellido').value);
-    formData.append('email', document.getElementById('edit_email').value);
+    formData.append('correo_electronico', document.getElementById('edit_email').value);
     formData.append('biografia', document.getElementById('edit_biografia').value);
     formData.append('links', JSON.stringify(links));
     

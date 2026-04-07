@@ -6,22 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Perfil extends Model
 {
-    protected $table = 'perfiles';
+    protected $table = 'perfil';
+    protected $primaryKey = 'id_perfil';
 
     protected $fillable = [
-        'user_id',
-        'foto',
+        'id_usuario',
+        'foto_perfil',
         'biografia',
-        'links'
+        'ubicacion'
     ];
 
-    // ✅ Agregar casting para JSON
-    protected $casts = [
-        'links' => 'array',  // Convierte automáticamente array <-> JSON
-    ];
-
-    public function usuario() 
+    public function usuario()
     {
-        return $this->belongsTo(Usuario::class, 'user_id');
+        return $this->belongsTo(Usuario::class, 'id_usuario');
     }
 }

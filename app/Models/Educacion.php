@@ -6,19 +6,26 @@ use Illuminate\Database\Eloquent\Model;
 
 class Educacion extends Model
 {
-    protected $table = 'educaciones';
+    protected $table = 'formacion_academica';
+    protected $primaryKey = 'id_formacion';
 
     protected $fillable = [
-        'usuario_id',
+        'id_perfil',
         'titulo',
         'institucion',
         'nivel',
         'descripcion',
-        'fecha_inicio',
+        'fecha_ini',
         'fecha_fin'
     ];
 
-    public function usuario() {
-        return $this->belongsTo(Usuario::class);
+    protected $casts = [
+        'fecha_ini' => 'date',
+        'fecha_fin' => 'date',
+    ];
+
+    public function perfil()
+    {
+        return $this->belongsTo(Perfil::class, 'id_perfil');
     }
 }

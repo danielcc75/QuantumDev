@@ -96,10 +96,10 @@
                 @php
                     $userId = request('user_id', 3);
                     use Illuminate\Support\Facades\DB;
-                    $usuario = DB::table('usuarios')->where('id', $userId)->first();
-                    $nombreUsuario = $usuario->nombre ?? $usuario->name ?? 'Usuario';
-                    $perfil = DB::table('perfiles')->where('user_id', $userId)->first();
-                    $avatar = $perfil && $perfil->foto ? $perfil->foto : substr($nombreUsuario, 0, 2);
+                    $usuario = DB::table('usuario')->where('id_usuario', $userId)->first();
+                    $nombreUsuario = $usuario->nombre ?? 'Usuario';
+                    $perfil = DB::table('perfil')->where('id_usuario', $userId)->first();
+                    $avatar = $perfil && $perfil->foto_perfil ? $perfil->foto_perfil : substr($nombreUsuario, 0, 2);
                 @endphp
                 
                 <div class="relative dropdown">
@@ -266,19 +266,12 @@
                 ])
             </div>
 
-            <!-- Proyectos (temporalmente igual al perfil mientras lo creas) -->
+            <!-- Proyectos -->
             <div id="seccion-proyectos" class="seccion-contenido">
-                <div class="ml-80 mr-80">
-                    <main class="p-8">
-                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                            <div class="text-center py-12">
-                                <i class="fas fa-folder-open text-6xl text-gray-300 mb-4"></i>
-                                <h3 class="text-xl font-semibold text-gray-700 mb-2">Mis Proyectos</h3>
-                                <p class="text-gray-500">Vista de proyectos - En construcción</p>
-                            </div>
-                        </div>
-                    </main>
-                </div>
+                @include('gestionarPerfil.proyectos', [
+                    'userId' => $userId,
+                    'nombreUsuario' => $nombreUsuario
+                ])
             </div>
 
             <!-- Habilidades (temporalmente igual al perfil mientras las creas) -->

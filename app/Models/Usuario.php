@@ -1,5 +1,4 @@
 <?php
-// app/Models/Usuario.php
 
 namespace App\Models;
 
@@ -7,41 +6,39 @@ use Illuminate\Database\Eloquent\Model;
 
 class Usuario extends Model
 {
-    protected $table = 'usuarios';
+    protected $table = 'usuario';
+    protected $primaryKey = 'id_usuario';
 
     protected $fillable = [
         'nombre',
         'apellido',
-        'email',
+        'correo_electronico',
         'telefono',
-        'password'
+        'contrasenia'
     ];
 
-    // RELACIONES
-    public function perfil() 
+    public function perfil()
     {
-        return $this->hasOne(Perfil::class, 'user_id'); 
+        return $this->hasOne(Perfil::class, 'id_usuario');
     }
 
-    public function proyectos() 
+    public function proyectos()
     {
-        return $this->hasMany(Proyecto::class);
+        return $this->hasManyThrough(Proyecto::class, Perfil::class, 'id_usuario', 'id_perfil', 'id_usuario', 'id_perfil');
     }
 
-    public function educaciones() 
+    public function formacionAcademica()
     {
-        return $this->hasMany(Educacion::class);
+        return $this->hasManyThrough(Educacion::class, Perfil::class, 'id_usuario', 'id_perfil', 'id_usuario', 'id_perfil');
     }
 
-    // ✅ CORREGIDA - Relación con habilidades del usuario
     public function habilidades()
     {
-        return $this->hasMany(UsuarioHabilidad::class, 'user_id')->orderBy('orden');
+        return $this->hasManyThrough(UsuarioHabilidad::class, Perfil::class, 'id_usuario', 'id_perfil', 'id_usuario', 'id_perfil');
     }
 
-    // ✅ NUEVA - Relación con experiencias laborales
     public function experienciasLaborales()
     {
-        return $this->hasMany(ExperienciaLaboral::class, 'user_id')->orderBy('orden');
+        return $this->hasManyThrough(ExperienciaLaboral::class, Perfil::class, 'id_usuario', 'id_perfil', 'id_usuario', 'id_perfil');
     }
 }

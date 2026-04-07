@@ -46,10 +46,10 @@
                         <i class="fas fa-envelope text-gray-400 mr-1"></i>
                         Email *
                     </label>
-                    <input type="email" name="email" value="{{ old('email') }}" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('email') border-red-500 @enderror"
+                    <input type="email" name="correo_electronico" value="{{ old('correo_electronico') }}" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('correo_electronico') border-red-500 @enderror"
                         placeholder="usuario@ejemplo.com">
-                    @error('email')
+                    @error('correo_electronico')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -69,10 +69,10 @@
                         <i class="fas fa-lock text-gray-400 mr-1"></i>
                         Contraseña *
                     </label>
-                    <input type="password" name="password" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('password') border-red-500 @enderror"
+                    <input type="password" name="contrasenia" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('contrasenia') border-red-500 @enderror"
                         placeholder="Mínimo 6 caracteres">
-                    @error('password')
+                    @error('contrasenia')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>

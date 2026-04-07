@@ -7,18 +7,28 @@ use Illuminate\Database\Eloquent\Model;
 class Proyecto extends Model
 {
     protected $table = 'proyectos';
+    protected $primaryKey = 'id_proyecto';
 
     protected $fillable = [
-        'user_id',
-        'titulo',
-        'institucion',
-        'nivel',
+        'id_perfil',
+        'nombre',
         'descripcion',
-        'fecha_inicio',
-        'fecha_fin'
+        'url_link',
+        'referencias',
+        'fecha_ini',
+        'fecha_fin',
+        'estado',
+        'tecnologias',
+        'visible'
     ];
 
-    public function usuario() {
-        return $this->belongsTo(Usuario::class, 'user_id');
+    protected $casts = [
+        'fecha_ini' => 'date',
+        'fecha_fin' => 'date',
+    ];
+
+    public function perfil()
+    {
+        return $this->belongsTo(Perfil::class, 'id_perfil');
     }
 }
