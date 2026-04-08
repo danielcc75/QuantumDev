@@ -6,8 +6,14 @@ use Illuminate\Support\Facades\Route;
 
 // Ruta principal
 Route::get('/', function () {
-    return view('welcome');
+    return view('home.welcome');
 });
+
+// Rutas de autenticación
+Route::post('/login', [UsuarioWebController::class, 'login'])->name('login.store');
+Route::post('/register', [UsuarioWebController::class, 'store'])->name('register.store');
+Route::post('/logout', [UsuarioWebController::class, 'logout'])->name('logout');
+Route::get('/dashboard', [UsuarioWebController::class, 'dashboard'])->name('dashboard');
 
 // ==========================================
 // GESTIÓN DE USUARIOS - RUTAS WEB
@@ -38,9 +44,6 @@ Route::delete('/usuarios/{id}', [UsuarioWebController::class, 'destroy'])->name(
 Route::get('/usuarios/{id}/perfil', [UsuarioWebController::class, 'editPerfil'])->name('usuarios.perfil');
 Route::put('/usuarios/{id}/perfil', [UsuarioWebController::class, 'updatePerfil'])->name('usuarios.updatePerfil');
 Route::post('/usuarios/{id}/perfil', [UsuarioWebController::class, 'updatePerfil']);
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
 
 // CRUD Proyectos (usado por AJAX desde el dashboard)
 Route::get('/proyectos',         [ProyectoController::class, 'index'])->name('proyectos.index');
