@@ -38,12 +38,13 @@ Route::delete('/usuarios/{id}', [UsuarioWebController::class, 'destroy'])->name(
 Route::get('/usuarios/{id}/perfil', [UsuarioWebController::class, 'editPerfil'])->name('usuarios.perfil');
 Route::put('/usuarios/{id}/perfil', [UsuarioWebController::class, 'updatePerfil'])->name('usuarios.updatePerfil');
 Route::post('/usuarios/{id}/perfil', [UsuarioWebController::class, 'updatePerfil']);
-Route::get('/', function () {
+Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
 
 // CRUD Proyectos (usado por AJAX desde el dashboard)
-Route::get('/proyectos/{id}',    [ProyectoController::class, 'show']);
-Route::post('/proyectos',        [ProyectoController::class, 'store']);
-Route::put('/proyectos/{id}',    [ProyectoController::class, 'update']);
-Route::delete('/proyectos/{id}', [ProyectoController::class, 'destroy']);
+Route::get('/proyectos',         [ProyectoController::class, 'index'])->name('proyectos.index');
+Route::get('/proyectos/{id}',    [ProyectoController::class, 'show'])->name('proyectos.show');
+Route::post('/proyectos',        [ProyectoController::class, 'store'])->name('proyectos.store');
+Route::put('/proyectos/{id}',    [ProyectoController::class, 'update'])->name('proyectos.update');
+Route::delete('/proyectos/{id}', [ProyectoController::class, 'destroy'])->name('proyectos.destroy');

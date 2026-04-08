@@ -396,7 +396,7 @@ document.getElementById('formEditarPerfil').addEventListener('submit', function(
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success || response.ok) {
+        if (data.success) {
             // Cerrar modal
             cerrarModalEditar();
             

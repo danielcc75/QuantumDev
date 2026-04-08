@@ -14,7 +14,8 @@ class Usuario extends Model
         'apellido',
         'correo_electronico',
         'telefono',
-        'contrasenia'
+        'contrasenia',
+        'estado'
     ];
 
     public function perfil()
