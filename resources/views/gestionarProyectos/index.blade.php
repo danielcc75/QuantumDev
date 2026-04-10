@@ -46,23 +46,21 @@
         ])
 
         {{-- Grid de tarjetas --}}
-        @if($proyectos->isEmpty())
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
-                <i class="fas fa-folder-open text-5xl text-gray-300 mb-4"></i>
-                <p class="text-gray-500 font-medium">No tienes proyectos registrados aún</p>
-                <button onclick="abrirModalProyecto()"
-                    class="mt-4 text-sm text-blue-600 hover:underline">+ Agregar tu primer proyecto</button>
-            </div>
-        @else
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                @foreach($proyectos as $proyecto)
-                    @include('gestionarProyectos._card', [
-                        'proyecto'    => $proyecto,
-                        'estadoBadge' => $estadoBadge,
-                    ])
-                @endforeach
-            </div>
-        @endif
+        <div id="empty-state" class="{{ $proyectos->isEmpty() ? '' : 'hidden' }} bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
+            <i class="fas fa-folder-open text-5xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500 font-medium">No tienes proyectos registrados aún</p>
+            <button onclick="abrirModalProyecto()"
+                class="mt-4 text-sm text-blue-600 hover:underline">+ Agregar tu primer proyecto</button>
+        </div>
+
+        <div id="proyectos-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 {{ $proyectos->isEmpty() ? 'hidden' : '' }}">
+            @foreach($proyectos as $proyecto)
+                @include('gestionarProyectos._card', [
+                    'proyecto'    => $proyecto,
+                    'estadoBadge' => $estadoBadge,
+                ])
+            @endforeach
+        </div>
 
     </main>
 </div>

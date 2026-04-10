@@ -8,7 +8,7 @@
             <p class="text-sm text-gray-500">Total Proyectos</p>
             <i class="fas fa-folder text-gray-300 text-xl"></i>
         </div>
-        <p class="text-4xl font-bold text-gray-800">{{ $totalProyectos }}</p>
+        <p id="stat-total" class="text-4xl font-bold text-gray-800">{{ $totalProyectos }}</p>
         <p class="text-xs text-gray-400 mt-1">Todos los registrados</p>
     </div>
 
@@ -17,7 +17,7 @@
             <p class="text-sm text-blue-600 font-medium">En Curso</p>
             <div class="w-4 h-4 rounded-full bg-blue-500"></div>
         </div>
-        <p class="text-4xl font-bold text-gray-800">{{ $enCurso }}</p>
+        <p id="stat-en-curso" class="text-4xl font-bold text-gray-800">{{ $enCurso }}</p>
         <p class="text-xs text-blue-500 mt-1">Actualmente trabajando</p>
     </div>
 
@@ -26,7 +26,7 @@
             <p class="text-sm text-purple-600 font-medium">Finalizados</p>
             <i class="fas fa-check-circle text-purple-400 text-xl"></i>
         </div>
-        <p class="text-4xl font-bold text-gray-800">{{ $finalizados }}</p>
+        <p id="stat-finalizados" class="text-4xl font-bold text-gray-800">{{ $finalizados }}</p>
         <p class="text-xs text-purple-500 mt-1">Proyectos completados</p>
     </div>
 

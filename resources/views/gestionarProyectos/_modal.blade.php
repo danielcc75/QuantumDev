@@ -1,93 +1,208 @@
 {{-- resources/views/gestionarProyectos/_modal.blade.php
-     Modal compartido para crear y editar proyectos. --}}
+     Modal crear / editar proyectos con diseño tipo página completa dentro de overlay. --}}
 
-<div id="modalProyecto" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+{{-- ── Modal de Confirmación ─────────────────────────────────────────────── --}}
+<div id="modalConfirmacion" class="fixed inset-0 bg-black bg-opacity-60 z-[60] hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in">
 
-        <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex justify-between items-center">
-            <h3 id="modalProyectoTitulo" class="text-lg font-semibold text-gray-800">Nuevo Proyecto</h3>
-            <button onclick="cerrarModalProyecto()" class="text-gray-400 hover:text-gray-600">
-                <i class="fas fa-times text-lg"></i>
-            </button>
+        {{-- Icono + contenido --}}
+        <div class="p-6 text-center">
+            <div id="confirmIconWrapper"
+                class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i id="confirmIcon" class="text-2xl"></i>
+            </div>
+            <h4 id="confirmTitulo" class="text-lg font-bold text-gray-800 mb-2"></h4>
+            <p id="confirmMensaje" class="text-sm text-gray-500 leading-relaxed"></p>
         </div>
 
-        <form id="formProyecto" class="p-6 space-y-4">
+        {{-- Acciones --}}
+        <div class="flex gap-3 px-6 pb-6">
+            <button type="button" onclick="cerrarConfirmacion()"
+                class="flex-1 px-4 py-2.5 text-sm border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition font-medium">
+                No, cancelar
+            </button>
+            <button type="button" id="confirmBtn"
+                class="flex-1 px-4 py-2.5 text-sm text-white rounded-xl font-medium transition">
+                Confirmar
+            </button>
+        </div>
+    </div>
+</div>
+
+{{-- ── Modal Proyecto ───────────────────────────────────────────────────────── --}}
+<div id="modalProyecto" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+    <div class="bg-[#f0f4f8] rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh] overflow-y-auto flex flex-col">
+
+        {{-- Header --}}
+        <div class="bg-[#1e3a5f] text-white px-8 py-5 flex items-center justify-between rounded-t-2xl sticky top-0 z-10">
+            <div class="flex items-center gap-4">
+                <button type="button" onclick="confirmarCancelar()" class="text-white hover:text-blue-200 transition">
+                    <i class="fas fa-arrow-left text-lg"></i>
+                </button>
+                <div>
+                    <h3 id="modalProyectoTitulo" class="text-xl font-bold">Crear Nuevo Proyecto</h3>
+                    <p class="text-blue-200 text-xs mt-0.5">Completa la información de tu proyecto</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button type="button" onclick="confirmarCancelar()"
+                    class="px-4 py-2 text-sm border border-white/30 text-white rounded-lg hover:bg-white/10 transition">
+                    Cancelar
+                </button>
+                <button type="button" onclick="confirmarGuardar()"
+                    class="flex items-center gap-2 px-4 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition">
+                    <i class="fas fa-save text-xs"></i> Guardar Proyecto
+                </button>
+            </div>
+        </div>
+
+        {{-- Body --}}
+        <form id="formProyecto" class="p-6 grid grid-cols-2 gap-5">
             @csrf
             <input type="hidden" id="proyectoId" value="">
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del proyecto *</label>
-                <input type="text" id="proj_nombre" required
-                    class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                    placeholder="Ej: Sistema de inventario">
-            </div>
+            {{-- Columna Izquierda --}}
+            <div class="flex flex-col gap-5">
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-                <textarea id="proj_descripcion" rows="3"
-                    class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                    placeholder="Describe brevemente el proyecto..."></textarea>
-            </div>
+                {{-- Información Básica --}}
+                <div class="bg-white rounded-2xl p-5 shadow-sm">
+                    <h4 class="font-semibold text-gray-800 text-sm mb-0.5">Información Básica</h4>
+                    <p class="text-xs text-blue-500 mb-4">Datos principales de tu proyecto</p>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha inicio *</label>
-                    <input type="date" id="proj_fecha_ini" required
-                        class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+                    <div class="mb-4">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">
+                            Nombre del Proyecto <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="proj_nombre" required
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            placeholder="Ej: Sistema de Gestión de Inventario">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Descripción</label>
+                        <textarea id="proj_descripcion" rows="3"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                            placeholder="Describe brevemente el proyecto y su objetivo principal..."></textarea>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha fin</label>
-                    <input type="date" id="proj_fecha_fin"
-                        class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+
+                {{-- Tecnologías --}}
+                <div class="bg-white rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center gap-2 mb-0.5">
+                        <i class="fas fa-code text-blue-500 text-sm"></i>
+                        <h4 class="font-semibold text-gray-800 text-sm">Tecnologías Utilizadas</h4>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-4">Agrega las tecnologías, lenguajes y frameworks que usaste</p>
+
+                    <div class="flex gap-2 mb-2">
+                        <input type="text" id="proj_tecnologia_input"
+                            class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            placeholder="Ej: React, Node.js, MongoDB">
+                        <button type="button" onclick="agregarTecnologia()"
+                            class="w-9 h-9 flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition">
+                            <i class="fas fa-plus text-xs"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-3">Presiona Enter o haz clic en + para agregar cada tecnología</p>
+
+                    <div id="proj_tags" class="flex flex-wrap gap-2"></div>
+                    <input type="hidden" id="proj_tecnologias">
                 </div>
+
+                {{-- Estado y Visibilidad --}}
+                <div class="bg-white rounded-2xl p-5 shadow-sm">
+                    <h4 class="font-semibold text-gray-800 text-sm mb-0.5">Estado y Visibilidad</h4>
+                    <p class="text-xs text-gray-400 mb-4">Configura el estado actual y quién puede ver este proyecto</p>
+
+                    <div class="mb-4">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Estado del Proyecto</label>
+                        <div class="relative">
+                            <select id="proj_estado"
+                                class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 appearance-none bg-white pr-8">
+                                <option value="pendiente">Pendiente</option>
+                                <option value="en_progreso" selected>En Curso</option>
+                                <option value="completado">Completado</option>
+                                <option value="cancelado">Cancelado</option>
+                            </select>
+                            <i class="fas fa-chevron-down text-gray-400 text-xs absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-eye text-blue-500 text-sm"></i>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Proyecto Público</p>
+                                <p class="text-xs text-gray-400">Visible en tu portafolio público</p>
+                            </div>
+                        </div>
+                        <button type="button" id="toggleVisible" onclick="toggleVisibleModal()"
+                            data-on="1"
+                            class="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-500 transition-colors">
+                            <span id="toggleThumb" class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform translate-x-6"></span>
+                        </button>
+                        <input type="hidden" id="proj_visible" value="1">
+                    </div>
+                </div>
+
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                <select id="proj_estado"
-                    class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
-                    <option value="pendiente">Pendiente</option>
-                    <option value="en_progreso">En progreso</option>
-                    <option value="completado">Completado</option>
-                    <option value="cancelado">Cancelado</option>
-                </select>
-            </div>
+            {{-- Columna Derecha --}}
+            <div class="flex flex-col gap-5">
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tecnologías</label>
-                <input type="text" id="proj_tecnologias"
-                    class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                    placeholder="React, Node.js, PostgreSQL (separadas por coma)">
-            </div>
+                {{-- Enlace del Proyecto --}}
+                <div class="bg-white rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center gap-2 mb-1">
+                        <i class="fas fa-globe text-red-400 text-sm"></i>
+                        <h4 class="font-semibold text-gray-800 text-sm">Enlace del Proyecto</h4>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-4">URL de la página web o aplicación desarrollada para la empresa o institución</p>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">URL demo / repositorio</label>
-                <input type="url" id="proj_url_link"
-                    class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                    placeholder="https://...">
-            </div>
+                    <label class="flex items-center gap-1 text-xs font-medium text-gray-700 mb-1">
+                        <i class="fas fa-globe text-red-400 text-xs"></i> URL del Proyecto Desplegado
+                    </label>
+                    <input type="url" id="proj_url_link"
+                        class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        placeholder="https://proyecto-cliente.com">
+                    <p class="text-xs text-gray-400 mt-1">Enlace a la aplicación o sitio web en producción desarrollada para el cliente</p>
+                </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Referencias / notas</label>
-                <input type="text" id="proj_referencias"
-                    class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                    placeholder="Links o notas adicionales">
-            </div>
+                {{-- Referencias --}}
+                <div class="bg-white rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center gap-2 mb-1">
+                        <i class="fas fa-user-friends text-red-400 text-sm"></i>
+                        <h4 class="font-semibold text-gray-800 text-sm">Referencias del Proyecto</h4>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-4">Información sobre personas que pueden dar referencias sobre este proyecto</p>
 
-            <div class="flex items-center gap-3">
-                <label class="text-sm font-medium text-gray-700">Visible al público</label>
-                <input type="checkbox" id="proj_visible" checked class="w-4 h-4 accent-blue-500">
-            </div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Referencias</label>
+                    <textarea id="proj_referencias" rows="4"
+                        class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                        placeholder="Ej: Juan Pérez - Supervisor de Proyecto&#10;Email: juan@ejemplo.com&#10;Teléfono: +123456789"></textarea>
+                    <p class="text-xs text-gray-400 mt-1">Nombre, cargo, email y teléfono de las personas que pueden dar referencias</p>
+                </div>
 
-            <div class="flex justify-end gap-3 pt-2 border-t border-gray-100">
-                <button type="button" onclick="cerrarModalProyecto()"
-                    class="px-4 py-2 text-sm border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50">
-                    Cancelar
-                </button>
-                <button type="submit"
-                    class="px-4 py-2 text-sm bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition">
-                    Guardar
-                </button>
+                {{-- Cronograma --}}
+                <div class="bg-white rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center gap-2 mb-1">
+                        <i class="fas fa-calendar-alt text-blue-400 text-sm"></i>
+                        <h4 class="font-semibold text-gray-800 text-sm">Cronograma</h4>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-4">Define las fechas de inicio y finalización</p>
+
+                    <div class="mb-3">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Fecha de Inicio</label>
+                        <input type="date" id="proj_fecha_ini" required
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Fecha de Finalización</label>
+                        <input type="date" id="proj_fecha_fin"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                </div>
+
             </div>
         </form>
 

@@ -13,7 +13,9 @@
         : 'Presente';
 @endphp
 
-<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3"
+     data-proyecto-id="{{ $proyecto->id_proyecto }}"
+     data-estado="{{ $proyecto->estado }}">
 
     {{-- Nombre + estado --}}
     <div class="flex items-center justify-between gap-2">
