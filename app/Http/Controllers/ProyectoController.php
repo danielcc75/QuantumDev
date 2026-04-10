@@ -54,6 +54,18 @@ class ProyectoController extends Controller
     {
         $proyecto = Proyecto::findOrFail($id);
 
+        $request->validate([
+            'nombre'      => 'sometimes|string|max:100',
+            'descripcion' => 'nullable|string',
+            'url_link'    => 'nullable|url',
+            'referencias' => 'nullable|string',
+            'tecnologias' => 'nullable|string',
+            'fecha_ini'   => 'nullable|date',
+            'fecha_fin'   => 'nullable|date|after_or_equal:fecha_ini',
+            'estado'      => 'nullable|in:pendiente,en_progreso,completado,cancelado',
+            'visible'     => 'nullable|boolean',
+        ]);
+
         $data = $request->only([
             'nombre', 'descripcion', 'url_link', 'referencias',
             'tecnologias', 'fecha_ini', 'fecha_fin', 'estado', 'visible'

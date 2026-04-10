@@ -41,6 +41,12 @@ function formatFecha(str) {
     return `${String(d.getDate()).padStart(2,'0')} ${MESES[d.getMonth()]} ${d.getFullYear()}`;
 }
 
+// Extrae la parte YYYY-MM-DD de cualquier formato de fecha que devuelva Laravel
+function toInputDate(str) {
+    if (!str) return '';
+    return String(str).substring(0, 10);
+}
+
 function buildCardHTML(p) {
     const badge    = ESTADO_BADGE[p.estado] ?? { label: p.estado, cls: 'bg-gray-100 text-gray-600' };
     const tags     = p.tecnologias ? p.tecnologias.split(',').map(t => t.trim()).filter(Boolean) : [];
@@ -187,8 +193,39 @@ document.getElementById('modalConfirmacion').addEventListener('click', function(
 function confirmarGuardar() {
     const nombre   = document.getElementById('proj_nombre').value.trim();
     const fechaIni = document.getElementById('proj_fecha_ini').value;
-    if (!nombre)   { resaltarError('proj_nombre',    'El nombre del proyecto es obligatorio.'); return; }
-    if (!fechaIni) { resaltarError('proj_fecha_ini', 'La fecha de inicio es obligatoria.');     return; }
+    const fechaFin = document.getElementById('proj_fecha_fin').value;
+    const urlLink  = document.getElementById('proj_url_link').value.trim();
+
+    // Nombre obligatorio y máx. 100 caracteres
+    if (!nombre) {
+        resaltarError('proj_nombre', 'El nombre del proyecto es obligatorio.');
+        return;
+    }
+    if (nombre.length > 100) {
+        resaltarError('proj_nombre', 'El nombre no puede superar los 100 caracteres.');
+        return;
+    }
+
+    // Fecha de inicio obligatoria
+    if (!fechaIni) {
+        resaltarError('proj_fecha_ini', 'La fecha de inicio es obligatoria.');
+        return;
+    }
+
+    // Fecha de finalización no puede ser anterior a inicio
+    if (fechaFin && fechaFin < fechaIni) {
+        resaltarError('proj_fecha_fin', 'La fecha de finalización no puede ser anterior a la de inicio.');
+        return;
+    }
+
+    // URL válida (si se proporcionó)
+    if (urlLink) {
+        try { new URL(urlLink); } catch (_) {
+            resaltarError('proj_url_link', 'Ingresa una URL válida (ej: https://miproyecto.com).');
+            return;
+        }
+    }
+
     mostrarConfirmacion('guardar');
 }
 
@@ -269,6 +306,45 @@ document.getElementById('proj_tecnologia_input').addEventListener('keydown', fun
     if (e.key === 'Enter') { e.preventDefault(); agregarTecnologia(); }
 });
 
+// ── Validación en tiempo real de URL ─────────────────────────────────────────
+
+document.getElementById('proj_url_link').addEventListener('input', function() {
+    const val    = this.value.trim();
+    const status = document.getElementById('url_status');
+    const hint   = document.getElementById('url_hint');
+    const input  = this;
+
+    if (!val) {
+        // Campo vacío → estado neutro
+        status.classList.add('hidden');
+        input.classList.remove('border-green-400', 'border-red-400', 'ring-2', 'ring-green-200', 'ring-red-200');
+        input.classList.add('border-gray-200');
+        hint.textContent = 'Enlace a la aplicación o sitio web en producción desarrollada para el cliente';
+        hint.className   = 'text-xs text-gray-400 mt-1';
+        return;
+    }
+
+    let valid = false;
+    try { new URL(val); valid = true; } catch (_) {}
+
+    status.classList.remove('hidden');
+    input.classList.remove('border-gray-200', 'border-green-400', 'border-red-400', 'ring-green-200', 'ring-red-200');
+    input.classList.add('ring-2');
+
+    if (valid) {
+        status.innerHTML  = '<i class="fas fa-check-circle text-green-500"></i>';
+        input.classList.add('border-green-400', 'ring-green-200');
+        hint.textContent = '✓ URL válida';
+        hint.className   = 'text-xs text-green-600 mt-1 font-medium';
+    } else {
+        status.innerHTML  = '<i class="fas fa-times-circle text-red-400"></i>';
+        input.classList.add('border-red-400', 'ring-red-200');
+        hint.textContent = 'URL no válida. Debe comenzar con https:// o http://';
+        hint.className   = 'text-xs text-red-500 mt-1';
+    }
+});
+
+
 // ── Toggle visible en modal ───────────────────────────────────────────────────
 
 function toggleVisibleModal() {
@@ -305,6 +381,17 @@ function resetToggle(on) {
     document.getElementById('proj_visible').value = on ? '1' : '0';
 }
 
+function resetUrlStatus() {
+    const input  = document.getElementById('proj_url_link');
+    const status = document.getElementById('url_status');
+    const hint   = document.getElementById('url_hint');
+    input.classList.remove('border-green-400', 'border-red-400', 'ring-2', 'ring-green-200', 'ring-red-200');
+    input.classList.add('border-gray-200');
+    status.classList.add('hidden');
+    hint.textContent = 'Enlace a la aplicación o sitio web en producción desarrollada para el cliente';
+    hint.className   = 'text-xs text-gray-400 mt-1';
+}
+
 function abrirModalProyecto() {
     document.getElementById('proyectoId').value = '';
     document.getElementById('formProyecto').reset();
@@ -313,6 +400,7 @@ function abrirModalProyecto() {
     document.getElementById('proj_tecnologia_input').value = '';
     document.getElementById('modalProyectoTitulo').textContent = 'Crear Nuevo Proyecto';
     resetToggle(true);
+    resetUrlStatus();
     document.getElementById('modalProyecto').classList.remove('hidden');
     document.getElementById('modalProyecto').classList.add('flex');
 }
@@ -335,10 +423,12 @@ function ejecutarAbrirEditar(id) {
             document.getElementById('proyectoId').value       = p.id_proyecto;
             document.getElementById('proj_nombre').value      = p.nombre       ?? '';
             document.getElementById('proj_descripcion').value = p.descripcion  ?? '';
-            document.getElementById('proj_fecha_ini').value   = p.fecha_ini    ?? '';
-            document.getElementById('proj_fecha_fin').value   = p.fecha_fin    ?? '';
+            document.getElementById('proj_fecha_ini').value   = toInputDate(p.fecha_ini);
+            document.getElementById('proj_fecha_fin').value   = toInputDate(p.fecha_fin);
             document.getElementById('proj_estado').value      = p.estado       ?? 'pendiente';
-            document.getElementById('proj_url_link').value    = p.url_link     ?? '';
+            const urlInput = document.getElementById('proj_url_link');
+            urlInput.value = p.url_link ?? '';
+            urlInput.dispatchEvent(new Event('input')); // activa el indicador visual
             document.getElementById('proj_referencias').value = p.referencias  ?? '';
             document.getElementById('proj_tecnologia_input').value = '';
             setTags(p.tecnologias ? p.tecnologias.split(',').map(t => t.trim()).filter(Boolean) : []);
@@ -365,18 +455,27 @@ function submitProyecto() {
             user_id:     USER_ID,
             nombre:      document.getElementById('proj_nombre').value.trim(),
             descripcion: document.getElementById('proj_descripcion').value,
-            fecha_ini:   document.getElementById('proj_fecha_ini').value,
-            fecha_fin:   document.getElementById('proj_fecha_fin').value,
+            fecha_ini:   document.getElementById('proj_fecha_ini').value || null,
+            fecha_fin:   document.getElementById('proj_fecha_fin').value || null,
             estado:      document.getElementById('proj_estado').value,
             tecnologias: document.getElementById('proj_tecnologias').value,
-            url_link:    document.getElementById('proj_url_link').value,
+            url_link:    document.getElementById('proj_url_link').value.trim() || null,
             referencias: document.getElementById('proj_referencias').value,
             visible:     parseInt(document.getElementById('proj_visible').value),
         })
     })
-    .then(r => r.json())
+    .then(r => {
+        if (r.status === 422) {
+            return r.json().then(err => {
+                const msgs = err.errors ? Object.values(err.errors).flat() : [err.message ?? 'Error de validación'];
+                resaltarError('proj_nombre', msgs[0]);
+                throw new Error('validation');
+            });
+        }
+        return r.json();
+    })
     .then(data => {
-        if (!data.success) { alert(data.message ?? 'Error al guardar'); return; }
+        if (!data || !data.success) { alert(data?.message ?? 'Error al guardar'); return; }
 
         cerrarModalProyecto();
         const p        = data.proyecto;
