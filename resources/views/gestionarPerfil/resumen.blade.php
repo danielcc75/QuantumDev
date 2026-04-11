@@ -43,37 +43,101 @@
         </div>
 
         <!-- Proyectos recientes -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
-            <h3 class="font-semibold text-gray-800 mb-4">Proyectos recientes</h3>
-            <div class="space-y-4">
-                @php
-                    $proyectosRecientes = $perfilId ? DB::table('proyectos')
-                        ->where('id_perfil', $perfilId)
-                        ->orderBy('created_at', 'desc')
-                        ->limit(3)
-                        ->get() : collect();
-                @endphp
-                
-                @forelse($proyectosRecientes as $proyecto)
-                <div class="flex justify-between items-center py-3 border-b border-gray-100 last:border-0">
-                    <div>
-                        <p class="font-medium text-gray-800">{{ $proyecto->nombre }}</p>
-                        <div class="flex space-x-3 text-xs text-gray-500 mt-1">
-                            <span><i class="fas fa-circle mr-1"></i>{{ $proyecto->estado }}</span>
+        @php
+            $proyectosRecientes = $perfilId ? DB::table('proyectos')
+                ->where('id_perfil', $perfilId)
+                ->orderBy('created_at', 'desc')
+                ->limit(3)
+                ->get() : collect();
+
+            $estadoConfig = [
+                'en_progreso' => ['label' => 'En curso',   'icon' => 'fa-spinner',      'bg' => 'bg-[#1e3a5f]/10', 'text' => 'text-[#1e3a5f]'],
+                'completado'  => ['label' => 'Finalizado', 'icon' => 'fa-check-circle', 'bg' => 'bg-indigo-100',   'text' => 'text-indigo-700'],
+                'pendiente'   => ['label' => 'Pendiente',  'icon' => 'fa-clock',        'bg' => 'bg-gray-100',     'text' => 'text-gray-600'],
+                'cancelado'   => ['label' => 'Cancelado',  'icon' => 'fa-times-circle', 'bg' => 'bg-red-100',      'text' => 'text-[#e11d48]'],
+            ];
+
+            $accentColors = [
+                'bg-[#1e3a5f]',
+                'bg-[#e11d48]',
+                'bg-indigo-600',
+            ];
+        @endphp
+
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-[#1e3a5f]">Proyectos recientes</h3>
+                    <div class="h-0.5 w-10 bg-[#e11d48] rounded-full mt-1"></div>
+                </div>
+                <span class="text-xs text-gray-400">Últimos {{ $proyectosRecientes->count() }} registros</span>
+            </div>
+
+            @if($proyectosRecientes->isEmpty())
+                <div class="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center">
+                    <div class="w-14 h-14 rounded-full bg-[#1e3a5f]/8 flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-folder-open text-2xl text-[#1e3a5f]/40"></i>
+                    </div>
+                    <p class="text-gray-500 font-medium text-sm">No hay proyectos registrados</p>
+                </div>
+            @else
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    @foreach($proyectosRecientes as $i => $proyecto)
+                    @php
+                        $cfg    = $estadoConfig[$proyecto->estado] ?? $estadoConfig['pendiente'];
+                        $accent = $accentColors[$i % count($accentColors)];
+                        $tags   = $proyecto->tecnologias
+                            ? array_slice(array_filter(array_map('trim', explode(',', $proyecto->tecnologias))), 0, 3)
+                            : [];
+                    @endphp
+                    <div class="bg-white rounded-2xl border border-gray-100 shadow-md hover:-translate-y-1 hover:shadow-xl transition-all duration-200 overflow-hidden flex flex-col">
+
+                        {{-- Franja de color superior --}}
+                        <div class="h-1.5 w-full {{ $accent }}"></div>
+
+                        <div class="p-5 flex flex-col gap-3 flex-1">
+
+                            {{-- Ícono + nombre --}}
+                            <div class="flex items-start gap-3">
+                                <div class="w-9 h-9 rounded-xl {{ $accent }} flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-code-branch text-white text-sm"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="font-semibold text-[#1e3a5f] text-sm leading-snug line-clamp-1">{{ $proyecto->nombre }}</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        {{ \Carbon\Carbon::parse($proyecto->fecha_ini)->format('d M Y') }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {{-- Descripción --}}
+                            <p class="text-xs text-gray-500 leading-relaxed line-clamp-2">
+                                {{ $proyecto->descripcion ?? 'Sin descripción' }}
+                            </p>
+
+                            {{-- Tags tecnologías --}}
+                            @if(count($tags))
+                            <div class="flex flex-wrap gap-1">
+                                @foreach($tags as $tag)
+                                <span class="text-xs bg-[#1e3a5f]/5 text-[#1e3a5f] border border-[#1e3a5f]/15 px-2 py-0.5 rounded-md font-medium">{{ $tag }}</span>
+                                @endforeach
+                            </div>
+                            @endif
+
+                            {{-- Badge estado --}}
+                            <div class="mt-auto pt-3 border-t border-gray-100">
+                                <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full {{ $cfg['bg'] }} {{ $cfg['text'] }}">
+                                    <i class="fas {{ $cfg['icon'] }} text-xs"></i>
+                                    {{ $cfg['label'] }}
+                                </span>
+                            </div>
+
                         </div>
                     </div>
-                    <div class="text-right text-sm">
-                        <p class="text-gray-600">{{ \Carbon\Carbon::parse($proyecto->fecha_ini)->format('Y') }}</p>
-                        <p class="text-gray-400 text-xs">{{ $proyecto->descripcion ? substr($proyecto->descripcion, 0, 50) : 'Sin descripción' }}</p>
-                    </div>
+                    @endforeach
                 </div>
-                @empty
-                    <div class="text-center py-8 text-gray-500">
-                        <i class="fas fa-folder-open text-4xl mb-2"></i>
-                        <p>No hay proyectos registrados</p>
-                    </div>
-                @endforelse
-            </div>
+            @endif
         </div>
 
         <!-- Habilidades técnicas -->

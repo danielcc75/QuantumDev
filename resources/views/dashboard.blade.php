@@ -74,39 +74,69 @@
 
     @php
         $nombreUsuario = trim(($usuario->nombre ?? '') . ' ' . ($usuario->apellido ?? ''));
-        $iniciales = strtoupper(substr($usuario->nombre ?? 'U', 0, 2));
+        $iniciales     = strtoupper(substr($usuario->nombre ?? 'U', 0, 2));
+
+        // ── Cálculo de progreso del perfil ────────────────────────────────────
+        $perfilDash   = DB::table('perfil')->where('id_usuario', $usuario->id_usuario)->first();
+        $perfilIdDash = $perfilDash->id_perfil ?? null;
+
+        $progreso = 0;
+        if ($perfilDash)                                                              $progreso += 20; // perfil creado
+        if (!empty($perfilDash?->foto_perfil))                                        $progreso += 20; // foto
+        if (!empty($perfilDash?->biografia))                                          $progreso += 20; // bio
+        if (!empty($perfilDash?->ubicacion))                                          $progreso += 15; // ubicación
+        if ($perfilIdDash && DB::table('proyectos')->where('id_perfil', $perfilIdDash)->exists())   $progreso += 15; // proyectos
+        if ($perfilIdDash && DB::table('habilidades')->where('id_perfil', $perfilIdDash)->exists()) $progreso += 10; // habilidades
+
+        $progresoColor = $progreso < 40 ? '#e11d48' : ($progreso < 75 ? '#f59e0b' : '#1e3a5f');
+        $progresoLabel = $progreso < 40 ? 'Perfil incompleto' : ($progreso < 75 ? 'Perfil en progreso' : 'Perfil casi completo');
     @endphp
 
     <!-- barra superior -->
     <header class="bg-white shadow-md sticky top-0 z-20">
-        <div class="flex justify-between items-center px-8 py-4">
+        <div class="flex justify-between items-center px-8 py-4 gap-6">
 
-            <!-- logo estilo home -->
-            <a href="{{ url('/') }}" class="flex items-center gap-3 transition-all-soft hover-scale">
+            <!-- logo -->
+            <a href="{{ url('/') }}" class="flex items-center gap-3 transition-all-soft hover-scale flex-shrink-0">
                 <img src="/logo.png" class="h-10 md:h-11" alt="Logo">
-
                 <div class="flex flex-col leading-none">
-                    <span class="font-bold text-blue-900 text-lg">
-                        Portafolio
-                    </span>
-                    <span class="text-pink-400 font-semibold text-base -mt-2">
-                        Digital
-                    </span>
+                    <span class="font-bold text-[#1e3a5f] text-lg">Portafolio</span>
+                    <span class="text-[#e11d48] font-semibold text-base -mt-2">Digital</span>
                 </div>
             </a>
 
+            <!-- buscador central -->
+            <div class="flex-1 max-w-md relative">
+                <div class="flex items-center bg-gray-100 rounded-xl px-4 py-2 gap-2 focus-within:ring-2 focus-within:ring-[#1e3a5f]/30 focus-within:bg-white transition-all border border-transparent focus-within:border-[#1e3a5f]/20">
+                    <i class="fas fa-search text-gray-400 text-sm flex-shrink-0"></i>
+                    <input
+                        id="buscador-global"
+                        type="text"
+                        placeholder="Buscar proyectos..."
+                        class="bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none w-full"
+                    >
+                    <button id="buscador-clear" onclick="limpiarBusqueda()" class="hidden text-gray-400 hover:text-gray-600 transition">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                </div>
+                <!-- resultados -->
+                <div id="buscador-resultados"
+                    class="hidden absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-lg border border-gray-100 z-40 overflow-hidden max-h-72 overflow-y-auto">
+                </div>
+            </div>
+
             <!-- derecha -->
-            <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-6 flex-shrink-0">
 
                 <!-- campana -->
                 <div class="relative dropdown">
-                    <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <button class="text-gray-500 hover:text-[#1e3a5f] focus:outline-none transition-colors">
                         <i class="fas fa-bell text-xl"></i>
-                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-[#e11d48] rounded-full"></span>
                     </button>
                     <div class="dropdown-menu hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-100 z-30">
                         <div class="p-3 border-b border-gray-100">
-                            <p class="font-semibold text-gray-800">Notificaciones</p>
+                            <p class="font-semibold text-[#1e3a5f]">Notificaciones</p>
                         </div>
                         <div class="max-h-96 overflow-y-auto">
                             <div class="p-3 hover:bg-gray-50 border-b border-gray-100">
@@ -124,7 +154,7 @@
                 <!-- usuario -->
                 <div class="relative dropdown">
                     <button class="flex items-center space-x-2 focus:outline-none">
-                        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center shadow-md">
+                        <div class="w-10 h-10 bg-gradient-to-br from-[#1e3a5f] to-indigo-600 rounded-full flex items-center justify-center shadow-md">
                             <span class="text-white text-sm font-bold">{{ $iniciales }}</span>
                         </div>
                         <span class="text-sm font-medium text-gray-700 hidden md:inline">{{ $nombreUsuario }}</span>
@@ -141,12 +171,27 @@
                         <div class="border-t border-gray-100"></div>
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
-                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-[#e11d48] hover:bg-gray-100">
                                 <i class="fas fa-sign-out-alt mr-2"></i> Cerrar sesion
                             </button>
                         </form>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- barra de progreso del perfil -->
+        <div class="px-8 pb-3">
+            <div class="flex items-center gap-3">
+                <span class="text-xs text-gray-500 flex-shrink-0">{{ $progresoLabel }}</span>
+                <div class="flex-1 bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                    <div id="barra-progreso"
+                        class="h-1.5 rounded-full transition-all duration-1000"
+                        style="width: 0%; background-color: {{ $progresoColor }};"
+                        data-target="{{ $progreso }}">
+                    </div>
+                </div>
+                <span class="text-xs font-semibold flex-shrink-0" style="color: {{ $progresoColor }};">{{ $progreso }}%</span>
             </div>
         </div>
     </header>
@@ -344,22 +389,30 @@
             }
 
             document.querySelectorAll('.seccion-link').forEach(link => {
-                link.classList.remove('bg-blue-50', 'border-r-4', 'border-blue-600');
+                link.classList.remove('bg-[#1e3a5f]', 'border-r-4', 'border-[#e11d48]', 'shadow-sm');
+                link.classList.add('text-gray-700');
+                link.classList.remove('text-white', 'font-semibold');
                 const icono = link.querySelector('i');
                 if (icono) {
-                    icono.classList.remove('text-blue-600');
+                    icono.classList.remove('text-white');
                     icono.classList.add('text-gray-500');
                 }
+                const span = link.querySelector('span');
+                if (span) span.classList.remove('font-semibold');
             });
 
             const linkActivo = document.querySelector(`.seccion-link[data-seccion="${seccionId}"]`);
             if (linkActivo) {
-                linkActivo.classList.add('bg-blue-50', 'border-r-4', 'border-blue-600');
+                linkActivo.classList.add('bg-[#1e3a5f]', 'border-r-4', 'border-[#e11d48]', 'shadow-sm');
+                linkActivo.classList.remove('text-gray-700');
+                linkActivo.classList.add('text-white', 'font-semibold');
                 const icono = linkActivo.querySelector('i');
                 if (icono) {
                     icono.classList.remove('text-gray-500');
-                    icono.classList.add('text-blue-600');
+                    icono.classList.add('text-white');
                 }
+                const span = linkActivo.querySelector('span');
+                if (span) span.classList.add('font-semibold');
             }
         }
 
@@ -382,6 +435,100 @@
         });
 
         cambiarSeccion('resumen');
+
+        // ── Animación barra de progreso ───────────────────────────────────────
+        window.addEventListener('load', () => {
+            const barra = document.getElementById('barra-progreso');
+            if (barra) {
+                setTimeout(() => {
+                    barra.style.width = barra.dataset.target + '%';
+                }, 300);
+            }
+        });
+
+        // ── Buscador de proyectos ─────────────────────────────────────────────
+        const inputBusqueda   = document.getElementById('buscador-global');
+        const resultadosPanel = document.getElementById('buscador-resultados');
+        const clearBtn        = document.getElementById('buscador-clear');
+
+        function obtenerProyectos() {
+            return Array.from(document.querySelectorAll('#proyectos-grid [data-proyecto-id]'));
+        }
+
+        function limpiarBusqueda() {
+            inputBusqueda.value = '';
+            resultadosPanel.classList.add('hidden');
+            clearBtn.classList.add('hidden');
+            obtenerProyectos().forEach(c => c.style.display = '');
+        }
+
+        inputBusqueda.addEventListener('input', function () {
+            const q = this.value.trim().toLowerCase();
+
+            clearBtn.classList.toggle('hidden', q === '');
+
+            if (!q) {
+                resultadosPanel.classList.add('hidden');
+                obtenerProyectos().forEach(c => c.style.display = '');
+                return;
+            }
+
+            const cards   = obtenerProyectos();
+            const matches = cards.filter(c => {
+                const nombre = c.querySelector('h3')?.textContent.toLowerCase() ?? '';
+                const desc   = c.querySelector('p')?.textContent.toLowerCase() ?? '';
+                return nombre.includes(q) || desc.includes(q);
+            });
+
+            // Mostrar resultados en el panel desplegable
+            resultadosPanel.innerHTML = '';
+
+            if (matches.length === 0) {
+                resultadosPanel.innerHTML = `
+                    <div class="px-4 py-6 text-center text-sm text-gray-400">
+                        <i class="fas fa-search mb-2 block text-lg"></i>
+                        Sin resultados para "<strong>${q}</strong>"
+                    </div>`;
+            } else {
+                matches.forEach(card => {
+                    const nombre = card.querySelector('h3')?.textContent.trim() ?? '';
+                    const badge  = card.querySelector('span.rounded-full')?.textContent.trim() ?? '';
+                    const item   = document.createElement('div');
+                    item.className = 'flex items-center gap-3 px-4 py-3 hover:bg-[#1e3a5f]/5 cursor-pointer border-b border-gray-50 last:border-0 transition-colors';
+                    item.innerHTML = `
+                        <div class="w-7 h-7 rounded-lg bg-[#1e3a5f] flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-code-branch text-white text-xs"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-[#1e3a5f] truncate">${nombre}</p>
+                        </div>
+                        <span class="text-xs text-gray-400">${badge}</span>`;
+                    item.addEventListener('click', () => {
+                        cambiarSeccion('proyectos');
+                        limpiarBusqueda();
+                        setTimeout(() => {
+                            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            card.classList.add('ring-2', 'ring-[#1e3a5f]', 'ring-offset-2');
+                            setTimeout(() => card.classList.remove('ring-2', 'ring-[#1e3a5f]', 'ring-offset-2'), 1800);
+                        }, 150);
+                    });
+                    resultadosPanel.appendChild(item);
+                });
+            }
+
+            resultadosPanel.classList.remove('hidden');
+        });
+
+        // Cerrar panel al hacer clic fuera
+        document.addEventListener('click', e => {
+            if (!e.target.closest('#buscador-global') && !e.target.closest('#buscador-resultados')) {
+                resultadosPanel.classList.add('hidden');
+            }
+        });
+
+        inputBusqueda.addEventListener('focus', () => {
+            if (inputBusqueda.value.trim()) resultadosPanel.classList.remove('hidden');
+        });
     </script>
 </body>
 </html>

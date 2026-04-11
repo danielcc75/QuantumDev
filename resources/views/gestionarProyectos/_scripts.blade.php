@@ -27,10 +27,10 @@ function recalcularStats() {
 // ── Construir HTML de tarjeta desde datos JS ──────────────────────────────────
 
 const ESTADO_BADGE = {
-    en_progreso: { label: 'en curso',   cls: 'bg-blue-100 text-blue-700'  },
-    completado:  { label: 'finalizado', cls: 'bg-green-100 text-green-700' },
-    pendiente:   { label: 'pendiente',  cls: 'bg-gray-100 text-gray-600'   },
-    cancelado:   { label: 'cancelado',  cls: 'bg-red-100 text-red-600'     },
+    en_progreso: { label: 'en curso',   cls: 'bg-[#1e3a5f]/10 text-[#1e3a5f]'  },
+    completado:  { label: 'finalizado', cls: 'bg-indigo-100 text-indigo-700'      },
+    pendiente:   { label: 'pendiente',  cls: 'bg-gray-100 text-gray-600'         },
+    cancelado:   { label: 'cancelado',  cls: 'bg-red-100 text-[#e11d48]'         },
 };
 
 const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
@@ -55,29 +55,29 @@ function buildCardHTML(p) {
     const fechaFin  = p.fecha_fin ? formatFecha(p.fecha_fin) : 'Presente';
 
     const tagsHTML = tags.map(t =>
-        `<span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md">${t}</span>`
+        `<span class="text-xs bg-[#1e3a5f]/5 text-[#1e3a5f] border border-[#1e3a5f]/15 px-2 py-0.5 rounded-md font-medium">${t}</span>`
     ).join('');
 
     const demoBtn = (p.url_link && esPublico)
         ? `<a href="${p.url_link}" target="_blank"
-              class="flex items-center gap-2 text-xs font-medium bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg w-fit transition">
+              class="flex items-center gap-2 text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg w-fit transition">
               <i class="fas fa-globe text-xs"></i> Ver Demo
               <i class="fas fa-external-link-alt text-xs"></i>
            </a>`
         : '';
 
-    const toggleColor = esPublico ? 'bg-blue-500'  : 'bg-gray-300';
+    const toggleColor = esPublico ? 'bg-[#1e3a5f]'  : 'bg-gray-300';
     const thumbPos    = esPublico ? 'translate-x-4' : 'translate-x-1';
     const visLabel    = esPublico ? 'Público' : 'Privado';
-    const visLabelCls = esPublico ? 'text-gray-700' : 'text-gray-400';
+    const visLabelCls = esPublico ? 'text-[#1e3a5f]' : 'text-gray-400';
 
     return `
-<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3"
+<div class="bg-white rounded-2xl border border-gray-200 shadow-md p-5 flex flex-col gap-3 border-t-4 border-t-[#1e3a5f] hover:-translate-y-1 hover:shadow-xl transition-all duration-200"
      data-proyecto-id="${p.id_proyecto}"
      data-estado="${p.estado}">
 
     <div class="flex items-center justify-between gap-2">
-        <h3 class="font-semibold text-gray-800 text-sm leading-snug line-clamp-1">${p.nombre}</h3>
+        <h3 class="font-semibold text-[#1e3a5f] text-sm leading-snug line-clamp-1">${p.nombre}</h3>
         <span class="text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap ${badge.cls}">
             ${badge.label}
         </span>
@@ -88,7 +88,7 @@ function buildCardHTML(p) {
     </p>
 
     <div class="flex items-center text-xs text-gray-400 gap-1.5">
-        <i class="fas fa-calendar-alt"></i>
+        <i class="fas fa-calendar-alt text-[#1e3a5f]/50"></i>
         <span>${fechaIni} – ${fechaFin}</span>
     </div>
 
@@ -108,11 +108,11 @@ function buildCardHTML(p) {
 
     <div class="flex gap-2 pt-1 border-t border-gray-100 mt-auto">
         <button onclick="abrirModalEditar(${p.id_proyecto})"
-            class="flex-1 flex items-center justify-center gap-1.5 text-xs border border-gray-200 text-gray-600 hover:bg-gray-50 px-3 py-1.5 rounded-lg transition">
+            class="flex-1 flex items-center justify-center gap-1.5 text-xs border border-[#1e3a5f]/30 text-[#1e3a5f] hover:bg-[#1e3a5f]/5 px-3 py-1.5 rounded-lg transition">
             <i class="fas fa-pencil-alt"></i> Editar
         </button>
         <button onclick="eliminarProyecto(${p.id_proyecto})"
-            class="flex-1 flex items-center justify-center gap-1.5 text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition">
+            class="flex-1 flex items-center justify-center gap-1.5 text-xs bg-[#e11d48] hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition">
             <i class="fas fa-trash"></i> Eliminar
         </button>
     </div>
@@ -126,9 +126,9 @@ const CONFIRM_CONFIG = {
         titulo:    '¿Guardar proyecto?',
         mensaje:   'Se almacenará toda la información ingresada. Podrás editarla en cualquier momento.',
         icon:      'fas fa-save',
-        iconBg:    'bg-blue-50',
-        iconColor: 'text-blue-500',
-        btnClass:  'bg-blue-500 hover:bg-blue-600',
+        iconBg:    'bg-[#1e3a5f]/10',
+        iconColor: 'text-[#1e3a5f]',
+        btnClass:  'bg-[#1e3a5f] hover:bg-[#e11d48]',
         accion:    () => submitProyecto(),
     },
     cancelar: {
@@ -144,9 +144,9 @@ const CONFIRM_CONFIG = {
         titulo:    '¿Editar este proyecto?',
         mensaje:   'Vas a modificar la información de este proyecto. Podrás cancelar si cambias de opinión.',
         icon:      'fas fa-pencil-alt',
-        iconBg:    'bg-blue-50',
-        iconColor: 'text-blue-500',
-        btnClass:  'bg-blue-500 hover:bg-blue-600',
+        iconBg:    'bg-[#1e3a5f]/10',
+        iconColor: 'text-[#1e3a5f]',
+        btnClass:  'bg-[#1e3a5f] hover:bg-[#e11d48]',
         accion:    null,
     },
     eliminar: {
@@ -269,7 +269,7 @@ function renderizarTags(tags) {
     container.innerHTML = '';
     tags.forEach((tag, i) => {
         const span = document.createElement('span');
-        span.className = 'flex items-center gap-1 text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-full';
+        span.className = 'flex items-center gap-1 text-xs bg-[#1e3a5f]/5 text-[#1e3a5f] border border-[#1e3a5f]/20 px-2.5 py-1 rounded-full';
         span.innerHTML = `${tag} <button type="button" onclick="eliminarTag(${i})" class="text-blue-400 hover:text-red-500 ml-1"><i class="fas fa-times text-xs"></i></button>`;
         container.appendChild(span);
     });
@@ -317,7 +317,7 @@ document.getElementById('proj_url_link').addEventListener('input', function() {
     if (!val) {
         // Campo vacío → estado neutro
         status.classList.add('hidden');
-        input.classList.remove('border-green-400', 'border-red-400', 'ring-2', 'ring-green-200', 'ring-red-200');
+        input.classList.remove('border-[#1e3a5f]', 'border-red-400', 'ring-2', 'ring-[#1e3a5f]/20', 'ring-red-200');
         input.classList.add('border-gray-200');
         hint.textContent = 'Enlace a la aplicación o sitio web en producción desarrollada para el cliente';
         hint.className   = 'text-xs text-gray-400 mt-1';
@@ -328,14 +328,14 @@ document.getElementById('proj_url_link').addEventListener('input', function() {
     try { new URL(val); valid = true; } catch (_) {}
 
     status.classList.remove('hidden');
-    input.classList.remove('border-gray-200', 'border-green-400', 'border-red-400', 'ring-green-200', 'ring-red-200');
+    input.classList.remove('border-gray-200', 'border-[#1e3a5f]', 'border-red-400', 'ring-[#1e3a5f]/20', 'ring-red-200');
     input.classList.add('ring-2');
 
     if (valid) {
-        status.innerHTML  = '<i class="fas fa-check-circle text-green-500"></i>';
-        input.classList.add('border-green-400', 'ring-green-200');
+        status.innerHTML  = '<i class="fas fa-check-circle text-[#1e3a5f]"></i>';
+        input.classList.add('border-[#1e3a5f]', 'ring-[#1e3a5f]/20');
         hint.textContent = '✓ URL válida';
-        hint.className   = 'text-xs text-green-600 mt-1 font-medium';
+        hint.className   = 'text-xs text-[#1e3a5f] mt-1 font-medium';
     } else {
         status.innerHTML  = '<i class="fas fa-times-circle text-red-400"></i>';
         input.classList.add('border-red-400', 'ring-red-200');
@@ -354,12 +354,12 @@ function toggleVisibleModal() {
     const isOn  = btn.dataset.on === '1';
     if (isOn) {
         btn.dataset.on = '0';
-        btn.classList.replace('bg-blue-500', 'bg-gray-300');
+        btn.classList.replace('bg-[#1e3a5f]', 'bg-gray-300');
         thumb.classList.replace('translate-x-6', 'translate-x-1');
         input.value = '0';
     } else {
         btn.dataset.on = '1';
-        btn.classList.replace('bg-gray-300', 'bg-blue-500');
+        btn.classList.replace('bg-gray-300', 'bg-[#1e3a5f]');
         thumb.classList.replace('translate-x-1', 'translate-x-6');
         input.value = '1';
     }
@@ -372,10 +372,10 @@ function resetToggle(on) {
     const thumb = document.getElementById('toggleThumb');
     btn.dataset.on = on ? '1' : '0';
     if (on) {
-        btn.classList.add('bg-blue-500');    btn.classList.remove('bg-gray-300');
+        btn.classList.add('bg-[#1e3a5f]');   btn.classList.remove('bg-gray-300');
         thumb.classList.add('translate-x-6'); thumb.classList.remove('translate-x-1');
     } else {
-        btn.classList.add('bg-gray-300');    btn.classList.remove('bg-blue-500');
+        btn.classList.add('bg-gray-300');    btn.classList.remove('bg-[#1e3a5f]');
         thumb.classList.add('translate-x-1'); thumb.classList.remove('translate-x-6');
     }
     document.getElementById('proj_visible').value = on ? '1' : '0';

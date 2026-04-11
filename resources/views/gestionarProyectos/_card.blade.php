@@ -13,13 +13,14 @@
         : 'Presente';
 @endphp
 
-<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3"
+<div class="bg-white rounded-2xl border border-gray-200 shadow-md p-5 flex flex-col gap-3
+            border-t-4 border-t-[#1e3a5f] hover:-translate-y-1 hover:shadow-xl transition-all duration-200"
      data-proyecto-id="{{ $proyecto->id_proyecto }}"
      data-estado="{{ $proyecto->estado }}">
 
     {{-- Nombre + estado --}}
     <div class="flex items-center justify-between gap-2">
-        <h3 class="font-semibold text-gray-800 text-sm leading-snug line-clamp-1">{{ $proyecto->nombre }}</h3>
+        <h3 class="font-semibold text-[#1e3a5f] text-sm leading-snug line-clamp-1">{{ $proyecto->nombre }}</h3>
         <span class="text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap {{ $badge['class'] }}">
             {{ $badge['label'] }}
         </span>
@@ -32,7 +33,7 @@
 
     {{-- Fechas --}}
     <div class="flex items-center text-xs text-gray-400 gap-1.5">
-        <i class="fas fa-calendar-alt"></i>
+        <i class="fas fa-calendar-alt text-[#1e3a5f]/50"></i>
         <span>{{ $fechaIni }} – {{ $fechaFin }}</span>
     </div>
 
@@ -40,7 +41,7 @@
     @if(count($tags))
     <div class="flex flex-wrap gap-1.5">
         @foreach($tags as $tag)
-        <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md">{{ $tag }}</span>
+        <span class="text-xs bg-[#1e3a5f]/5 text-[#1e3a5f] border border-[#1e3a5f]/15 px-2 py-0.5 rounded-md font-medium">{{ $tag }}</span>
         @endforeach
     </div>
     @endif
@@ -48,7 +49,7 @@
     {{-- Botón demo --}}
     @if($proyecto->url_link && $esPublico)
     <a href="{{ $proyecto->url_link }}" target="_blank"
-        class="flex items-center gap-2 text-xs font-medium bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg w-fit transition">
+        class="flex items-center gap-2 text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg w-fit transition">
         <i class="fas fa-globe text-xs"></i> Ver Demo
         <i class="fas fa-external-link-alt text-xs"></i>
     </a>
@@ -57,13 +58,13 @@
     {{-- Toggle visibilidad --}}
     <div class="flex items-center gap-2 text-xs text-gray-500">
         <span>Visibilidad:</span>
-        <span class="font-medium {{ $esPublico ? 'text-gray-700' : 'text-gray-400' }}">
+        <span class="font-medium {{ $esPublico ? 'text-[#1e3a5f]' : 'text-gray-400' }}">
             {{ $esPublico ? 'Público' : 'Privado' }}
         </span>
         <button onclick="toggleVisibilidad({{ $proyecto->id_proyecto }}, this)"
             data-visible="{{ $esPublico ? '1' : '0' }}"
             class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors
-                   {{ $esPublico ? 'bg-blue-500' : 'bg-gray-300' }}">
+                   {{ $esPublico ? 'bg-[#1e3a5f]' : 'bg-gray-300' }}">
             <span class="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform
                          {{ $esPublico ? 'translate-x-4' : 'translate-x-1' }}"></span>
         </button>
@@ -72,11 +73,11 @@
     {{-- Acciones editar / eliminar --}}
     <div class="flex gap-2 pt-1 border-t border-gray-100 mt-auto">
         <button onclick="abrirModalEditar({{ $proyecto->id_proyecto }})"
-            class="flex-1 flex items-center justify-center gap-1.5 text-xs border border-gray-200 text-gray-600 hover:bg-gray-50 px-3 py-1.5 rounded-lg transition">
+            class="flex-1 flex items-center justify-center gap-1.5 text-xs border border-[#1e3a5f]/30 text-[#1e3a5f] hover:bg-[#1e3a5f]/5 px-3 py-1.5 rounded-lg transition">
             <i class="fas fa-pencil-alt"></i> Editar
         </button>
         <button onclick="eliminarProyecto({{ $proyecto->id_proyecto }})"
-            class="flex-1 flex items-center justify-center gap-1.5 text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition">
+            class="flex-1 flex items-center justify-center gap-1.5 text-xs bg-[#e11d48] hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition">
             <i class="fas fa-trash"></i> Eliminar
         </button>
     </div>
