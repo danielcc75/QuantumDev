@@ -21,4 +21,17 @@ class Perfil extends Model
     {
         return $this->belongsTo(Usuario::class, 'id_usuario');
     }
+    public function experienciasLaborales()
+    {
+        return $this->hasMany(ExperienciaLaboral::class, 'id_perfil');
+    }
+
+    public function formacionAcademica()
+    {
+        return $this->hasMany(Educacion::class, 'id_perfil');
+    }
+    public function links()
+    {
+        return $this->hasMany(PerfilLink::class, 'id_perfil');
+    }
 }

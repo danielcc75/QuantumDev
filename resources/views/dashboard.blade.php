@@ -121,15 +121,25 @@
                     </div>
                 </div>
 
-                <!-- usuario -->
+                     <!-- usuario -->
                 <div class="relative dropdown">
                     <button class="flex items-center space-x-2 focus:outline-none">
-                        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center shadow-md">
-                            <span class="text-white text-sm font-bold">{{ $iniciales }}</span>
-                        </div>
+                        @php
+                            $fotoPerfilHeader = $usuario->perfil->foto_perfil ?? null;
+                        @endphp
+                        
+                        @if($fotoPerfilHeader)
+                            <img src="{{ $fotoPerfilHeader }}" alt="Foto perfil" class="w-10 h-10 rounded-full object-cover shadow-md">
+                        @else
+                            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center shadow-md">
+                                <span class="text-white text-sm font-bold">{{ $iniciales }}</span>
+                            </div>
+                        @endif
+                        
                         <span class="text-sm font-medium text-gray-700 hidden md:inline">{{ $nombreUsuario }}</span>
                         <i class="fas fa-chevron-down text-xs text-gray-500 hidden md:inline"></i>
                     </button>
+                    <!-- resto del dropdown -->
 
                     <div class="dropdown-menu hidden absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-lg border border-gray-100 z-30">
                         <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">

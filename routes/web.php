@@ -51,3 +51,8 @@ Route::get('/proyectos/{id}',    [ProyectoController::class, 'show'])->name('pro
 Route::post('/proyectos',        [ProyectoController::class, 'store'])->name('proyectos.store');
 Route::put('/proyectos/{id}',    [ProyectoController::class, 'update'])->name('proyectos.update');
 Route::delete('/proyectos/{id}', [ProyectoController::class, 'destroy'])->name('proyectos.destroy');
+
+// Perfil 2
+Route::get('/mi-perfil', [UsuarioWebController::class, 'verPerfil'])->name('perfil.ver');
+Route::get('/mi-perfil/editar', [UsuarioWebController::class, 'editarPerfil'])->name('perfil.editar');
+Route::put('/mi-perfil', [UsuarioWebController::class, 'actualizarPerfil'])->name('perfil.actualizar');
