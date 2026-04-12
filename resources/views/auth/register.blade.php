@@ -1,99 +1,107 @@
-<div id="modalRegister" class="fixed inset-0 hidden items-center justify-center z-50">
+<div id="modalRegister" class="fixed inset-0 hidden items-center justify-center z-50 px-4">
 
+    <!-- fondo -->
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarRegister()"></div>
 
-    <div class="relative bg-white w-full max-w-xl mx-auto rounded-xl shadow-lg p-8 z-10">
+    <!-- modal -->
+    <div class="relative w-full max-w-2xl bg-[#f3f4f6] rounded-xl shadow-xl overflow-hidden z-10">
 
-        <button onclick="cerrarRegister()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-xl">
+        <!-- cerrar -->
+        <button onclick="cerrarRegister()" class="absolute top-3 right-4 text-white/80 hover:text-white text-xl z-20">
             ✕
         </button>
 
-        <div class="flex items-center gap-3 mb-4">
-            <div class="bg-blue-100 text-blue-900 p-2 rounded-lg">
-                📝
+        <!-- header -->
+        <div class="bg-[#1e3a5f] text-center px-6 py-6">
+            <div class="flex justify-center items-center gap-2 mb-1">
+                <i class="fas fa-user-circle text-white text-xl"></i>
+                <h2 class="text-white text-2xl font-bold">Crear Cuenta</h2>
             </div>
-
-            <h2 class="text-2xl font-bold text-blue-900">
-                Crear cuenta
-            </h2>
+            <p class="text-gray-200 text-sm">
+                Completa el formulario para registrarte en el sistema de portafolios
+            </p>
         </div>
 
-        <p class="text-gray-500 text-sm mb-6">
-            Completa el formulario para registrarte
-        </p>
+        <!-- contenido -->
+        <div class="p-6">
 
-        @if ($errors->any())
-            <div class="mb-4 rounded-md bg-red-100 border border-red-300 text-red-700 p-3 text-sm">
-                <ul class="list-disc list-inside">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+            @php
+                $inputClass = "w-full mt-1 px-3 py-2 rounded-md border border-gray-300 bg-white outline-none focus:border-[#1e3a5f] focus:ring-2 focus:ring-[#1e3a5f]/20";
+            @endphp
 
-        <form action="{{ route('register.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            @csrf
+            <!-- error general -->
+            <div id="registerErrorBox" class="hidden mb-4 text-sm bg-red-100 border border-red-300 text-red-700 p-3 rounded-md"></div>
 
-            <div>
-                <label class="text-sm text-gray-600">Nombre</label>
-                <div class="flex items-center border rounded-md px-3 py-2 mt-1">
-                    <span class="mr-2">👤</span>
-                    <input type="text" name="nombre" value="{{ old('nombre') }}" placeholder="Tu nombre" class="w-full outline-none" required>
+            <form id="registerForm" action="{{ route('register.store') }}" method="POST" class="grid md:grid-cols-2 gap-4" novalidate>
+                @csrf
+
+                <div>
+                    <label class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <i class="fas fa-user text-[#1e3a5f] text-xs"></i>
+                        Nombre <span class="text-[#e11d48]">*</span>
+                    </label>
+                    <input id="registerNombre" type="text" name="nombre" value="{{ old('nombre') }}" placeholder="Tu nombre" class="{{ $inputClass }}">
+                    <p id="registerNombreError" class="hidden mt-1 text-sm text-red-600"></p>
                 </div>
-            </div>
 
-            <div>
-                <label class="text-sm text-gray-600">Apellidos</label>
-                <div class="flex items-center border rounded-md px-3 py-2 mt-1">
-                    <span class="mr-2">👥</span>
-                    <input type="text" name="apellido" value="{{ old('apellido') }}" placeholder="Tus apellidos" class="w-full outline-none" required>
+                <div>
+                    <label class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <i class="fas fa-users text-[#1e3a5f] text-xs"></i>
+                        Apellidos <span class="text-[#e11d48]">*</span>
+                    </label>
+                    <input id="registerApellido" type="text" name="apellido" value="{{ old('apellido') }}" placeholder="Tus apellidos" class="{{ $inputClass }}">
+                    <p id="registerApellidoError" class="hidden mt-1 text-sm text-red-600"></p>
                 </div>
-            </div>
 
-            <div>
-                <label class="text-sm text-gray-600">Correo electronico</label>
-                <div class="flex items-center border rounded-md px-3 py-2 mt-1">
-                    <span class="mr-2">📧</span>
-                    <input type="email" name="correo_electronico" value="{{ old('correo_electronico') }}" placeholder="correo@ejemplo.com" class="w-full outline-none" required>
+                <div>
+                    <label class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <i class="fas fa-envelope text-[#1e3a5f] text-xs"></i>
+                        Correo electrónico <span class="text-[#e11d48]">*</span>
+                    </label>
+                    <input id="registerCorreo" type="email" name="correo_electronico" value="{{ old('correo_electronico') }}" placeholder="tu@email.com" class="{{ $inputClass }}">
+                    <p id="registerCorreoError" class="hidden mt-1 text-sm text-red-600"></p>
                 </div>
-            </div>
 
-            <div>
-                <label class="text-sm text-gray-600">Telefono</label>
-                <div class="flex items-center border rounded-md px-3 py-2 mt-1">
-                    <span class="mr-2">📱</span>
-                    <input type="text" name="telefono" value="{{ old('telefono') }}" placeholder="+591 700 00000" class="w-full outline-none">
+                <div>
+                    <label class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <i class="fas fa-phone text-[#1e3a5f] text-xs"></i>
+                        Teléfono
+                    </label>
+                    <input id="registerTelefono" type="text" name="telefono" value="{{ old('telefono') }}" placeholder="+591 700 00000" class="{{ $inputClass }}">
+                    <p id="registerTelefonoError" class="hidden mt-1 text-sm text-red-600"></p>
                 </div>
-            </div>
 
-            <div>
-                <label class="text-sm text-gray-600">Contraseña</label>
-                <div class="flex items-center border rounded-md px-3 py-2 mt-1">
-                    <span class="mr-2">🔒</span>
-                    <input type="password" name="contrasenia" placeholder="********" class="w-full outline-none" required>
+                <div>
+                    <label class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <i class="fas fa-lock text-[#1e3a5f] text-xs"></i>
+                        Contraseña <span class="text-[#e11d48]">*</span>
+                    </label>
+                    <input id="registerContrasenia" type="password" name="contrasenia" placeholder="Minimo 6 caracteres" class="{{ $inputClass }}">
+                    <p id="registerContraseniaError" class="hidden mt-1 text-sm text-red-600"></p>
                 </div>
-            </div>
 
-            <div>
-                <label class="text-sm text-gray-600">Confirmar contraseña</label>
-                <div class="flex items-center border rounded-md px-3 py-2 mt-1">
-                    <span class="mr-2">🔐</span>
-                    <input type="password" name="contrasenia_confirmation" placeholder="********" class="w-full outline-none" required>
+                <div>
+                    <label class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <i class="fas fa-lock text-[#1e3a5f] text-xs"></i>
+                        Confirmar contraseña <span class="text-[#e11d48]">*</span>
+                    </label>
+                    <input id="registerContraseniaConfirmacion" type="password" name="contrasenia_confirmation" placeholder="Repite tu contraseña" class="{{ $inputClass }}">
+                    <p id="registerContraseniaConfirmacionError" class="hidden mt-1 text-sm text-red-600"></p>
                 </div>
-            </div>
 
-            <button type="submit" class="col-span-1 md:col-span-2 w-full bg-blue-900 text-white py-3 rounded-md hover:bg-blue-800 transition">
-                Crear cuenta
-            </button>
-        </form>
+                <button type="submit"
+                    class="md:col-span-2 w-full bg-[#1e3a5f] text-white py-3 rounded-md font-semibold hover:bg-[#16304d] transition">
+                    <i class="fas fa-check mr-2"></i> Crear Cuenta
+                </button>
+            </form>
 
-        <p class="text-sm text-center mt-4">
-            ¿Ya tienes cuenta?
-            <span onclick="irALogin()" class="text-blue-900 font-semibold cursor-pointer">
-                Inicia sesion
-            </span>
-        </p>
+            <p class="text-sm text-center mt-4 text-gray-600">
+                ¿Ya tienes una cuenta?
+                <span onclick="irALogin()" class="text-[#1e3a5f] font-semibold cursor-pointer hover:text-[#e11d48] transition">
+                    Inicia sesión
+                </span>
+            </p>
 
+        </div>
     </div>
 </div>

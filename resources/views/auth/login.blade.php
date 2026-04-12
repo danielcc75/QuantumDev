@@ -1,92 +1,91 @@
-<div id="modalLogin" class="fixed inset-0 hidden items-center justify-center z-50">
+<div id="modalLogin" class="fixed inset-0 hidden items-center justify-center z-50 px-4">
 
+    <!-- fondo -->
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarLogin()"></div>
 
-    <div class="relative bg-white w-full max-w-xl mx-auto rounded-xl shadow-lg p-8 z-10">
+    <!-- modal -->
+    <div class="relative w-full max-w-2xl bg-[#f3f4f6] rounded-xl shadow-xl overflow-hidden z-10">
 
-        <button onclick="cerrarLogin()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-xl">
+        <!-- cerrar -->
+        <button onclick="cerrarLogin()" class="absolute top-3 right-4 text-white/80 hover:text-white text-xl z-20">
             ✕
         </button>
 
-        <div class="flex items-center gap-3 mb-4">
-            <div class="bg-blue-100 text-blue-900 p-2 rounded-lg">
-                🔐
+        <!-- header -->
+        <div class="bg-[#1e3a5f] text-center px-6 py-6">
+            <div class="flex justify-center items-center gap-2 mb-1">
+                <i class="fas fa-right-to-bracket text-white text-xl"></i>
+                <h2 class="text-white text-2xl font-bold">Iniciar Sesión</h2>
             </div>
-
-            <h2 class="text-2xl font-bold text-blue-900">
-                Iniciar sesion
-            </h2>
+            <p class="text-gray-200 text-sm">
+                Ingresa tus credenciales para acceder a tu cuenta
+            </p>
         </div>
 
-        <p class="text-gray-500 text-sm mb-6">
-            Ingresa tus credenciales para acceder a tu cuenta
-        </p>
+        <!-- contenido -->
+        <div class="p-6">
 
-        @if (session('error_login'))
-            <div class="mb-4 rounded-md bg-red-100 border border-red-300 text-red-700 p-3 text-sm">
-                {{ session('error_login') }}
-            </div>
-        @endif
+            @php
+                $inputClass = "w-full mt-1 px-3 py-2 rounded-md border border-gray-300 bg-white outline-none focus:border-[#1e3a5f] focus:ring-2 focus:ring-[#1e3a5f]/20";
+            @endphp
 
-        @if ($errors->any())
-            <div class="mb-4 rounded-md bg-red-100 border border-red-300 text-red-700 p-3 text-sm">
-                <ul class="list-disc list-inside">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+            <!-- error general -->
+            <div id="loginErrorBox" class="hidden mb-4 text-sm bg-red-100 border border-red-300 text-red-700 p-3 rounded-md"></div>
 
-        <form action="{{ route('login.store') }}" method="POST" class="space-y-4">
-            @csrf
+            <form id="loginForm" action="{{ route('login.store') }}" method="POST" class="space-y-4" novalidate>
+                @csrf
 
-            <div>
-                <label class="text-sm text-gray-600">Correo electronico</label>
-                <div class="flex items-center border rounded-md px-3 py-2 mt-1">
-                    <span class="mr-2">📧</span>
+                <div>
+                    <label class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <i class="fas fa-envelope text-[#1e3a5f] text-xs"></i>
+                        Correo Electrónico <span class="text-[#e11d48]">*</span>
+                    </label>
                     <input
+                        id="loginCorreo"
                         type="email"
                         name="correo_electronico"
                         value="{{ old('correo_electronico') }}"
-                        placeholder="correo@ejemplo.com"
-                        class="w-full outline-none"
-                        required
+                        placeholder="tu@email.com"
+                        class="{{ $inputClass }}"
                     >
+                    <p id="loginCorreoError" class="hidden mt-1 text-sm text-red-600"></p>
                 </div>
-            </div>
 
-            <div>
-                <label class="text-sm text-gray-600">Contraseña</label>
-                <div class="flex items-center border rounded-md px-3 py-2 mt-1">
-                    <span class="mr-2">🔒</span>
+                <div>
+                    <label class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <i class="fas fa-lock text-[#1e3a5f] text-xs"></i>
+                        Contraseña <span class="text-[#e11d48]">*</span>
+                    </label>
                     <input
+                        id="loginContrasenia"
                         type="password"
                         name="contrasenia"
-                        placeholder="********"
-                        class="w-full outline-none"
-                        required
+                        placeholder="Ingresa tu contraseña"
+                        class="{{ $inputClass }}"
                     >
+                    <p id="loginContraseniaError" class="hidden mt-1 text-sm text-red-600"></p>
                 </div>
-            </div>
 
-            <div class="text-right">
-                <a href="#" class="text-sm text-blue-900 hover:underline">
-                    ¿Olvidaste tu contraseña?
-                </a>
-            </div>
+                <div class="text-right">
+                    <a href="#" class="text-sm font-medium text-[#1e3a5f] hover:text-[#e11d48] transition">
+                        ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
 
-            <button type="submit" class="w-full bg-blue-900 text-white py-3 rounded-md hover:bg-blue-800 transition">
-                Iniciar sesion
-            </button>
-        </form>
+                <button
+                    type="submit"
+                    class="w-full bg-[#1e3a5f] text-white py-3 rounded-md font-semibold hover:bg-[#16304d] transition">
+                    <i class="fas fa-right-to-bracket mr-2"></i> Iniciar Sesión
+                </button>
+            </form>
 
-        <p class="text-sm text-center mt-6">
-            ¿No tienes cuenta?
-            <span onclick="irARegister()" class="text-blue-900 font-semibold cursor-pointer">
-                Registrate
-            </span>
-        </p>
+            <p class="text-sm text-center mt-5 text-gray-600">
+                ¿No tienes una cuenta?
+                <span onclick="irARegister()" class="text-[#1e3a5f] font-semibold cursor-pointer hover:text-[#e11d48] transition">
+                    Regístrate aquí
+                </span>
+            </p>
 
+        </div>
     </div>
 </div>

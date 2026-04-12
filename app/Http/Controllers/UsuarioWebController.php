@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class UsuarioWebController extends Controller
 {
@@ -17,15 +18,29 @@ class UsuarioWebController extends Controller
     // =========================
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'nombre'              => 'required|string|max:50',
             'apellido'            => 'required|string|max:50',
             'correo_electronico'  => 'required|email|unique:usuario,correo_electronico',
             'telefono'            => 'nullable|string|max:50',
             'contrasenia'         => 'required|min:6|confirmed'
         ], [
-            'contrasenia.confirmed' => 'Las contraseñas no coinciden.'
+            'contrasenia.confirmed' => 'Las contraseñas no coinciden.',
+            'correo_electronico.unique' => 'Ese correo electrónico ya está registrado.'
         ]);
+
+        if ($validator->fails()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'ok' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            return redirect('/')
+                ->withErrors($validator)
+                ->withInput();
+        }
 
         $usuario = Usuario::create([
             'nombre'             => $request->nombre,
@@ -40,12 +55,18 @@ class UsuarioWebController extends Controller
             'id_usuario' => $usuario->id_usuario
         ]);
 
-        //iniciar sesión automáticamente
         session([
             'usuario_id' => $usuario->id_usuario,
             'usuario_nombre' => $usuario->nombre . ' ' . $usuario->apellido,
             'usuario_email' => $usuario->correo_electronico
         ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => true,
+                'redirect' => route('dashboard')
+            ]);
+        }
 
         return redirect()->route('dashboard');
     }
@@ -65,7 +86,14 @@ class UsuarioWebController extends Controller
             ->first();
 
         if (!$usuario || !Hash::check($request->contrasenia, $usuario->contrasenia)) {
-            return redirect('/')->with('error_login', 'Credenciales incorrectas');
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'El correo o la contraseña no son correctos.'
+                ], 422);
+            }
+
+            return redirect('/')->with('error_login', 'El correo o la contraseña no son correctos.');
         }
 
         session([
@@ -73,6 +101,13 @@ class UsuarioWebController extends Controller
             'usuario_nombre' => $usuario->nombre . ' ' . $usuario->apellido,
             'usuario_email' => $usuario->correo_electronico
         ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => true,
+                'redirect' => route('dashboard')
+            ]);
+        }
 
         return redirect()->route('dashboard');
     }
