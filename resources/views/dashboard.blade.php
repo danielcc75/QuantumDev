@@ -652,18 +652,21 @@
             const form = modal.querySelector('form');
             const tituloModal = document.getElementById('titulo-modal-habilidad');
 
-            // Mostrar el modal
             modal.classList.remove('hidden');
             modal.classList.add('flex');
 
-            // Cambiar el título del modal a "Registrar Habilidad"
             tituloModal.textContent = "Registrar Habilidad";
 
-            // Limpiar el formulario (en caso de que tenga valores previos)
             form.reset();
 
-            // Configurar la acción del formulario para CREAR (esto debe ser la ruta para crear una habilidad)
-            form.action = "{{ route('habilidades.store') }}";  // Acción para crear habilidad
+            // 🔥 ELIMINAR cualquier _method previo
+            const methodInput = form.querySelector('input[name="_method"]');
+            if (methodInput) {
+                methodInput.remove();
+            }
+
+            // ✅ Acción correcta
+            form.action = "{{ route('habilidades.store') }}";
         });
 
         // Cerrar modal
@@ -712,12 +715,18 @@
                 // Configurar la acción del formulario para EDITAR (esto debe ser la ruta para editar una habilidad)
                 form.action = `/habilidades/${id}`;  // Asegúrate de que esta URL esté correcta, es la ruta de editar habilidad
 
-                // Cambiar el método del formulario a PUT para editar
-                const methodInput = document.createElement('input');
-                methodInput.setAttribute('type', 'hidden');
-                methodInput.setAttribute('name', '_method');
-                methodInput.setAttribute('value', 'PUT');
-                form.appendChild(methodInput);
+                // 🔥 Verificar si ya existe _method
+                let methodInput = form.querySelector('input[name="_method"]');
+
+                if (methodInput) {
+                    methodInput.value = 'PUT';
+                } else {
+                    methodInput = document.createElement('input');
+                    methodInput.setAttribute('type', 'hidden');
+                    methodInput.setAttribute('name', '_method');
+                    methodInput.setAttribute('value', 'PUT');
+                    form.appendChild(methodInput);
+                }
             });
         });
     </script>
