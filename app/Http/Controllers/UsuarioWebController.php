@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Usuario;
 use App\Models\Perfil;
 use App\Models\ExperienciaLaboral;
+use App\Models\Categoria;
+use App\Models\Habilidad;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+
 
 class UsuarioWebController extends Controller
 {
@@ -87,8 +90,14 @@ class UsuarioWebController extends Controller
         }
 
         $usuario = Usuario::with('perfil')->find(session('usuario_id'));
+        $categorias = Categoria::all();
 
-        return view('dashboard', compact('usuario'));
+        // 🔥 TRAER habilidades del usuario con su categoría
+        $habilidades = Habilidad::with('categoria')  
+            ->where('id_perfil', $usuario->perfil->id_perfil)
+            ->get();
+ 
+        return view('dashboard', compact('usuario', 'categorias', 'habilidades'));
     }
 
     // =========================

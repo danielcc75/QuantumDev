@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Habilidad extends Model
 {
-    protected $table      = 'habilidades';
+    protected $table = 'habilidades';
     protected $primaryKey = 'id_habilidad';
 
     protected $fillable = [
@@ -19,11 +19,11 @@ class Habilidad extends Model
 
     public function perfil()
     {
-        return $this->belongsTo(Perfil::class, 'id_perfil');
+        return $this->belongsTo(Perfil::class, 'id_perfil', 'id_perfil');
     }
 
     public function categoria()
     {
-        return $this->belongsTo(Categoria::class, 'id_categoria');
+        return $this->belongsTo(Categoria::class, 'id_categoria', 'id_categoria');
     }
 }
