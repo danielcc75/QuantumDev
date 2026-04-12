@@ -659,6 +659,12 @@
 
             form.reset();
 
+            // 🔥 LIMPIEZA EXTRA (clave)
+            form.querySelector('[name="nombreHabilidad"]').value = '';
+            form.querySelector('[name="categoria"]').value = '';
+            form.querySelector('[name="anosExperiencia"]').value = '';
+            form.querySelector('[name="descripcion"]').value = '';
+
             // 🔥 ELIMINAR cualquier _method previo
             const methodInput = form.querySelector('input[name="_method"]');
             if (methodInput) {
