@@ -389,8 +389,13 @@
                                             <div class="flex justify-between mt-4">
 
                                                 <!-- EDITAR -->
-                                                <a href="{{ route('habilidades.edit', $habilidad->id_habilidad) }}"
-                                                    class="bg-yellow-500 text-white px-3 py-1 rounded">
+                                                <a href="#"
+                                                    class="editar-habilidad bg-yellow-500 text-white px-3 py-1 rounded"
+                                                    data-id="{{ $habilidad->id_habilidad }}"
+                                                    data-nombre="{{ $habilidad->nombre }}"
+                                                    data-categoria="{{ $habilidad->id_categoria }}"
+                                                    data-experiencia="{{ $habilidad->anios_experiencia }}"
+                                                    data-descripcion="{{ $habilidad->descripcion }}">
                                                     Editar
                                                 </a>
 
@@ -438,7 +443,9 @@
                                 <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl relative">
 
                                     <div class="bg-[#1e3a5f] text-white p-5 rounded-t-xl flex justify-between items-center">
-                                        <h2 class="text-lg font-semibold">Registrar Habilidad</h2>
+                                        <h2 id="titulo-modal-habilidad" class="text-lg font-semibold">
+                                            Registrar Habilidad
+                                        </h2>
 
                                         <button id="cerrar-modal" class="text-white text-xl">✖</button>
                                     </div>
@@ -641,8 +648,22 @@
 
         // Abrir modal
         btnAgregar.addEventListener('click', () => {
+            const modal = document.getElementById('modal-habilidades');
+            const form = modal.querySelector('form');
+            const tituloModal = document.getElementById('titulo-modal-habilidad');
+
+            // Mostrar el modal
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+
+            // Cambiar el título del modal a "Registrar Habilidad"
+            tituloModal.textContent = "Registrar Habilidad";
+
+            // Limpiar el formulario (en caso de que tenga valores previos)
+            form.reset();
+
+            // Configurar la acción del formulario para CREAR (esto debe ser la ruta para crear una habilidad)
+            form.action = "{{ route('habilidades.store') }}";  // Acción para crear habilidad
         });
 
         // Cerrar modal
@@ -657,6 +678,47 @@
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
             }
+        });
+
+        // Obtener todos los enlaces de "Editar"
+        document.querySelectorAll('.editar-habilidad').forEach(enlace => {
+            enlace.addEventListener('click', (event) => {
+                event.preventDefault();
+                
+                // Obtener los datos de la habilidad
+                const id = enlace.getAttribute('data-id');
+                const nombre = enlace.getAttribute('data-nombre');
+                const categoria = enlace.getAttribute('data-categoria');
+                const experiencia = enlace.getAttribute('data-experiencia');
+                const descripcion = enlace.getAttribute('data-descripcion');
+
+                const modal = document.getElementById('modal-habilidades');
+                const form = modal.querySelector('form');
+                const tituloModal = document.getElementById('titulo-modal-habilidad'); // Asegúrate de que exista este elemento en el HTML (lo vamos a definir)
+
+                // Mostrar el modal
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+
+                // Cambiar el título del modal a "Editar Habilidad"
+                tituloModal.textContent = "Editar Habilidad";
+
+                // Rellenar el formulario con los datos de la habilidad
+                form.querySelector('[name="nombreHabilidad"]').value = nombre;
+                form.querySelector('[name="categoria"]').value = categoria;
+                form.querySelector('[name="anosExperiencia"]').value = experiencia;
+                form.querySelector('[name="descripcion"]').value = descripcion;
+
+                // Configurar la acción del formulario para EDITAR (esto debe ser la ruta para editar una habilidad)
+                form.action = `/habilidades/${id}`;  // Asegúrate de que esta URL esté correcta, es la ruta de editar habilidad
+
+                // Cambiar el método del formulario a PUT para editar
+                const methodInput = document.createElement('input');
+                methodInput.setAttribute('type', 'hidden');
+                methodInput.setAttribute('name', '_method');
+                methodInput.setAttribute('value', 'PUT');
+                form.appendChild(methodInput);
+            });
         });
     </script>
 </body>

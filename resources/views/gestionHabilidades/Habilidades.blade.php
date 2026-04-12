@@ -1,5 +1,12 @@
-<form method="POST" action="{{ route('habilidades.store') }}" class="space-y-6">
+<form method="POST"
+      action="{{ isset($habilidad) ? route('habilidades.update', $habilidad->id_habilidad) : route('habilidades.store') }}"
+      class="space-y-6">
+
     @csrf
+
+    @if(isset($habilidad))
+        @method('PUT')
+    @endif
 
     <!-- GRID -->
     <div class="grid grid-cols-2 gap-6">
@@ -10,9 +17,10 @@
                 Nombre de la Habilidad <span class="text-red-500">*</span>
             </label>
 
-            <input type="text" name="nombreHabilidad"
+            <input type="text"
+                name="nombreHabilidad"
                 placeholder="Ej: React, Node.js, PostgreSQL"
-                value="{{ old('nombreHabilidad') }}"
+                value="{{ old('nombreHabilidad', $habilidad->nombre ?? '') }}"
                 class="w-full p-3 border border-gray-300 rounded-lg bg-gray-200 focus:outline-none">
         </div>
 
@@ -29,7 +37,7 @@
 
                 @foreach ($categorias as $categoria)
                     <option value="{{ $categoria->id_categoria }}"
-                        {{ old('categoria') == $categoria->id_categoria ? 'selected' : '' }}>
+                        {{ old('categoria', $habilidad->id_categoria ?? '') == $categoria->id_categoria ? 'selected' : '' }}>
                         {{ $categoria->nombre }}
                     </option>
                 @endforeach
@@ -45,9 +53,11 @@
             Años de Experiencia <span class="text-red-500">*</span>
         </label>
 
-        <input type="number" step="0.5" name="anosExperiencia"
+        <input type="number"
+            step="0.5"
+            name="anosExperiencia"
             placeholder="Ej: 2.5"
-            value="{{ old('anosExperiencia') }}"
+            value="{{ old('anosExperiencia', $habilidad->anios_experiencia ?? '') }}"
             class="w-full p-3 border border-gray-300 rounded-lg bg-gray-200">
     </div>
 
@@ -59,7 +69,7 @@
 
         <textarea name="descripcion"
             placeholder="Describe tu experiencia y proyectos realizados..."
-            class="w-full p-3 border border-gray-300 rounded-lg bg-gray-200 min-h-32">{{ old('descripcion') }}</textarea>
+            class="w-full p-3 border border-gray-300 rounded-lg bg-gray-200 min-h-32">{{ old('descripcion', $habilidad->descripcion ?? '') }}</textarea>
 
         <p class="text-sm text-gray-500 mt-1">
             Mínimo 20 caracteres, máximo 500 caracteres
@@ -79,7 +89,9 @@
         <!-- GUARDAR -->
         <button type="submit"
             class="py-4 text-lg rounded-lg text-white bg-black hover:bg-gray-800 transition">
-            💾 Guardar Habilidad
+
+            {{ isset($habilidad) ? '💾 Actualizar Habilidad' : '💾 Guardar Habilidad' }}
+
         </button>
 
     </div>
