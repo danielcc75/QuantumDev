@@ -7,6 +7,8 @@
     <title>QuantumDev - Gestión de Usuarios</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .transition-all {
             transition: all 0.3s ease;
@@ -31,7 +33,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <nav class="mt-8">
                 <a href="{{ route('usuarios.index') }}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition-all sidebar-item">
                     <i class="fas fa-users w-5 h-5 mr-3"></i>
