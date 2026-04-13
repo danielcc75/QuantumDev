@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Usuario;
 use App\Models\Perfil;
 use App\Models\PerfilLink;
+use App\Models\Educacion;
 use App\Models\ExperienciaLaboral;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

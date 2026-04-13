@@ -52,7 +52,6 @@ function mostrarConfirmacionPerfil(tipo) {
     btn.className = `flex-1 px-4 py-2.5 text-sm text-white rounded-xl font-medium transition ${cfg.btnClass}`;
     btn.onclick = () => { cerrarConfirmacionPerfil(); cfg.accion(); };
     
-    // Mostrar botón de cancelar solo si no es éxito
     const cancelBtn = document.querySelector('#modalConfirmacionPerfil .flex.gap-3 button:first-child');
     if (cancelBtn) {
         cancelBtn.style.display = tipo === 'exito' ? 'none' : 'block';
@@ -77,7 +76,6 @@ function mostrarExitoPerfil() {
     btn.className = `flex-1 px-4 py-2.5 text-sm text-white rounded-xl font-medium transition ${cfg.btnClass}`;
     btn.onclick = () => { cerrarConfirmacionPerfil(); };
     
-    // Ocultar botón de cancelar
     const cancelBtn = document.querySelector('#modalConfirmacionPerfil .flex.gap-3 button:first-child');
     if (cancelBtn) {
         cancelBtn.style.display = 'none';
@@ -86,7 +84,6 @@ function mostrarExitoPerfil() {
     document.getElementById('modalConfirmacionPerfil').classList.remove('hidden');
     document.getElementById('modalConfirmacionPerfil').classList.add('flex');
     
-    // Auto cerrar después de 2 segundos
     setTimeout(() => {
         cerrarConfirmacionPerfil();
     }, 2000);
@@ -96,7 +93,6 @@ function cerrarConfirmacionPerfil() {
     document.getElementById('modalConfirmacionPerfil').classList.add('hidden');
     document.getElementById('modalConfirmacionPerfil').classList.remove('flex');
     
-    // Restaurar botón de cancelar
     const cancelBtn = document.querySelector('#modalConfirmacionPerfil .flex.gap-3 button:first-child');
     if (cancelBtn) {
         cancelBtn.style.display = 'block';
@@ -124,41 +120,66 @@ function resaltarErrorPerfil(campoId, mensaje) {
     setTimeout(() => msg.remove(), 2500);
 }
 
-// ── Actualizar la interfaz con los nuevos datos ────────────────────────────────
+// ── Actualizar la interfaz con los nuevos datos (CORREGIDO) ───────────────────
 
 function actualizarInterfazPerfil(data) {
-    // Actualizar nombre en el header
+    // 1. Actualizar nombre completo en el header (dropdown)
     const nombreCompleto = data.usuario.nombre + ' ' + data.usuario.apellido;
     const headerNombre = document.querySelector('header .text-sm.font-medium.text-gray-700');
     if (headerNombre) headerNombre.textContent = nombreCompleto;
     
-    // ============================================
-    // ACTUALIZAR FOTO EN EL HEADER (ICONO)
-    // ============================================
-    const headerAvatarContainer = document.querySelector('header .w-10.h-10');
-    if (headerAvatarContainer) {
-        if (data.perfil.foto_perfil) {
-            // Mostrar imagen
-            headerAvatarContainer.innerHTML = `<img src="${data.perfil.foto_perfil}" class="w-full h-full rounded-full object-cover">`;
-        } else {
-            // Mostrar iniciales
-            const iniciales = (data.usuario.nombre?.charAt(0) || 'U') + (data.usuario.apellido?.charAt(0) || 'S');
-            headerAvatarContainer.innerHTML = `<div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center shadow-md">
+    // 2. Actualizar nombre en el perfil (h1 principal)
+    const nombrePerfil = document.querySelector('.max-w-4xl.mx-auto .bg-white.rounded-2xl h1');
+    if (nombrePerfil) nombrePerfil.textContent = nombreCompleto;
+    
+    // 3. Actualizar título profesional
+    const tituloPerfil = document.querySelector('.max-w-4xl.mx-auto .bg-white.rounded-2xl .text-gray-500.mt-1');
+    if (tituloPerfil && data.perfil.titulo_profesional) {
+        tituloPerfil.textContent = data.perfil.titulo_profesional;
+    }
+    
+    // 4. Actualizar ubicación
+    const ubicacionSpan = document.querySelector('.max-w-4xl.mx-auto .bg-white.rounded-2xl .flex.flex-wrap .flex.items-center:first-child span:last-child');
+    if (ubicacionSpan && data.perfil.ubicacion) {
+        ubicacionSpan.textContent = data.perfil.ubicacion;
+    }
+    
+    // 5. Actualizar correo electrónico
+    const emailSpan = document.querySelector('.max-w-4xl.mx-auto .bg-white.rounded-2xl .flex.flex-wrap .flex.items-center:last-child span:last-child');
+    if (emailSpan && data.usuario.correo_electronico) {
+        emailSpan.textContent = data.usuario.correo_electronico;
+    }
+    
+    // 6. Actualizar biografía
+    const bioParrafo = document.querySelector('#perfil_biografia_texto');
+    if (bioParrafo) {
+        bioParrafo.textContent = data.perfil.biografia || 'Sin biografía. Haz clic en "Editar Perfil" para agregar una descripción.';
+    }
+    
+    // 7. Actualizar foto en el header (dropdown)
+    const dropdownButton = document.querySelector('header .dropdown button');
+    if (dropdownButton) {
+        let avatarContainer = dropdownButton.querySelector('.w-10.h-10, div:first-child');
+        if (avatarContainer) {
+            if (data.perfil.foto_perfil) {
+                avatarContainer.innerHTML = `<img src="${data.perfil.foto_perfil}" class="w-full h-full rounded-full object-cover">`;
+                avatarContainer.className = 'w-10 h-10 rounded-full object-cover shadow-md';
+            } else {
+                const iniciales = (data.usuario.nombre?.charAt(0) || 'U') + (data.usuario.apellido?.charAt(0) || 'S');
+                avatarContainer.innerHTML = `<div class="w-full h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
                                                 <span class="text-white text-sm font-bold">${iniciales.toUpperCase()}</span>
-                                              </div>`;
+                                            </div>`;
+                avatarContainer.className = 'w-10 h-10';
+            }
         }
     }
     
-    // ============================================
-    // ACTUALIZAR FOTO EN EL PERFIL
-    // ============================================
-    const fotoContainer = document.querySelector('#seccion-perfil .flex-shrink-0');
+    // 8. Actualizar foto en el perfil
+    const fotoContainer = document.querySelector('.max-w-4xl.mx-auto .bg-white.rounded-2xl .flex-shrink-0');
     if (fotoContainer) {
         if (data.perfil.foto_perfil) {
-            // Mostrar imagen
             fotoContainer.innerHTML = `<img src="${data.perfil.foto_perfil}" alt="Foto de perfil" class="w-32 h-32 rounded-full object-cover border-4 border-blue-100">`;
         } else {
-            // Mostrar iniciales
             const iniciales = (data.usuario.nombre?.charAt(0) || 'U') + (data.usuario.apellido?.charAt(0) || 'S');
             fotoContainer.innerHTML = `<div class="w-32 h-32 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center border-4 border-blue-100">
                                         <span class="text-white text-4xl font-bold">${iniciales.toUpperCase()}</span>
@@ -166,45 +187,42 @@ function actualizarInterfazPerfil(data) {
         }
     }
     
-    // Actualizar cabecera del perfil (nombre, título, ubicación, email)
-    const nombrePerfil = document.querySelector('#seccion-perfil h1');
-    if (nombrePerfil) nombrePerfil.textContent = nombreCompleto;
-    
-    // Actualizar ubicación
-    const ubicacionPerfil = document.querySelector('#seccion-perfil .flex.flex-wrap .flex.items-center:first-child');
-    if (ubicacionPerfil && data.perfil.ubicacion) {
-        ubicacionPerfil.innerHTML = `<i class="fas fa-map-marker-alt w-4 h-4 mr-1 text-gray-400"></i> ${data.perfil.ubicacion}`;
-    }
-    
-    // Actualizar email
-    const emailPerfil = document.querySelector('#seccion-perfil .flex.flex-wrap .flex.items-center:last-child');
-    if (emailPerfil && data.usuario.correo_electronico) {
-        emailPerfil.innerHTML = `<i class="fas fa-envelope w-4 h-4 mr-1 text-gray-400"></i> ${data.usuario.correo_electronico}`;
-    }
-    
-    // Actualizar biografía
-    const bioTexto = document.querySelector('#seccion-perfil .bg-white.rounded-2xl:first-child p');
-    if (bioTexto) {
-        bioTexto.textContent = data.perfil.biografia || 'Sin biografía. Haz clic en "Editar Perfil" para agregar una descripción.';
-    }
-    
-    // Actualizar links de redes sociales
+    // 9. Actualizar links de redes sociales
+    // Crear mapa de links
     const linksMap = {};
     (data.links || []).forEach(link => {
         linksMap[link.tipo] = link.url;
     });
     
-    const githubLink = document.querySelector('#seccion-perfil .flex.flex-wrap.justify-center a[href*="github"]');
-    if (githubLink && linksMap.github) githubLink.href = linksMap.github;
-    
-    const linkedinLink = document.querySelector('#seccion-perfil .flex.flex-wrap.justify-center a[href*="linkedin"]');
-    if (linkedinLink && linksMap.linkedin) linkedinLink.href = linksMap.linkedin;
-    
-    const twitterLink = document.querySelector('#seccion-perfil .flex.flex-wrap.justify-center a[href*="twitter"]');
-    if (twitterLink && linksMap.twitter) twitterLink.href = linksMap.twitter;
-    
-    const portfolioLink = document.querySelector('#seccion-perfil .flex.flex-wrap.justify-center a[href*="portfolio"]');
-    if (portfolioLink && linksMap.portfolio) portfolioLink.href = linksMap.portfolio;
+    // Obtener el contenedor de redes sociales
+    const socialContainer = document.querySelector('.max-w-4xl.mx-auto .bg-white.rounded-2xl .flex.flex-wrap.justify-center.md\\:justify-start.gap-3.mt-4');
+    if (socialContainer) {
+        // Limpiar y regenerar los links
+        const linksConfig = {
+            github: { icon: 'fab fa-github', color: 'hover:text-gray-900' },
+            linkedin: { icon: 'fab fa-linkedin', color: 'hover:text-blue-700' },
+            twitter: { icon: 'fab fa-twitter', color: 'hover:text-blue-400' },
+            portfolio: { icon: 'fas fa-globe', color: 'hover:text-green-600' }
+        };
+        
+        socialContainer.innerHTML = '';
+        
+        for (const [tipo, config] of Object.entries(linksConfig)) {
+            if (linksMap[tipo] && linksMap[tipo].trim() !== '') {
+                const link = document.createElement('a');
+                link.href = linksMap[tipo];
+                link.target = '_blank';
+                link.className = `text-gray-600 ${config.color} transition-colors`;
+                link.innerHTML = `<i class="${config.icon} text-xl"></i>`;
+                socialContainer.appendChild(link);
+            } else {
+                const span = document.createElement('span');
+                span.className = 'text-gray-300';
+                span.innerHTML = `<i class="${config.icon} text-xl"></i>`;
+                socialContainer.appendChild(span);
+            }
+        }
+    }
 }
 
 // ── Modal Perfil ───────────────────────────────────────────────────────────────
@@ -220,6 +238,7 @@ function abrirModalPerfil() {
             document.getElementById('edit_correo').value = data.usuario?.correo_electronico || '';
             document.getElementById('edit_telefono').value = data.usuario?.telefono || '';
             document.getElementById('edit_biografia').value = data.perfil?.biografia || '';
+            document.getElementById('edit_titulo').value = data.perfil?.titulo_profesional || '';
             document.getElementById('edit_ubicacion').value = data.perfil?.ubicacion || '';
             document.getElementById('edit_foto').value = data.perfil?.foto_perfil || '';
             
@@ -310,7 +329,6 @@ function submitPerfil() {
     .then(data => {
         if (data.success) {
             cerrarModalPerfil();
-            // Recargar los datos actualizados
             return fetch('{{ route("perfil.editar") }}');
         } else {
             alert(data.message || 'Error al guardar');
@@ -346,4 +364,5 @@ document.addEventListener('keydown', function(e) {
 });
 
 console.log('Scripts de perfil cargados correctamente');
+
 </script>

@@ -56,3 +56,16 @@ Route::delete('/proyectos/{id}', [ProyectoController::class, 'destroy'])->name('
 Route::get('/mi-perfil', [UsuarioWebController::class, 'verPerfil'])->name('perfil.ver');
 Route::get('/mi-perfil/editar', [UsuarioWebController::class, 'editarPerfil'])->name('perfil.editar');
 Route::put('/mi-perfil', [UsuarioWebController::class, 'actualizarPerfil'])->name('perfil.actualizar');
+
+// Experiencia Laboral
+Route::get('/perfil/experiencia/{id}', [App\Http\Controllers\ExperienciaController::class, 'show'])->name('perfil.experiencia.mostrar');
+Route::post('/perfil/experiencia', [App\Http\Controllers\ExperienciaController::class, 'store'])->name('perfil.experiencia.guardar');
+Route::put('/perfil/experiencia/{id}', [App\Http\Controllers\ExperienciaController::class, 'update'])->name('perfil.experiencia.actualizar');
+Route::delete('/perfil/experiencia/{id}', [App\Http\Controllers\ExperienciaController::class, 'destroy'])->name('perfil.experiencia.eliminar');
+
+
+// Formación Académica
+Route::get('/perfil/educacion/{id}', [App\Http\Controllers\EducacionController::class, 'show']);  // ← NUEVA
+Route::post('/perfil/educacion', [App\Http\Controllers\EducacionController::class, 'store']);
+Route::put('/perfil/educacion/{id}', [App\Http\Controllers\EducacionController::class, 'update']);
+Route::delete('/perfil/educacion/{id}', [App\Http\Controllers\EducacionController::class, 'destroy']);
