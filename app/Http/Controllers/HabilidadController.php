@@ -67,7 +67,7 @@ class HabilidadController extends Controller
             'nombreHabilidad'   => 'required|string|max:100',
             'categoria'         => 'required|exists:categoria,id_categoria',
             'anosExperiencia'   => 'required|numeric|min:0',
-            'descripcion'       => 'required|string|min:10|max:500',
+            'descripcion'       => 'required|string|min:0|max:500',
         ]);
 
         $habilidad = Habilidad::findOrFail($id);
