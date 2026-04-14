@@ -60,7 +60,7 @@
         </div>
 
         {{-- Grid de tarjetas --}}
-        <div id="proyectos-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 {{ $proyectos->isEmpty() ? 'hidden' : '' }}">
+        <div id="proyectos-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5 {{ $proyectos->isEmpty() ? 'hidden' : '' }}">
             @foreach($proyectos as $proyecto)
                 @include('gestionarProyectos._card', [
                     'proyecto'    => $proyecto,

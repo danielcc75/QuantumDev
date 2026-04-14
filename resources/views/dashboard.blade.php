@@ -230,6 +230,16 @@
                     <span class="font-medium">Mis Proyectos</span>
                 </a>
 
+                <a href="#" data-seccion="experiencia" class="seccion-link flex items-center px-6 py-3 text-gray-700 transition-all">
+                    <i class="fas fa-briefcase w-5 h-5 mr-3 text-gray-500"></i>
+                    <span class="font-medium">Experiencia Laboral</span>
+                </a>
+
+                <a href="#" data-seccion="formacion" class="seccion-link flex items-center px-6 py-3 text-gray-700 transition-all">
+                    <i class="fas fa-graduation-cap w-5 h-5 mr-3 text-gray-500"></i>
+                    <span class="font-medium">Formación Académica</span>
+                </a>
+
                 <a href="#" data-seccion="habilidades" class="seccion-link flex items-center px-6 py-3 text-gray-700 transition-all">
                     <i class="fas fa-code w-5 h-5 mr-3 text-gray-500"></i>
                     <span class="font-medium">Mis Habilidades</span>
@@ -346,6 +356,20 @@
             <div id="seccion-proyectos" class="seccion-contenido">
                 @include('gestionarPerfil.proyectos', [
                     'userId' => $usuario->id_usuario,
+                    'nombreUsuario' => $nombreUsuario
+                ])
+            </div>
+
+            <div id="seccion-experiencia" class="seccion-contenido">
+                @include('gestionarPerfil.experiencia', [
+                    'userId'        => $usuario->id_usuario,
+                    'nombreUsuario' => $nombreUsuario
+                ])
+            </div>
+
+            <div id="seccion-formacion" class="seccion-contenido">
+                @include('gestionarPerfil.formacion', [
+                    'userId'        => $usuario->id_usuario,
                     'nombreUsuario' => $nombreUsuario
                 ])
             </div>

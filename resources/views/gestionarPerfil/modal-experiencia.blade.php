@@ -2,7 +2,7 @@
 
 <div id="modalExperiencia" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4" onclick="cerrarModalExperienciaFondo(event)">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
-        
+
         {{-- Header --}}
         <div class="bg-[#1e3a5f] text-white px-6 py-4 flex items-center justify-between rounded-t-2xl sticky top-0 z-10">
             <div>
@@ -18,7 +18,7 @@
         <form id="formExperiencia" class="p-6">
             @csrf
             <input type="hidden" id="exp_id_experiencia" name="id_experiencia">
-            
+
             <div class="mb-4">
                 <label class="block text-xs font-medium text-gray-700 mb-1">
                     Cargo <span class="text-red-500">*</span>
@@ -42,14 +42,12 @@
                     <label class="block text-xs font-medium text-gray-700 mb-1">
                         Fecha Inicio <span class="text-red-500">*</span>
                     </label>
-                    <input type="month" id="exp_fecha_ini" name="fecha_ini"
+                    <input type="date" id="exp_fecha_ini" name="fecha_ini"
                         class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                 </div>
                 <div id="exp_fecha_fin_container">
-                    <label class="block text-xs font-medium text-gray-700 mb-1">
-                        Fecha Fin
-                    </label>
-                    <input type="month" id="exp_fecha_fin" name="fecha_fin"
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Fecha Fin</label>
+                    <input type="date" id="exp_fecha_fin" name="fecha_fin"
                         class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                 </div>
             </div>
@@ -75,7 +73,7 @@
                     Cancelar
                 </button>
                 <button type="button" onclick="confirmarGuardarExperiencia()"
-                    class="flex-1 px-4 py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition">
+                    class="flex-1 px-4 py-2 text-sm bg-[#1e3a5f] hover:bg-[#e11d48] text-white rounded-lg font-medium transition">
                     <i class="fas fa-save text-xs mr-1"></i> Guardar
                 </button>
             </div>
@@ -83,9 +81,9 @@
     </div>
 </div>
 
-{{-- Modal de Confirmación para Experiencia --}}
+{{-- Modal de Confirmación --}}
 <div id="modalConfirmacionExperiencia" class="fixed inset-0 bg-black bg-opacity-60 z-[60] hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
         <div class="p-6 text-center">
             <div id="confirmIconWrapperExperiencia" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <i id="confirmIconExperiencia" class="text-2xl"></i>
@@ -107,63 +105,62 @@
 </div>
 
 <script>
-// ============================================
+// ============================================================
 // VARIABLES GLOBALES
-// ============================================
+// ============================================================
 let experienciaEditandoId = null;
 
-// ============================================
+// ============================================================
 // CONFIGURACIÓN DE CONFIRMACIÓN
-// ============================================
+// ============================================================
 const CONFIRM_CONFIG_EXPERIENCIA = {
     guardar: {
-        titulo: '¿Guardar experiencia?',
-        mensaje: 'Se almacenará la información de tu experiencia laboral. Podrás editarla en cualquier momento.',
-        icon: 'fas fa-save',
-        iconBg: 'bg-blue-50',
+        titulo:    '¿Guardar experiencia?',
+        mensaje:   'Se almacenará la información de tu experiencia laboral. Podrás editarla en cualquier momento.',
+        icon:      'fas fa-save',
+        iconBg:    'bg-blue-50',
         iconColor: 'text-blue-500',
-        btnClass: 'bg-blue-500 hover:bg-blue-600',
-        accion: () => submitExperiencia(),
+        btnClass:  'bg-[#1e3a5f] hover:bg-[#1e3a5f]/90',
+        accion:    () => submitExperiencia(),
     },
     cancelar: {
-        titulo: '¿Descartar cambios?',
-        mensaje: 'Los datos ingresados no se guardarán. Esta acción no se puede deshacer.',
-        icon: 'fas fa-times-circle',
-        iconBg: 'bg-yellow-50',
+        titulo:    '¿Descartar cambios?',
+        mensaje:   'Los datos ingresados no se guardarán. Esta acción no se puede deshacer.',
+        icon:      'fas fa-times-circle',
+        iconBg:    'bg-yellow-50',
         iconColor: 'text-yellow-500',
-        btnClass: 'bg-yellow-500 hover:bg-yellow-600',
-        accion: () => cerrarModalExperiencia(),
+        btnClass:  'bg-yellow-500 hover:bg-yellow-600',
+        accion:    () => cerrarModalExperiencia(),
     },
     eliminar: {
-        titulo: '¿Eliminar experiencia?',
-        mensaje: 'Esta acción es permanente y no se puede deshacer. La experiencia será eliminada definitivamente.',
-        icon: 'fas fa-trash-alt',
-        iconBg: 'bg-red-50',
+        titulo:    '¿Eliminar experiencia?',
+        mensaje:   'Esta acción es permanente y no se puede deshacer. La experiencia será eliminada definitivamente.',
+        icon:      'fas fa-trash-alt',
+        iconBg:    'bg-red-50',
         iconColor: 'text-red-500',
-        btnClass: 'bg-red-500 hover:bg-red-600',
-        accion: null,
+        btnClass:  'bg-[#e11d48] hover:bg-red-600',
+        accion:    null,
     },
 };
 
-// ============================================
+// ============================================================
 // MODAL DE CONFIRMACIÓN
-// ============================================
+// ============================================================
 function mostrarConfirmacionExperiencia(tipo) {
     const cfg = CONFIRM_CONFIG_EXPERIENCIA[tipo];
-    
-    document.getElementById('confirmTituloExperiencia').textContent = cfg.titulo;
+    document.getElementById('confirmTituloExperiencia').textContent  = cfg.titulo;
     document.getElementById('confirmMensajeExperiencia').textContent = cfg.mensaje;
-    
+
     const wrapper = document.getElementById('confirmIconWrapperExperiencia');
     wrapper.className = `w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${cfg.iconBg}`;
-    
+
     const icon = document.getElementById('confirmIconExperiencia');
     icon.className = `${cfg.icon} text-2xl ${cfg.iconColor}`;
-    
+
     const btn = document.getElementById('confirmBtnExperiencia');
     btn.className = `flex-1 px-4 py-2.5 text-sm text-white rounded-xl font-medium transition ${cfg.btnClass}`;
     btn.onclick = () => { cerrarConfirmacionExperiencia(); cfg.accion(); };
-    
+
     document.getElementById('modalConfirmacionExperiencia').classList.remove('hidden');
     document.getElementById('modalConfirmacionExperiencia').classList.add('flex');
 }
@@ -177,18 +174,19 @@ document.getElementById('modalConfirmacionExperiencia')?.addEventListener('click
     if (e.target === this) cerrarConfirmacionExperiencia();
 });
 
-// ============================================
+// ============================================================
 // HELPER: RESALTAR ERROR
-// ============================================
+// ============================================================
 function resaltarErrorExperiencia(campoId, mensaje) {
     const el = document.getElementById(campoId);
+    if (!el) return;
     el.classList.add('border-red-400', 'ring-2', 'ring-red-300');
     el.focus();
     setTimeout(() => el.classList.remove('border-red-400', 'ring-2', 'ring-red-300'), 2500);
-    
+
     const prev = el.parentElement.querySelector('.error-msg-exp');
     if (prev) prev.remove();
-    
+
     const msg = document.createElement('p');
     msg.className = 'error-msg-exp text-xs text-red-500 mt-1';
     msg.textContent = mensaje;
@@ -196,38 +194,50 @@ function resaltarErrorExperiencia(campoId, mensaje) {
     setTimeout(() => msg.remove(), 2500);
 }
 
-// ============================================
+// ============================================================
+// RECALCULAR ESTADÍSTICAS Y ESTADO VACÍO
+// ============================================================
+function recalcularStatsExperiencia() {
+    const lista = document.getElementById('experiencias-lista');
+    if (!lista) return;
+
+    const cards       = lista.querySelectorAll('[data-experiencia-id]');
+    const total       = cards.length;
+    const actuales    = lista.querySelectorAll('[data-trabajo-actual="1"]').length;
+    const finalizadas = total - actuales;
+
+    const elTotal      = document.getElementById('stat-exp-total');
+    const elActual     = document.getElementById('stat-exp-actual');
+    const elFinalizada = document.getElementById('stat-exp-finalizada');
+    if (elTotal)      elTotal.textContent      = total;
+    if (elActual)     elActual.textContent     = actuales;
+    if (elFinalizada) elFinalizada.textContent = finalizadas;
+
+    const emptyState = document.getElementById('empty-state-exp');
+    if (emptyState) emptyState.classList.toggle('hidden', total > 0);
+    lista.classList.toggle('hidden', total === 0);
+}
+
+// ============================================================
 // CONFIRMAR GUARDAR (VALIDACIONES)
-// ============================================
+// ============================================================
 function confirmarGuardarExperiencia() {
-    const cargo = document.getElementById('exp_cargo').value.trim();
-    const empresa = document.getElementById('exp_empresa').value.trim();
-    const fechaIni = document.getElementById('exp_fecha_ini').value;
-    const fechaFin = document.getElementById('exp_fecha_fin').value;
+    const cargo       = document.getElementById('exp_cargo').value.trim();
+    const empresa     = document.getElementById('exp_empresa').value.trim();
+    const fechaIni    = document.getElementById('exp_fecha_ini').value;
+    const fechaFin    = document.getElementById('exp_fecha_fin').value;
     const trabajoActual = document.getElementById('exp_trabajo_actual').checked;
 
-    if (!cargo) {
-        resaltarErrorExperiencia('exp_cargo', 'El cargo es obligatorio.');
-        return;
-    }
-
-    if (!empresa) {
-        resaltarErrorExperiencia('exp_empresa', 'La empresa es obligatoria.');
-        return;
-    }
-
-    if (!fechaIni) {
-        resaltarErrorExperiencia('exp_fecha_ini', 'La fecha de inicio es obligatoria.');
-        return;
-    }
+    if (!cargo)   { resaltarErrorExperiencia('exp_cargo',    'El cargo es obligatorio.');    return; }
+    if (!empresa) { resaltarErrorExperiencia('exp_empresa',  'La empresa es obligatoria.');  return; }
+    if (!fechaIni){ resaltarErrorExperiencia('exp_fecha_ini','La fecha de inicio es obligatoria.'); return; }
 
     if (!trabajoActual && !fechaFin) {
-        resaltarErrorExperiencia('exp_fecha_fin', 'Si no es tu trabajo actual, debes indicar la fecha de finalización.');
+        resaltarErrorExperiencia('exp_fecha_fin', 'Si no es tu trabajo actual, indica la fecha de finalización.');
         return;
     }
-
     if (!trabajoActual && fechaFin && fechaFin < fechaIni) {
-        resaltarErrorExperiencia('exp_fecha_fin', 'La fecha de finalización no puede ser anterior a la fecha de inicio.');
+        resaltarErrorExperiencia('exp_fecha_fin', 'La fecha de fin no puede ser anterior al inicio.');
         return;
     }
 
@@ -235,7 +245,7 @@ function confirmarGuardarExperiencia() {
 }
 
 function confirmarCancelarExperiencia() {
-    const cargo = document.getElementById('exp_cargo').value.trim();
+    const cargo   = document.getElementById('exp_cargo').value.trim();
     const empresa = document.getElementById('exp_empresa').value.trim();
     if (cargo || empresa) {
         mostrarConfirmacionExperiencia('cancelar');
@@ -244,55 +254,55 @@ function confirmarCancelarExperiencia() {
     }
 }
 
-// ============================================
+// ============================================================
 // ABRIR MODAL CREAR
-// ============================================
+// ============================================================
 function abrirModalExperiencia() {
     document.getElementById('modalExperienciaTitulo').textContent = 'Agregar Experiencia Laboral';
     document.getElementById('formExperiencia').reset();
     document.getElementById('exp_id_experiencia').value = '';
     experienciaEditandoId = null;
-    
+
     document.getElementById('exp_fecha_fin_container').style.opacity = '1';
     document.getElementById('exp_fecha_fin').disabled = false;
     document.getElementById('exp_trabajo_actual').checked = false;
-    
+
     document.getElementById('modalExperiencia').classList.remove('hidden');
     document.getElementById('modalExperiencia').classList.add('flex');
 }
 
-// ============================================
+// ============================================================
 // ABRIR MODAL EDITAR
-// ============================================
+// ============================================================
 function abrirModalEditarExperiencia(exp) {
     document.getElementById('modalExperienciaTitulo').textContent = 'Editar Experiencia Laboral';
     document.getElementById('exp_id_experiencia').value = exp.id_experiencia;
-    document.getElementById('exp_cargo').value = exp.cargo ?? '';
-    document.getElementById('exp_empresa').value = exp.empresa ?? '';
-    document.getElementById('exp_fecha_ini').value = exp.fecha_ini ? exp.fecha_ini.substring(0, 7) : '';
-    document.getElementById('exp_fecha_fin').value = exp.fecha_fin ? exp.fecha_fin.substring(0, 7) : '';
-    document.getElementById('exp_descripcion').value = exp.descripcion ?? '';
-    
+    document.getElementById('exp_cargo').value          = exp.cargo       ?? '';
+    document.getElementById('exp_empresa').value        = exp.empresa     ?? '';
+    document.getElementById('exp_fecha_ini').value      = exp.fecha_ini   ? exp.fecha_ini.substring(0, 10) : '';
+    document.getElementById('exp_fecha_fin').value      = exp.fecha_fin   ? exp.fecha_fin.substring(0, 10) : '';
+    document.getElementById('exp_descripcion').value    = exp.descripcion ?? '';
+
     const trabajoActual = (exp.trabajo_actual === 1 || exp.trabajo_actual === true);
     document.getElementById('exp_trabajo_actual').checked = trabajoActual;
     experienciaEditandoId = exp.id_experiencia;
-    
+
     if (trabajoActual) {
         document.getElementById('exp_fecha_fin_container').style.opacity = '0.5';
         document.getElementById('exp_fecha_fin').disabled = true;
-        document.getElementById('exp_fecha_fin').value = '';
+        document.getElementById('exp_fecha_fin').value    = '';
     } else {
         document.getElementById('exp_fecha_fin_container').style.opacity = '1';
         document.getElementById('exp_fecha_fin').disabled = false;
     }
-    
+
     document.getElementById('modalExperiencia').classList.remove('hidden');
     document.getElementById('modalExperiencia').classList.add('flex');
 }
 
-// ============================================
+// ============================================================
 // CERRAR MODAL
-// ============================================
+// ============================================================
 function cerrarModalExperiencia() {
     document.getElementById('modalExperiencia').classList.add('hidden');
     document.getElementById('modalExperiencia').classList.remove('flex');
@@ -300,124 +310,123 @@ function cerrarModalExperiencia() {
 }
 
 function cerrarModalExperienciaFondo(event) {
-    if (event.target.id === 'modalExperiencia') {
-        confirmarCancelarExperiencia();
-    }
+    if (event.target.id === 'modalExperiencia') confirmarCancelarExperiencia();
 }
 
-// ============================================
+// ============================================================
 // CHECKBOX trabajo actual
-// ============================================
+// ============================================================
 document.getElementById('exp_trabajo_actual')?.addEventListener('change', function(e) {
-    const fechaFinContainer = document.getElementById('exp_fecha_fin_container');
-    const fechaFinInput = document.getElementById('exp_fecha_fin');
-    
+    const container = document.getElementById('exp_fecha_fin_container');
+    const input     = document.getElementById('exp_fecha_fin');
     if (e.target.checked) {
-        fechaFinContainer.style.opacity = '0.5';
-        fechaFinInput.disabled = true;
-        fechaFinInput.value = '';
+        container.style.opacity = '0.5';
+        input.disabled = true;
+        input.value    = '';
     } else {
-        fechaFinContainer.style.opacity = '1';
-        fechaFinInput.disabled = false;
+        container.style.opacity = '1';
+        input.disabled = false;
     }
 });
 
-// ============================================
-// TOAST NOTIFICATIONS
-// ============================================
-function mostrarToast(mensaje, tipo = 'success') {
-    let toastContainer = document.getElementById('toastContainer');
-    if (!toastContainer) {
-        toastContainer = document.createElement('div');
-        toastContainer.id = 'toastContainer';
-        toastContainer.className = 'fixed bottom-4 right-4 z-50 space-y-2';
-        document.body.appendChild(toastContainer);
-    }
-    
-    const toast = document.createElement('div');
-    const bgColor = tipo === 'success' ? 'bg-green-500' : 'bg-red-500';
-    toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg text-sm flex items-center gap-2 animate-in slide-in-from-right-5`;
-    
-    const icon = tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-    toast.innerHTML = `<i class="fas ${icon}"></i><span>${mensaje}</span>`;
-    
-    toastContainer.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        toast.style.transition = 'all 0.3s ease';
-        setTimeout(() => {
-            toast.remove();
-            if (toastContainer.children.length === 0) {
-                toastContainer.remove();
-            }
-        }, 300);
-    }, 3000);
-}
-
-// ============================================
-// ESCAPAR HTML
-// ============================================
-function escapeHtml(text) {
+// ============================================================
+// CONSTRUIR TARJETA HTML (estilo card igual que gestionarProyectos)
+// ============================================================
+function escapeHtmlExp(text) {
     if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
 
-// ============================================
-// CONSTRUIR TARJETA HTML
-// ============================================
 function buildCardHTMLExperiencia(experiencia) {
-    const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    
+    const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
     let fechaInicioStr = '';
     if (experiencia.fecha_ini) {
-        const fecha = new Date(experiencia.fecha_ini);
-        fechaInicioStr = `${meses[fecha.getMonth()]} ${fecha.getFullYear()}`;
+        const d = new Date(experiencia.fecha_ini + 'T12:00:00');
+        fechaInicioStr = `${meses[d.getMonth()]} ${d.getFullYear()}`;
     }
-    
+
+    const esActual = (experiencia.trabajo_actual === 1 || experiencia.trabajo_actual === true);
     let fechaFinStr = '';
-    if (experiencia.trabajo_actual) {
+    if (esActual) {
         fechaFinStr = '<span class="text-green-600 font-medium">Actualidad</span>';
     } else if (experiencia.fecha_fin) {
-        const fecha = new Date(experiencia.fecha_fin);
-        fechaFinStr = `${meses[fecha.getMonth()]} ${fecha.getFullYear()}`;
+        const d = new Date(experiencia.fecha_fin + 'T12:00:00');
+        fechaFinStr = `${meses[d.getMonth()]} ${d.getFullYear()}`;
     }
-    
-    const cargo = escapeHtml(experiencia.cargo || '');
-    const empresa = escapeHtml(experiencia.empresa || '');
-    const descripcion = escapeHtml(experiencia.descripcion || 'Sin descripción');
-    
+
+    const badgeClass = esActual ? 'bg-[#1e3a5f]/10 text-[#1e3a5f]' : 'bg-gray-100 text-gray-600';
+    const badgeLabel = esActual ? 'actual' : 'finalizada';
+
+    const cargo      = escapeHtmlExp(experiencia.cargo      || '');
+    const empresa    = escapeHtmlExp(experiencia.empresa    || '');
+    const descripcion = escapeHtmlExp(experiencia.descripcion || '');
+
+    const expJson = JSON.stringify(experiencia).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+
     return `
-<div class="experiencia-item mb-6 last:mb-0 border-b border-gray-100 pb-4 last:border-0" data-id="${experiencia.id_experiencia}">
-    <div class="flex justify-between items-start flex-wrap gap-2">
-        <div class="flex-1">
-            <h3 class="font-semibold text-gray-800">${cargo}</h3>
-            <p class="text-blue-600 font-medium">${empresa}</p>
-        </div>
-        <div class="flex items-center gap-2">
-            <p class="text-sm text-gray-500">
-                ${fechaInicioStr} - ${fechaFinStr}
-            </p>
-            <button onclick='abrirModalEditarExperiencia(${JSON.stringify(experiencia).replace(/'/g, "\\'")})' 
-                class="text-gray-400 hover:text-blue-500 transition">
-                <i class="fas fa-edit"></i>
-            </button>
-            <button onclick="confirmarEliminarExperiencia(${experiencia.id_experiencia})" 
-                class="text-gray-400 hover:text-red-500 transition">
-                <i class="fas fa-trash"></i>
-            </button>
-        </div>
+<div class="bg-white rounded-2xl border border-gray-200 shadow-md p-5 flex flex-col gap-2
+            border-l-4 border-l-[#1e3a5f] hover:-translate-y-1 hover:shadow-xl transition-all duration-200"
+     data-experiencia-id="${experiencia.id_experiencia}"
+     data-trabajo-actual="${esActual ? '1' : '0'}">
+
+    <div class="flex items-start justify-between gap-2">
+        <h3 class="font-semibold text-[#1e3a5f] text-sm leading-snug line-clamp-1">${cargo}</h3>
+        <span class="text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap ${badgeClass}">${badgeLabel}</span>
     </div>
-    <p class="text-gray-600 text-sm mt-2">${descripcion}</p>
+
+    <p class="text-xs font-medium text-indigo-600">${empresa}</p>
+
+    <div class="flex items-center text-xs text-gray-400 gap-1.5">
+        <i class="fas fa-calendar-alt text-[#1e3a5f]/50"></i>
+        <span>${fechaInicioStr} – ${fechaFinStr}</span>
+    </div>
+
+    ${descripcion ? `<p class="text-xs text-gray-500 leading-relaxed line-clamp-2">${descripcion}</p>` : ''}
+
+    <div class="flex gap-2 pt-2 border-t border-gray-100 mt-auto">
+        <button onclick='abrirModalEditarExperiencia(${expJson})'
+            class="flex-1 flex items-center justify-center gap-1.5 text-xs border border-[#1e3a5f]/30 text-[#1e3a5f] hover:bg-[#1e3a5f]/5 px-3 py-1.5 rounded-lg transition">
+            <i class="fas fa-pencil-alt"></i> Editar
+        </button>
+        <button onclick="confirmarEliminarExperiencia(${experiencia.id_experiencia})"
+            class="flex-1 flex items-center justify-center gap-1.5 text-xs bg-[#e11d48] hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition">
+            <i class="fas fa-trash"></i> Eliminar
+        </button>
+    </div>
 </div>`;
 }
 
-// ============================================
+// ============================================================
+// TOAST
+// ============================================================
+function mostrarToastExp(mensaje, tipo = 'success') {
+    let container = document.getElementById('toastContainer');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'fixed bottom-4 right-4 z-[70] space-y-2';
+        document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    const bg    = tipo === 'success' ? 'bg-green-500' : 'bg-red-500';
+    const ico   = tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+    toast.className = `${bg} text-white px-6 py-3 rounded-lg shadow-lg text-sm flex items-center gap-2`;
+    toast.innerHTML = `<i class="fas ${ico}"></i><span>${mensaje}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity   = '0';
+        toast.style.transform = 'translateX(100%)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => { toast.remove(); if (!container.children.length) container.remove(); }, 300);
+    }, 3000);
+}
+
+// ============================================================
 // SUBMIT FORMULARIO (GUARDAR)
-// ============================================
+// ============================================================
 function submitExperiencia() {
     const btnGuardar = document.querySelector('#modalExperiencia button[onclick="confirmarGuardarExperiencia()"]');
     const textoOriginal = btnGuardar.innerHTML;
@@ -425,26 +434,25 @@ function submitExperiencia() {
     btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Guardando...';
 
     const trabajoActual = document.getElementById('exp_trabajo_actual').checked;
-
     const data = {
-        cargo: document.getElementById('exp_cargo').value,
-        empresa: document.getElementById('exp_empresa').value,
-        fecha_ini: document.getElementById('exp_fecha_ini').value,
-        fecha_fin: trabajoActual ? null : document.getElementById('exp_fecha_fin').value,
-        descripcion: document.getElementById('exp_descripcion').value,
-        trabajo_actual: trabajoActual ? 1 : 0
+        cargo:          document.getElementById('exp_cargo').value,
+        empresa:        document.getElementById('exp_empresa').value,
+        fecha_ini:      document.getElementById('exp_fecha_ini').value,
+        fecha_fin:      trabajoActual ? null : document.getElementById('exp_fecha_fin').value,
+        descripcion:    document.getElementById('exp_descripcion').value,
+        trabajo_actual: trabajoActual ? 1 : 0,
     };
 
-    const url = experienciaEditandoId ? `/perfil/experiencia/${experienciaEditandoId}` : '/perfil/experiencia';
+    const url    = experienciaEditandoId ? `/perfil/experiencia/${experienciaEditandoId}` : '/perfil/experiencia';
     const method = experienciaEditandoId ? 'PUT' : 'POST';
 
     fetch(url, {
-        method: method,
+        method,
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
     })
     .then(r => {
         if (r.status === 422) {
@@ -456,90 +464,64 @@ function submitExperiencia() {
         }
         return r.json();
     })
-    .then(data => {
-        if (data.success) {
-            const experiencia = data.experiencia;
-            const container = document.getElementById('experiencias-container');
-            
-            if (container.children.length === 1 && container.children[0].classList?.contains('text-center')) {
-                container.innerHTML = '';
-            }
-            
-            const cardHTML = buildCardHTMLExperiencia(experiencia);
-            
+    .then(res => {
+        if (res.success) {
+            const exp    = res.experiencia;
+            const lista  = document.getElementById('experiencias-lista');
+            const cardHTML = buildCardHTMLExperiencia(exp);
+
             if (experienciaEditandoId) {
-                const existing = container.querySelector(`.experiencia-item[data-id="${experiencia.id_experiencia}"]`);
-                if (existing) {
-                    existing.outerHTML = cardHTML;
-                }
+                const existing = lista?.querySelector(`[data-experiencia-id="${exp.id_experiencia}"]`);
+                if (existing) existing.outerHTML = cardHTML;
             } else {
-                container.insertAdjacentHTML('afterbegin', cardHTML);
+                lista?.insertAdjacentHTML('afterbegin', cardHTML);
             }
-            
+
+            recalcularStatsExperiencia();
             cerrarModalExperiencia();
-            mostrarToast('Experiencia guardada correctamente', 'success');
+            mostrarToastExp('Experiencia guardada correctamente', 'success');
         } else {
-            mostrarToast(data.error || 'Error al guardar', 'error');
+            mostrarToastExp(res.error || 'Error al guardar', 'error');
         }
     })
-    .catch(error => {
-        if (error.message !== 'validation') {
-            console.error('Error:', error);
-            mostrarToast('Hubo un problema al guardar', 'error');
+    .catch(err => {
+        if (err.message !== 'validation') {
+            console.error(err);
+            mostrarToastExp('Hubo un problema al guardar', 'error');
         }
     })
     .finally(() => {
-        btnGuardar.disabled = false;
+        btnGuardar.disabled  = false;
         btnGuardar.innerHTML = textoOriginal;
     });
 }
 
-// ============================================
-// CONFIRMAR ELIMINAR
-// ============================================
+// ============================================================
+// ELIMINAR
+// ============================================================
 function confirmarEliminarExperiencia(id) {
     CONFIRM_CONFIG_EXPERIENCIA.eliminar.accion = () => ejecutarEliminarExperiencia(id);
     mostrarConfirmacionExperiencia('eliminar');
 }
 
-// ============================================
-// EJECUTAR ELIMINAR
-// ============================================
 function ejecutarEliminarExperiencia(id) {
     fetch(`/perfil/experiencia/${id}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        }
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
     })
     .then(r => r.json())
-    .then(data => {
-        if (data.success) {
-            const card = document.querySelector(`.experiencia-item[data-id="${id}"]`);
+    .then(res => {
+        if (res.success) {
+            const card = document.querySelector(`[data-experiencia-id="${id}"]`);
             if (card) card.remove();
-            
-            const container = document.getElementById('experiencias-container');
-            if (container && container.children.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-8 text-gray-400">
-                        <i class="fas fa-briefcase text-3xl mb-2"></i>
-                        <p>No hay experiencia laboral registrada</p>
-                        <p class="text-sm">Haz clic en "+ Agregar" para añadir</p>
-                    </div>
-                `;
-            }
-            
-            mostrarToast('Experiencia eliminada correctamente', 'success');
+            recalcularStatsExperiencia();
+            mostrarToastExp('Experiencia eliminada correctamente', 'success');
         } else {
-            mostrarToast(data.error || 'Error al eliminar', 'error');
+            mostrarToastExp(res.error || 'Error al eliminar', 'error');
         }
     });
 }
-
-// ============================================
-// NO AGREGAR event listener al submit del formulario
-// ============================================
-// El formulario NO tiene submit automático porque los botones son type="button"
-// Esto evita completamente el doble envío
 </script>
