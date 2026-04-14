@@ -246,24 +246,29 @@
                         <h3 class="font-semibold text-gray-800">Calendario</h3>
                         <a href="#" class="text-sm text-blue-600 hover:text-blue-800">Ver agenda →</a>
                     </div>
+                    @php
+                        $hoyC       = \Carbon\Carbon::now();
+                        $meses      = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+                        $mesNombre  = $meses[$hoyC->month - 1] . ' ' . $hoyC->year;
+                        $diasSemana = ['L','M','X','J','V','S','D'];
+                        $offset     = $hoyC->copy()->startOfMonth()->dayOfWeekIso - 1;
+                        $diasEnMes  = $hoyC->daysInMonth;
+                        $diaHoy     = $hoyC->day;
+                    @endphp
                     <div class="text-center mb-4">
-                        <p class="text-lg font-medium text-gray-700">Octubre 2026</p>
+                        <p class="text-lg font-medium text-gray-700">{{ $mesNombre }}</p>
                     </div>
                     <div class="grid grid-cols-7 gap-1 text-center text-sm">
-                        @php
-                            $days = ['L', 'M', 'J', 'V', 'S', 'D'];
-                        @endphp
-                        @foreach($days as $day)
-                            <div class="text-gray-500 font-medium py-1">{{ $day }}</div>
+                        @foreach($diasSemana as $dia)
+                            <div class="text-gray-500 font-medium py-1">{{ $dia }}</div>
                         @endforeach
-                        @for($i = 1; $i <= 31; $i++)
-                            @if($i >= 5 && $i <= 26)
-                                <div class="py-1 {{ $i == 15 ? 'bg-blue-600 text-white rounded-full w-7 h-7 flex items-center justify-center mx-auto' : 'text-gray-700' }}">
-                                    {{ $i }}
-                                </div>
-                            @elseif($i < 5)
-                                <div class="py-1 text-gray-300">{{ $i }}</div>
-                            @endif
+                        @for($i = 0; $i < $offset; $i++)
+                            <div></div>
+                        @endfor
+                        @for($i = 1; $i <= $diasEnMes; $i++)
+                            <div class="py-1 {{ $i == $diaHoy ? 'bg-blue-600 text-white rounded-full w-7 h-7 flex items-center justify-center mx-auto' : 'text-gray-700' }}">
+                                {{ $i }}
+                            </div>
                         @endfor
                     </div>
                 </div>
