@@ -11,6 +11,7 @@ class Proyecto extends Model
 
     protected $fillable = [
         'id_perfil',
+        'id_experiencia',
         'nombre',
         'descripcion',
         'url_link',
@@ -30,5 +31,10 @@ class Proyecto extends Model
     public function perfil()
     {
         return $this->belongsTo(Perfil::class, 'id_perfil');
+    }
+
+    public function experienciaLaboral()
+    {
+        return $this->belongsTo(ExperienciaLaboral::class, 'id_experiencia');
     }
 }

@@ -29,4 +29,9 @@ class ExperienciaLaboral extends Model
     {
         return $this->belongsTo(Perfil::class, 'id_perfil');
     }
+
+    public function proyectos()
+    {
+        return $this->hasMany(Proyecto::class, 'id_experiencia');
+    }
 }
