@@ -101,16 +101,60 @@
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Fecha Fin</label>
-                            <input type="date" id="exp_proj_fecha_fin"
+                            <input type="date" id="exp_proj_fecha_fin" onchange="verificarFechaFinProyectoExp()"
                                 class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                         </div>
                     </div>
 
+                    {{-- Enlace obligatorio si el proyecto ya finalizó --}}
+                    <div id="exp_proj_url_wrapper" class="hidden">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">
+                            Enlace del Proyecto <span class="text-red-500">*</span>
+                            <span class="text-gray-400 font-normal">(obligatorio porque el proyecto ya finalizó)</span>
+                        </label>
+                        <input type="url" id="exp_proj_url_link"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            placeholder="https://proyecto-cliente.com">
+                    </div>
+
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Tecnologías</label>
-                        <input type="text" id="exp_proj_tecnologias"
-                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            placeholder="Ej: React, Laravel, PostgreSQL (separadas por comas)">
+
+                        {{-- Selector de categoría --}}
+                        <div class="relative mb-2">
+                            <select id="exp_categoria_select" onchange="filtrarTecnologiasExp()"
+                                class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 appearance-none bg-white pr-8 text-gray-500">
+                                <option value="">Selecciona una categoría</option>
+                                <option value="Frontend">Frontend</option>
+                                <option value="Backend">Backend</option>
+                                <option value="Lenguajes">Lenguajes</option>
+                                <option value="Bases de Datos">Bases de Datos</option>
+                                <option value="Cloud & DevOps">Cloud &amp; DevOps</option>
+                                <option value="Mobile">Mobile</option>
+                                <option value="APIs & Real-time">APIs &amp; Real-time</option>
+                                <option value="Testing">Testing</option>
+                                <option value="Data Science & ML">Data Science &amp; ML</option>
+                                <option value="Diseño & Prototipado">Diseño &amp; Prototipado</option>
+                                <option value="Gestión de Proyectos">Gestión de Proyectos</option>
+                            </select>
+                            <i class="fas fa-chevron-down text-gray-400 text-xs absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        </div>
+
+                        {{-- Chips de tecnologías disponibles --}}
+                        <div id="exp_chips_container" class="hidden mb-2">
+                            <div id="exp_chips" class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1"></div>
+                            <div class="flex items-center justify-between mt-2">
+                                <p class="text-xs text-gray-400">Clic para seleccionar, clic de nuevo para deseleccionar</p>
+                                <button type="button" onclick="agregarTecnologiaExp()"
+                                    class="flex items-center gap-1 px-2.5 py-1 text-xs bg-[#1e3a5f] hover:bg-[#e11d48] text-white rounded-lg transition font-medium">
+                                    <i class="fas fa-plus text-xs"></i> Agregar
+                                </button>
+                            </div>
+                        </div>
+
+                        {{-- Tags agregados --}}
+                        <div id="exp_proj_tags" class="flex flex-wrap gap-1.5 mt-1"></div>
+                        <input type="hidden" id="exp_proj_tecnologias">
                     </div>
 
                     <div>
@@ -144,16 +188,22 @@
 {{-- Modal de Confirmación --}}
 <div id="modalConfirmacionExperiencia" class="fixed inset-0 bg-black bg-opacity-60 z-[60] hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
-        <div class="p-6 text-center">
-            <div id="confirmIconWrapperExperiencia" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+
+        {{-- Franja superior de color --}}
+        <div id="confirmHeaderExperiencia" class="h-1.5 w-full"></div>
+
+        {{-- Icono + contenido --}}
+        <div class="px-6 pt-6 pb-4 text-center">
+            <div id="confirmIconWrapperExperiencia" class="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <i id="confirmIconExperiencia" class="text-2xl"></i>
             </div>
-            <h4 id="confirmTituloExperiencia" class="text-lg font-bold text-gray-800 mb-2"></h4>
-            <p id="confirmMensajeExperiencia" class="text-sm text-gray-500 leading-relaxed"></p>
+            <h4 id="confirmTituloExperiencia" class="text-base font-bold text-[#1e3a5f] mb-1.5"></h4>
+            <p id="confirmMensajeExperiencia" class="text-xs text-gray-500 leading-relaxed"></p>
         </div>
+
         <div class="flex gap-3 px-6 pb-6">
             <button type="button" onclick="cerrarConfirmacionExperiencia()"
-                class="flex-1 px-4 py-2.5 text-sm border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition font-medium">
+                class="flex-1 px-4 py-2.5 text-sm border border-gray-200 text-gray-500 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition font-medium">
                 No, cancelar
             </button>
             <button type="button" id="confirmBtnExperiencia"
@@ -177,31 +227,34 @@ const EXP_USER_ID = {{ $userId ?? 'null' }};
 // ============================================================
 const CONFIRM_CONFIG_EXPERIENCIA = {
     guardar: {
-        titulo:    '¿Guardar experiencia?',
-        mensaje:   'Se almacenará la información de tu experiencia laboral. Podrás editarla en cualquier momento.',
-        icon:      'fas fa-save',
-        iconBg:    'bg-blue-50',
-        iconColor: 'text-blue-500',
-        btnClass:  'bg-[#1e3a5f] hover:bg-[#1e3a5f]/90',
-        accion:    () => submitExperiencia(),
+        titulo:      '¿Guardar experiencia?',
+        mensaje:     'Se almacenará la información de tu experiencia laboral. Podrás editarla en cualquier momento.',
+        icon:        'fas fa-save',
+        iconBg:      'bg-[#1e3a5f]/10',
+        iconColor:   'text-[#1e3a5f]',
+        headerColor: 'bg-[#1e3a5f]',
+        btnClass:    'bg-[#1e3a5f] hover:bg-[#1e3a5f]/80',
+        accion:      () => submitExperiencia(),
     },
     cancelar: {
-        titulo:    '¿Descartar cambios?',
-        mensaje:   'Los datos ingresados no se guardarán. Esta acción no se puede deshacer.',
-        icon:      'fas fa-times-circle',
-        iconBg:    'bg-yellow-50',
-        iconColor: 'text-yellow-500',
-        btnClass:  'bg-yellow-500 hover:bg-yellow-600',
-        accion:    () => cerrarModalExperiencia(),
+        titulo:      '¿Descartar cambios?',
+        mensaje:     'Los datos ingresados no se guardarán. Esta acción no se puede deshacer.',
+        icon:        'fas fa-times-circle',
+        iconBg:      'bg-gray-100',
+        iconColor:   'text-gray-500',
+        headerColor: 'bg-gray-400',
+        btnClass:    'bg-gray-500 hover:bg-gray-600',
+        accion:      () => cerrarModalExperiencia(),
     },
     eliminar: {
-        titulo:    '¿Eliminar experiencia?',
-        mensaje:   'Esta acción es permanente y no se puede deshacer. La experiencia será eliminada definitivamente.',
-        icon:      'fas fa-trash-alt',
-        iconBg:    'bg-red-50',
-        iconColor: 'text-red-500',
-        btnClass:  'bg-[#e11d48] hover:bg-red-600',
-        accion:    null,
+        titulo:      '¿Eliminar experiencia?',
+        mensaje:     'Esta acción es permanente y no se puede deshacer. La experiencia será eliminada definitivamente.',
+        icon:        'fas fa-trash-alt',
+        iconBg:      'bg-[#e11d48]/10',
+        iconColor:   'text-[#e11d48]',
+        headerColor: 'bg-[#e11d48]',
+        btnClass:    'bg-[#e11d48] hover:bg-[#e11d48]/80',
+        accion:      null,
     },
 };
 
@@ -212,9 +265,10 @@ function mostrarConfirmacionExperiencia(tipo) {
     const cfg = CONFIRM_CONFIG_EXPERIENCIA[tipo];
     document.getElementById('confirmTituloExperiencia').textContent  = cfg.titulo;
     document.getElementById('confirmMensajeExperiencia').textContent = cfg.mensaje;
+    document.getElementById('confirmHeaderExperiencia').className    = `h-1.5 w-full ${cfg.headerColor}`;
 
     const wrapper = document.getElementById('confirmIconWrapperExperiencia');
-    wrapper.className = `w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${cfg.iconBg}`;
+    wrapper.className = `w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 ${cfg.iconBg}`;
 
     const icon = document.getElementById('confirmIconExperiencia');
     icon.className = `${cfg.icon} text-2xl ${cfg.iconColor}`;
@@ -307,8 +361,23 @@ function confirmarGuardarExperiencia() {
     if (!experienciaEditandoId) {
         const projNombre   = document.getElementById('exp_proj_nombre').value.trim();
         const projFechaIni = document.getElementById('exp_proj_fecha_ini').value;
+        const projFechaFin = document.getElementById('exp_proj_fecha_fin').value;
+        const projUrlLink  = document.getElementById('exp_proj_url_link').value.trim();
+        const hoy          = new Date().toISOString().split('T')[0];
+
         if (!projNombre)   { resaltarErrorExperiencia('exp_proj_nombre',   'El nombre del proyecto es obligatorio.');          return; }
         if (!projFechaIni) { resaltarErrorExperiencia('exp_proj_fecha_ini','La fecha de inicio del proyecto es obligatoria.'); return; }
+
+        if (projFechaFin && projFechaFin < hoy) {
+            if (!projUrlLink) {
+                resaltarErrorExperiencia('exp_proj_url_link', 'El proyecto ya finalizó. El enlace es obligatorio.');
+                return;
+            }
+            try { new URL(projUrlLink); } catch (_) {
+                resaltarErrorExperiencia('exp_proj_url_link', 'Ingresa una URL válida (ej: https://miproyecto.com).');
+                return;
+            }
+        }
     }
 
     mostrarConfirmacionExperiencia('guardar');
@@ -328,12 +397,18 @@ function confirmarCancelarExperiencia() {
 // RESET FORMULARIO DE PROYECTO
 // ============================================================
 function resetProyectoForm() {
-    document.getElementById('exp_proj_nombre').value       = '';
-    document.getElementById('exp_proj_descripcion').value  = '';
-    document.getElementById('exp_proj_fecha_ini').value    = '';
-    document.getElementById('exp_proj_fecha_fin').value    = '';
-    document.getElementById('exp_proj_tecnologias').value  = '';
-    document.getElementById('exp_proj_estado').value       = 'en_progreso';
+    document.getElementById('exp_proj_nombre').value      = '';
+    document.getElementById('exp_proj_descripcion').value = '';
+    document.getElementById('exp_proj_fecha_ini').value   = '';
+    document.getElementById('exp_proj_fecha_fin').value   = '';
+    document.getElementById('exp_proj_tecnologias').value = '';
+    document.getElementById('exp_proj_estado').value      = 'en_progreso';
+    document.getElementById('exp_proj_url_link').value    = '';
+    document.getElementById('exp_proj_url_wrapper').classList.add('hidden');
+    document.getElementById('exp_categoria_select').value = '';
+    document.getElementById('exp_chips').innerHTML        = '';
+    document.getElementById('exp_chips_container').classList.add('hidden');
+    document.getElementById('exp_proj_tags').innerHTML    = '';
 }
 
 // ============================================================
@@ -620,6 +695,7 @@ function submitExperiencia() {
                     fecha_ini:      projFechaIni,
                     fecha_fin:      document.getElementById('exp_proj_fecha_fin').value || null,
                     tecnologias:    document.getElementById('exp_proj_tecnologias').value,
+                    url_link:       document.getElementById('exp_proj_url_link').value.trim() || null,
                     estado:         document.getElementById('exp_proj_estado').value,
                     visible:        1,
                 }),
@@ -680,6 +756,132 @@ function submitExperiencia() {
     .finally(() => {
         btnGuardar.disabled  = false;
         btnGuardar.innerHTML = textoOriginal;
+    });
+}
+
+// ============================================================
+// TECNOLOGÍAS (chips) — PROYECTO EN EXPERIENCIA
+// ============================================================
+
+// Reutiliza TECNOLOGIAS_POR_CATEGORIA definido en _scripts.blade.php
+// Si no está disponible en esta página, se define localmente
+window.TECNOLOGIAS_POR_CATEGORIA = window.TECNOLOGIAS_POR_CATEGORIA || {
+    'Frontend':             ['React', 'Vue.js', 'Angular', 'Svelte', 'Next.js', 'Nuxt.js', 'HTML', 'CSS', 'Tailwind CSS', 'Bootstrap', 'jQuery', 'TypeScript'],
+    'Backend':              ['Node.js', 'Express', 'Django', 'FastAPI', 'Spring Boot', 'Laravel', 'Ruby on Rails', 'ASP.NET', 'Flask', 'NestJS', 'Phoenix'],
+    'Lenguajes':            ['JavaScript', 'TypeScript', 'Python', 'Java', 'C#', 'C++', 'C', 'PHP', 'Ruby', 'Go', 'Rust', 'Swift', 'Kotlin', 'Dart', 'R'],
+    'Bases de Datos':       ['MySQL', 'PostgreSQL', 'MongoDB', 'SQLite', 'Redis', 'MariaDB', 'Oracle', 'SQL Server', 'Cassandra', 'Firebase', 'Supabase'],
+    'Cloud & DevOps':       ['AWS', 'Google Cloud', 'Azure', 'Docker', 'Kubernetes', 'GitHub Actions', 'GitLab CI', 'Terraform', 'Ansible', 'Jenkins', 'Nginx'],
+    'Mobile':               ['React Native', 'Flutter', 'Android', 'iOS', 'Ionic', 'Xamarin', 'Expo'],
+    'APIs & Real-time':     ['REST API', 'GraphQL', 'WebSockets', 'gRPC', 'Swagger', 'Postman', 'Socket.io'],
+    'Testing':              ['Jest', 'PHPUnit', 'Cypress', 'Selenium', 'Pytest', 'JUnit', 'Mocha', 'Vitest'],
+    'Data Science & ML':    ['TensorFlow', 'PyTorch', 'Scikit-learn', 'Pandas', 'NumPy', 'Keras', 'OpenCV', 'Jupyter'],
+    'Diseño & Prototipado': ['Figma', 'Adobe XD', 'Sketch', 'InVision', 'Canva'],
+    'Gestión de Proyectos': ['Git', 'GitHub', 'GitLab', 'Jira', 'Trello', 'Notion', 'Slack', 'Linear'],
+};
+
+function getTagsExp() {
+    const val = document.getElementById('exp_proj_tecnologias').value;
+    return val ? val.split(',').map(t => t.trim()).filter(Boolean) : [];
+}
+
+function setTagsExp(tags) {
+    document.getElementById('exp_proj_tecnologias').value = tags.join(', ');
+    renderizarTagsExp(tags);
+}
+
+function renderizarTagsExp(tags) {
+    const container = document.getElementById('exp_proj_tags');
+    container.innerHTML = '';
+    tags.forEach((tag, i) => {
+        const span = document.createElement('span');
+        span.className = 'flex items-center gap-1 text-xs bg-[#1e3a5f]/5 text-[#1e3a5f] border border-[#1e3a5f]/20 px-2.5 py-1 rounded-full';
+        span.innerHTML = `${tag} <button type="button" onclick="eliminarTagExp(${i})" class="text-blue-400 hover:text-red-500 ml-1"><i class="fas fa-times text-xs"></i></button>`;
+        container.appendChild(span);
+    });
+}
+
+function eliminarTagExp(index) {
+    const tags = getTagsExp();
+    tags.splice(index, 1);
+    setTagsExp(tags);
+}
+
+function verificarFechaFinProyectoExp() {
+    const fechaFin = document.getElementById('exp_proj_fecha_fin').value;
+    const wrapper  = document.getElementById('exp_proj_url_wrapper');
+    const hoy      = new Date().toISOString().split('T')[0];
+    const pasado   = fechaFin && fechaFin < hoy;
+
+    if (pasado) {
+        wrapper.classList.remove('hidden');
+        document.getElementById('exp_proj_estado').value = 'completado';
+    } else {
+        wrapper.classList.add('hidden');
+        document.getElementById('exp_proj_url_link').value = '';
+        document.getElementById('exp_proj_estado').value = 'en_progreso';
+    }
+}
+
+function filtrarTecnologiasExp() {
+    const categoria = document.getElementById('exp_categoria_select').value;
+    const container = document.getElementById('exp_chips_container');
+    const chipsDiv  = document.getElementById('exp_chips');
+
+    chipsDiv.innerHTML = '';
+
+    if (!categoria || !TECNOLOGIAS_POR_CATEGORIA[categoria]) {
+        container.classList.add('hidden');
+        return;
+    }
+
+    const yaAgregadas = getTagsExp();
+
+    TECNOLOGIAS_POR_CATEGORIA[categoria].forEach(tec => {
+        const chip = document.createElement('button');
+        chip.type        = 'button';
+        chip.dataset.tec = tec;
+        chip.textContent = tec;
+
+        if (yaAgregadas.includes(tec)) {
+            chip.className = 'text-xs px-2.5 py-1 rounded-full border border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed';
+            chip.disabled  = true;
+        } else {
+            chip.className = 'text-xs px-2.5 py-1 rounded-full border border-[#1e3a5f]/20 bg-white text-[#1e3a5f] hover:bg-[#1e3a5f]/10 transition cursor-pointer select-none';
+            chip.addEventListener('click', () => toggleChipExp(chip));
+        }
+
+        chipsDiv.appendChild(chip);
+    });
+
+    container.classList.remove('hidden');
+}
+
+function toggleChipExp(chip) {
+    const activo = chip.dataset.activo === '1';
+    if (activo) {
+        chip.dataset.activo = '0';
+        chip.className = 'text-xs px-2.5 py-1 rounded-full border border-[#1e3a5f]/20 bg-white text-[#1e3a5f] hover:bg-[#1e3a5f]/10 transition cursor-pointer select-none';
+    } else {
+        chip.dataset.activo = '1';
+        chip.className = 'text-xs px-2.5 py-1 rounded-full border border-[#1e3a5f] bg-[#1e3a5f] text-white transition cursor-pointer select-none';
+    }
+}
+
+function agregarTecnologiaExp() {
+    const seleccionados = document.querySelectorAll('#exp_chips [data-activo="1"]');
+    if (!seleccionados.length) return;
+
+    const tags = getTagsExp();
+    seleccionados.forEach(chip => {
+        const tec = chip.dataset.tec;
+        if (!tags.includes(tec)) tags.push(tec);
+    });
+    setTagsExp(tags);
+
+    seleccionados.forEach(chip => {
+        chip.dataset.activo = '0';
+        chip.className = 'text-xs px-2.5 py-1 rounded-full border border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed';
+        chip.disabled  = true;
     });
 }
 

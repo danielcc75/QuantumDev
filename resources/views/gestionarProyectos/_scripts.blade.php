@@ -123,40 +123,44 @@ function buildCardHTML(p) {
 
 const CONFIRM_CONFIG = {
     guardar: {
-        titulo:    '¿Guardar proyecto?',
-        mensaje:   'Se almacenará toda la información ingresada. Podrás editarla en cualquier momento.',
-        icon:      'fas fa-save',
-        iconBg:    'bg-[#1e3a5f]/10',
-        iconColor: 'text-[#1e3a5f]',
-        btnClass:  'bg-[#1e3a5f] hover:bg-[#e11d48]',
-        accion:    () => submitProyecto(),
+        titulo:     '¿Guardar proyecto?',
+        mensaje:    'Se almacenará toda la información ingresada. Podrás editarla en cualquier momento.',
+        icon:       'fas fa-save',
+        iconBg:     'bg-[#1e3a5f]/10',
+        iconColor:  'text-[#1e3a5f]',
+        headerColor:'bg-[#1e3a5f]',
+        btnClass:   'bg-[#1e3a5f] hover:bg-[#1e3a5f]/80',
+        accion:     () => submitProyecto(),
     },
     cancelar: {
-        titulo:    '¿Descartar cambios?',
-        mensaje:   'Los datos ingresados no se guardarán. Esta acción no se puede deshacer.',
-        icon:      'fas fa-times-circle',
-        iconBg:    'bg-yellow-50',
-        iconColor: 'text-yellow-500',
-        btnClass:  'bg-yellow-500 hover:bg-yellow-600',
-        accion:    () => cerrarModalProyecto(),
+        titulo:     '¿Descartar cambios?',
+        mensaje:    'Los datos ingresados no se guardarán. Esta acción no se puede deshacer.',
+        icon:       'fas fa-times-circle',
+        iconBg:     'bg-gray-100',
+        iconColor:  'text-gray-500',
+        headerColor:'bg-gray-400',
+        btnClass:   'bg-gray-500 hover:bg-gray-600',
+        accion:     () => cerrarModalProyecto(),
     },
     editar: {
-        titulo:    '¿Editar este proyecto?',
-        mensaje:   'Vas a modificar la información de este proyecto. Podrás cancelar si cambias de opinión.',
-        icon:      'fas fa-pencil-alt',
-        iconBg:    'bg-[#1e3a5f]/10',
-        iconColor: 'text-[#1e3a5f]',
-        btnClass:  'bg-[#1e3a5f] hover:bg-[#e11d48]',
-        accion:    null,
+        titulo:     '¿Editar este proyecto?',
+        mensaje:    'Vas a modificar la información de este proyecto. Podrás cancelar si cambias de opinión.',
+        icon:       'fas fa-pencil-alt',
+        iconBg:     'bg-[#1e3a5f]/10',
+        iconColor:  'text-[#1e3a5f]',
+        headerColor:'bg-[#1e3a5f]',
+        btnClass:   'bg-[#1e3a5f] hover:bg-[#1e3a5f]/80',
+        accion:     null,
     },
     eliminar: {
-        titulo:    '¿Eliminar proyecto?',
-        mensaje:   'Esta acción es permanente y no se puede deshacer. El proyecto será eliminado definitivamente.',
-        icon:      'fas fa-trash-alt',
-        iconBg:    'bg-red-50',
-        iconColor: 'text-red-500',
-        btnClass:  'bg-red-500 hover:bg-red-600',
-        accion:    null,
+        titulo:     '¿Eliminar proyecto?',
+        mensaje:    'Esta acción es permanente y no se puede deshacer. El proyecto será eliminado definitivamente.',
+        icon:       'fas fa-trash-alt',
+        iconBg:     'bg-[#e11d48]/10',
+        iconColor:  'text-[#e11d48]',
+        headerColor:'bg-[#e11d48]',
+        btnClass:   'bg-[#e11d48] hover:bg-[#e11d48]/80',
+        accion:     null,
     },
 };
 
@@ -164,9 +168,10 @@ function mostrarConfirmacion(tipo) {
     const cfg = CONFIRM_CONFIG[tipo];
     document.getElementById('confirmTitulo').textContent  = cfg.titulo;
     document.getElementById('confirmMensaje').textContent = cfg.mensaje;
+    document.getElementById('confirmHeader').className    = `h-1.5 w-full ${cfg.headerColor}`;
 
     const wrapper = document.getElementById('confirmIconWrapper');
-    wrapper.className = `w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${cfg.iconBg}`;
+    wrapper.className = `w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 ${cfg.iconBg}`;
 
     const icon = document.getElementById('confirmIcon');
     icon.className = `${cfg.icon} text-2xl ${cfg.iconColor}`;
@@ -218,6 +223,15 @@ function confirmarGuardar() {
         return;
     }
 
+    // Si la fecha de fin es anterior a hoy, el enlace es obligatorio
+    const hoy = new Date().toISOString().split('T')[0];
+    if (fechaFin && fechaFin < hoy) {
+        if (!urlLink) {
+            resaltarError('proj_url_link', 'El proyecto ya finalizó. El enlace es obligatorio.');
+            return;
+        }
+    }
+
     // URL válida (si se proporcionó)
     if (urlLink) {
         try { new URL(urlLink); } catch (_) {
@@ -264,7 +278,7 @@ function resaltarError(campoId, mensaje) {
 
 // ── Datos de tecnologías por categoría ───────────────────────────────────────
 
-const TECNOLOGIAS_POR_CATEGORIA = {
+window.TECNOLOGIAS_POR_CATEGORIA = {
     'Frontend':              ['React', 'Vue.js', 'Angular', 'Svelte', 'Next.js', 'Nuxt.js', 'HTML', 'CSS', 'Tailwind CSS', 'Bootstrap', 'jQuery', 'TypeScript'],
     'Backend':               ['Node.js', 'Express', 'Django', 'FastAPI', 'Spring Boot', 'Laravel', 'Ruby on Rails', 'ASP.NET', 'Flask', 'NestJS', 'Phoenix'],
     'Lenguajes':             ['JavaScript', 'TypeScript', 'Python', 'Java', 'C#', 'C++', 'C', 'PHP', 'Ruby', 'Go', 'Rust', 'Swift', 'Kotlin', 'Dart', 'R'],
@@ -279,18 +293,59 @@ const TECNOLOGIAS_POR_CATEGORIA = {
 };
 
 function filtrarTecnologias() {
-    const categoria = document.getElementById('proj_categoria_select').value;
-    const select    = document.getElementById('proj_tecnologia_select');
-    select.innerHTML = '<option value="">Selecciona una tecnología</option>';
+    const categoria  = document.getElementById('proj_categoria_select').value;
+    const container  = document.getElementById('proj_chips_container');
+    const chipsDiv   = document.getElementById('proj_chips');
 
-    if (!categoria || !TECNOLOGIAS_POR_CATEGORIA[categoria]) return;
+    chipsDiv.innerHTML = '';
+
+    if (!categoria || !TECNOLOGIAS_POR_CATEGORIA[categoria]) {
+        container.classList.add('hidden');
+        return;
+    }
+
+    const yaAgregadas = getTags();
 
     TECNOLOGIAS_POR_CATEGORIA[categoria].forEach(tec => {
-        const opt = document.createElement('option');
-        opt.value       = tec;
-        opt.textContent = tec;
-        select.appendChild(opt);
+        const chip = document.createElement('button');
+        chip.type      = 'button';
+        chip.dataset.tec = tec;
+        chip.textContent = tec;
+
+        if (yaAgregadas.includes(tec)) {
+            // Ya está en los tags → mostrar deshabilitado
+            chip.className = 'text-xs px-2.5 py-1 rounded-full border border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed';
+            chip.disabled  = true;
+        } else {
+            chip.className = 'text-xs px-2.5 py-1 rounded-full border border-[#1e3a5f]/20 bg-white text-[#1e3a5f] hover:bg-[#1e3a5f]/10 transition cursor-pointer select-none';
+            chip.addEventListener('click', () => toggleChip(chip));
+        }
+
+        chipsDiv.appendChild(chip);
     });
+
+    container.classList.remove('hidden');
+}
+
+function toggleChip(chip) {
+    const activo = chip.dataset.activo === '1';
+    if (activo) {
+        chip.dataset.activo = '0';
+        chip.className = 'text-xs px-2.5 py-1 rounded-full border border-[#1e3a5f]/20 bg-white text-[#1e3a5f] hover:bg-[#1e3a5f]/10 transition cursor-pointer select-none';
+    } else {
+        chip.dataset.activo = '1';
+        chip.className = 'text-xs px-2.5 py-1 rounded-full border border-[#1e3a5f] bg-[#1e3a5f] text-white transition cursor-pointer select-none';
+    }
+}
+
+// ── Fecha fin → estado y enlace obligatorio ───────────────────────────────────
+
+function verificarFechaFinProyecto() {
+    const fechaFin = document.getElementById('proj_fecha_fin').value;
+    const hoy      = new Date().toISOString().split('T')[0];
+    const pasado   = fechaFin && fechaFin < hoy;
+
+    document.getElementById('proj_estado').value = pasado ? 'completado' : 'en_progreso';
 }
 
 // ── Tags de tecnologías ───────────────────────────────────────────────────────
@@ -317,15 +372,23 @@ function setTags(tags) {
 }
 
 function agregarTecnologia() {
-    const select = document.getElementById('proj_tecnologia_select');
-    const tec    = select.value.trim();
-    if (!tec) return;
+    const seleccionados = document.querySelectorAll('#proj_chips [data-activo="1"]');
+    if (!seleccionados.length) return;
+
     const tags = getTags();
-    if (!tags.includes(tec)) {
-        tags.push(tec);
-        setTags(tags);
-    }
-    select.value = '';
+    seleccionados.forEach(chip => {
+        const tec = chip.dataset.tec;
+        if (!tags.includes(tec)) tags.push(tec);
+    });
+    setTags(tags);
+
+    // Marcar los chips agregados como deshabilitados
+    seleccionados.forEach(chip => {
+        chip.dataset.activo = '0';
+        chip.className = 'text-xs px-2.5 py-1 rounded-full border border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed';
+        chip.disabled  = true;
+        chip.removeEventListener('click', toggleChip);
+    });
 }
 
 function eliminarTag(index) {
@@ -426,7 +489,8 @@ function abrirModalProyecto() {
     document.getElementById('proj_tecnologias').value = '';
     document.getElementById('proj_tags').innerHTML = '';
     document.getElementById('proj_categoria_select').value = '';
-    document.getElementById('proj_tecnologia_select').innerHTML = '<option value="">Selecciona una tecnología</option>';
+    document.getElementById('proj_chips').innerHTML = '';
+    document.getElementById('proj_chips_container').classList.add('hidden');
     document.getElementById('modalProyectoTitulo').textContent = 'Crear Nuevo Proyecto';
     resetToggle(true);
     resetUrlStatus();
@@ -460,7 +524,8 @@ function ejecutarAbrirEditar(id) {
             urlInput.dispatchEvent(new Event('input')); // activa el indicador visual
             document.getElementById('proj_referencias').value = p.referencias  ?? '';
             document.getElementById('proj_categoria_select').value = '';
-            document.getElementById('proj_tecnologia_select').innerHTML = '<option value="">Selecciona una tecnología</option>';
+            document.getElementById('proj_chips').innerHTML = '';
+            document.getElementById('proj_chips_container').classList.add('hidden');
             setTags(p.tecnologias ? p.tecnologias.split(',').map(t => t.trim()).filter(Boolean) : []);
             resetToggle(!!p.visible);
             document.getElementById('modalProyectoTitulo').textContent = 'Editar Proyecto';

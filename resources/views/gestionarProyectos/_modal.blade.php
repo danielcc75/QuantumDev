@@ -3,22 +3,25 @@
 
 {{-- ── Modal de Confirmación ─────────────────────────────────────────────── --}}
 <div id="modalConfirmacion" class="fixed inset-0 bg-black bg-opacity-60 z-[60] hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+
+        {{-- Franja superior de color --}}
+        <div id="confirmHeader" class="h-1.5 w-full"></div>
 
         {{-- Icono + contenido --}}
-        <div class="p-6 text-center">
+        <div class="px-6 pt-6 pb-4 text-center">
             <div id="confirmIconWrapper"
-                class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                class="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <i id="confirmIcon" class="text-2xl"></i>
             </div>
-            <h4 id="confirmTitulo" class="text-lg font-bold text-[#1e3a5f] mb-2"></h4>
-            <p id="confirmMensaje" class="text-sm text-gray-500 leading-relaxed"></p>
+            <h4 id="confirmTitulo" class="text-base font-bold text-[#1e3a5f] mb-1.5"></h4>
+            <p id="confirmMensaje" class="text-xs text-gray-500 leading-relaxed"></p>
         </div>
 
         {{-- Acciones --}}
         <div class="flex gap-3 px-6 pb-6">
             <button type="button" onclick="cerrarConfirmacion()"
-                class="flex-1 px-4 py-2.5 text-sm border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition font-medium">
+                class="flex-1 px-4 py-2.5 text-sm border border-gray-200 text-gray-500 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition font-medium">
                 No, cancelar
             </button>
             <button type="button" id="confirmBtn"
@@ -95,7 +98,7 @@
                     <p class="text-xs text-gray-400 mb-4">Agrega las tecnologías, lenguajes y frameworks que usaste</p>
 
                     {{-- Selector de categoría --}}
-                    <div class="relative mb-2">
+                    <div class="relative mb-3">
                         <select id="proj_categoria_select" onchange="filtrarTecnologias()"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/40 focus:border-[#1e3a5f] appearance-none bg-white pr-8 text-gray-500">
                             <option value="">Selecciona una categoría</option>
@@ -114,23 +117,20 @@
                         <i class="fas fa-chevron-down text-gray-400 text-xs absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
                     </div>
 
-                    {{-- Selector de tecnología + botón + --}}
-                    <div class="flex gap-2 mb-2">
-                        <div class="relative flex-1">
-                            <select id="proj_tecnologia_select"
-                                class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/40 focus:border-[#1e3a5f] appearance-none bg-white pr-8 text-gray-500">
-                                <option value="">Selecciona una tecnología</option>
-                            </select>
-                            <i class="fas fa-chevron-down text-gray-400 text-xs absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                    {{-- Chips de tecnologías disponibles --}}
+                    <div id="proj_chips_container" class="hidden mb-2">
+                        <div id="proj_chips" class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-1"></div>
+                        <div class="flex items-center justify-between mt-2">
+                            <p class="text-xs text-gray-400">Haz clic para seleccionar, vuelve a hacer clic para deseleccionar</p>
+                            <button type="button" onclick="agregarTecnologia()"
+                                class="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-[#1e3a5f] hover:bg-[#e11d48] text-white rounded-lg transition font-medium">
+                                <i class="fas fa-plus text-xs"></i> Agregar seleccionadas
+                            </button>
                         </div>
-                        <button type="button" onclick="agregarTecnologia()"
-                            class="w-9 h-9 flex items-center justify-center bg-[#1e3a5f] hover:bg-[#e11d48] text-white rounded-lg transition">
-                            <i class="fas fa-plus text-xs"></i>
-                        </button>
                     </div>
-                    <p class="text-xs text-gray-400 mb-3">Selecciona una tecnología y haz clic en + para agregarla</p>
 
-                    <div id="proj_tags" class="flex flex-wrap gap-2"></div>
+                    {{-- Tags agregados --}}
+                    <div id="proj_tags" class="flex flex-wrap gap-2 mt-1"></div>
                     <input type="hidden" id="proj_tecnologias">
                 </div>
 
@@ -228,7 +228,7 @@
 
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Fecha de Finalización</label>
-                        <input type="date" id="proj_fecha_fin"
+                        <input type="date" id="proj_fecha_fin" onchange="verificarFechaFinProyecto()"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/40 focus:border-[#1e3a5f]">
                     </div>
                 </div>
