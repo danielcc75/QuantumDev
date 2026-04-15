@@ -262,6 +262,37 @@ function resaltarError(campoId, mensaje) {
     setTimeout(() => msg.remove(), 2500);
 }
 
+// ── Datos de tecnologías por categoría ───────────────────────────────────────
+
+const TECNOLOGIAS_POR_CATEGORIA = {
+    'Frontend':              ['React', 'Vue.js', 'Angular', 'Svelte', 'Next.js', 'Nuxt.js', 'HTML', 'CSS', 'Tailwind CSS', 'Bootstrap', 'jQuery', 'TypeScript'],
+    'Backend':               ['Node.js', 'Express', 'Django', 'FastAPI', 'Spring Boot', 'Laravel', 'Ruby on Rails', 'ASP.NET', 'Flask', 'NestJS', 'Phoenix'],
+    'Lenguajes':             ['JavaScript', 'TypeScript', 'Python', 'Java', 'C#', 'C++', 'C', 'PHP', 'Ruby', 'Go', 'Rust', 'Swift', 'Kotlin', 'Dart', 'R'],
+    'Bases de Datos':        ['MySQL', 'PostgreSQL', 'MongoDB', 'SQLite', 'Redis', 'MariaDB', 'Oracle', 'SQL Server', 'Cassandra', 'Firebase', 'Supabase'],
+    'Cloud & DevOps':        ['AWS', 'Google Cloud', 'Azure', 'Docker', 'Kubernetes', 'GitHub Actions', 'GitLab CI', 'Terraform', 'Ansible', 'Jenkins', 'Nginx'],
+    'Mobile':                ['React Native', 'Flutter', 'Android', 'iOS', 'Ionic', 'Xamarin', 'Expo'],
+    'APIs & Real-time':      ['REST API', 'GraphQL', 'WebSockets', 'gRPC', 'Swagger', 'Postman', 'Socket.io'],
+    'Testing':               ['Jest', 'PHPUnit', 'Cypress', 'Selenium', 'Pytest', 'JUnit', 'Mocha', 'Vitest'],
+    'Data Science & ML':     ['TensorFlow', 'PyTorch', 'Scikit-learn', 'Pandas', 'NumPy', 'Keras', 'OpenCV', 'Jupyter'],
+    'Diseño & Prototipado':  ['Figma', 'Adobe XD', 'Sketch', 'InVision', 'Canva'],
+    'Gestión de Proyectos':  ['Git', 'GitHub', 'GitLab', 'Jira', 'Trello', 'Notion', 'Slack', 'Linear'],
+};
+
+function filtrarTecnologias() {
+    const categoria = document.getElementById('proj_categoria_select').value;
+    const select    = document.getElementById('proj_tecnologia_select');
+    select.innerHTML = '<option value="">Selecciona una tecnología</option>';
+
+    if (!categoria || !TECNOLOGIAS_POR_CATEGORIA[categoria]) return;
+
+    TECNOLOGIAS_POR_CATEGORIA[categoria].forEach(tec => {
+        const opt = document.createElement('option');
+        opt.value       = tec;
+        opt.textContent = tec;
+        select.appendChild(opt);
+    });
+}
+
 // ── Tags de tecnologías ───────────────────────────────────────────────────────
 
 function renderizarTags(tags) {
@@ -286,14 +317,15 @@ function setTags(tags) {
 }
 
 function agregarTecnologia() {
-    const input = document.getElementById('proj_tecnologia_input');
-    const raw   = input.value.trim();
-    if (!raw) return;
-    const nuevas = raw.split(',').map(t => t.trim()).filter(Boolean);
-    const tags   = getTags();
-    nuevas.forEach(t => { if (!tags.includes(t)) tags.push(t); });
-    setTags(tags);
-    input.value = '';
+    const select = document.getElementById('proj_tecnologia_select');
+    const tec    = select.value.trim();
+    if (!tec) return;
+    const tags = getTags();
+    if (!tags.includes(tec)) {
+        tags.push(tec);
+        setTags(tags);
+    }
+    select.value = '';
 }
 
 function eliminarTag(index) {
@@ -301,10 +333,6 @@ function eliminarTag(index) {
     tags.splice(index, 1);
     setTags(tags);
 }
-
-document.getElementById('proj_tecnologia_input').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') { e.preventDefault(); agregarTecnologia(); }
-});
 
 // ── Validación en tiempo real de URL ─────────────────────────────────────────
 
@@ -397,7 +425,8 @@ function abrirModalProyecto() {
     document.getElementById('formProyecto').reset();
     document.getElementById('proj_tecnologias').value = '';
     document.getElementById('proj_tags').innerHTML = '';
-    document.getElementById('proj_tecnologia_input').value = '';
+    document.getElementById('proj_categoria_select').value = '';
+    document.getElementById('proj_tecnologia_select').innerHTML = '<option value="">Selecciona una tecnología</option>';
     document.getElementById('modalProyectoTitulo').textContent = 'Crear Nuevo Proyecto';
     resetToggle(true);
     resetUrlStatus();
@@ -430,7 +459,8 @@ function ejecutarAbrirEditar(id) {
             urlInput.value = p.url_link ?? '';
             urlInput.dispatchEvent(new Event('input')); // activa el indicador visual
             document.getElementById('proj_referencias').value = p.referencias  ?? '';
-            document.getElementById('proj_tecnologia_input').value = '';
+            document.getElementById('proj_categoria_select').value = '';
+            document.getElementById('proj_tecnologia_select').innerHTML = '<option value="">Selecciona una tecnología</option>';
             setTags(p.tecnologias ? p.tecnologias.split(',').map(t => t.trim()).filter(Boolean) : []);
             resetToggle(!!p.visible);
             document.getElementById('modalProyectoTitulo').textContent = 'Editar Proyecto';

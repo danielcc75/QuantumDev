@@ -94,16 +94,41 @@
                     </div>
                     <p class="text-xs text-gray-400 mb-4">Agrega las tecnologías, lenguajes y frameworks que usaste</p>
 
+                    {{-- Selector de categoría --}}
+                    <div class="relative mb-2">
+                        <select id="proj_categoria_select" onchange="filtrarTecnologias()"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/40 focus:border-[#1e3a5f] appearance-none bg-white pr-8 text-gray-500">
+                            <option value="">Selecciona una categoría</option>
+                            <option value="Frontend">Frontend</option>
+                            <option value="Backend">Backend</option>
+                            <option value="Lenguajes">Lenguajes</option>
+                            <option value="Bases de Datos">Bases de Datos</option>
+                            <option value="Cloud & DevOps">Cloud &amp; DevOps</option>
+                            <option value="Mobile">Mobile</option>
+                            <option value="APIs & Real-time">APIs &amp; Real-time</option>
+                            <option value="Testing">Testing</option>
+                            <option value="Data Science & ML">Data Science &amp; ML</option>
+                            <option value="Diseño & Prototipado">Diseño &amp; Prototipado</option>
+                            <option value="Gestión de Proyectos">Gestión de Proyectos</option>
+                        </select>
+                        <i class="fas fa-chevron-down text-gray-400 text-xs absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                    </div>
+
+                    {{-- Selector de tecnología + botón + --}}
                     <div class="flex gap-2 mb-2">
-                        <input type="text" id="proj_tecnologia_input"
-                            class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/40 focus:border-[#1e3a5f]"
-                            placeholder="Ej: React, Node.js, MongoDB">
+                        <div class="relative flex-1">
+                            <select id="proj_tecnologia_select"
+                                class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/40 focus:border-[#1e3a5f] appearance-none bg-white pr-8 text-gray-500">
+                                <option value="">Selecciona una tecnología</option>
+                            </select>
+                            <i class="fas fa-chevron-down text-gray-400 text-xs absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        </div>
                         <button type="button" onclick="agregarTecnologia()"
                             class="w-9 h-9 flex items-center justify-center bg-[#1e3a5f] hover:bg-[#e11d48] text-white rounded-lg transition">
                             <i class="fas fa-plus text-xs"></i>
                         </button>
                     </div>
-                    <p class="text-xs text-gray-400 mb-3">Presiona Enter o haz clic en + para agregar cada tecnología</p>
+                    <p class="text-xs text-gray-400 mb-3">Selecciona una tecnología y haz clic en + para agregarla</p>
 
                     <div id="proj_tags" class="flex flex-wrap gap-2"></div>
                     <input type="hidden" id="proj_tecnologias">

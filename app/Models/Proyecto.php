@@ -37,4 +37,14 @@ class Proyecto extends Model
     {
         return $this->belongsTo(ExperienciaLaboral::class, 'id_experiencia');
     }
+
+    public function tecnologias()
+    {
+        return $this->belongsToMany(
+            Tecnologia::class,
+            'proyecto_tecnologia',
+            'id_proyecto',
+            'id_tecnologia'
+        );
+    }
 }
