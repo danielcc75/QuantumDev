@@ -66,6 +66,66 @@
                     placeholder="Describe tus responsabilidades y logros..."></textarea>
             </div>
 
+            {{-- Sección obligatoria: agregar proyecto --}}
+            <div id="exp_proyecto_wrapper" class="border-t border-gray-100 pt-4 mt-2">
+                <p class="text-sm font-medium text-[#1e3a5f] mb-3">
+                    <i class="fas fa-folder-plus text-xs mr-1"></i> Proyecto vinculado <span class="text-red-500">*</span>
+                </p>
+
+                <div id="exp_proyecto_form" class="bg-[#1e3a5f]/5 border border-[#1e3a5f]/15 rounded-xl p-4 flex flex-col gap-3">
+                    <p class="text-xs text-gray-500">El proyecto quedará vinculado a esta experiencia y también aparecerá en <strong>Mis Proyectos</strong>.</p>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">
+                            Nombre del Proyecto <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="exp_proj_nombre"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            placeholder="Ej: Sistema de Gestión Interna">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Descripción</label>
+                        <textarea id="exp_proj_descripcion" rows="2"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                            placeholder="Breve descripción del proyecto..."></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">
+                                Fecha Inicio <span class="text-red-500">*</span>
+                            </label>
+                            <input type="date" id="exp_proj_fecha_ini"
+                                class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Fecha Fin</label>
+                            <input type="date" id="exp_proj_fecha_fin"
+                                class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Tecnologías</label>
+                        <input type="text" id="exp_proj_tecnologias"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            placeholder="Ej: React, Laravel, PostgreSQL (separadas por comas)">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Estado</label>
+                        <select id="exp_proj_estado"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
+                            <option value="en_progreso">En Curso</option>
+                            <option value="completado">Completado</option>
+                            <option value="pendiente">Pendiente</option>
+                            <option value="cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             {{-- Botones --}}
             <div class="flex gap-3 mt-6 pt-4 border-t border-gray-100">
                 <button type="button" onclick="confirmarCancelarExperiencia()"
@@ -109,6 +169,8 @@
 // VARIABLES GLOBALES
 // ============================================================
 let experienciaEditandoId = null;
+const EXP_USER_ID = {{ $userId ?? 'null' }};
+
 
 // ============================================================
 // CONFIGURACIÓN DE CONFIRMACIÓN
@@ -241,6 +303,14 @@ function confirmarGuardarExperiencia() {
         return;
     }
 
+    // Validar campos obligatorios del proyecto (solo al crear)
+    if (!experienciaEditandoId) {
+        const projNombre   = document.getElementById('exp_proj_nombre').value.trim();
+        const projFechaIni = document.getElementById('exp_proj_fecha_ini').value;
+        if (!projNombre)   { resaltarErrorExperiencia('exp_proj_nombre',   'El nombre del proyecto es obligatorio.');          return; }
+        if (!projFechaIni) { resaltarErrorExperiencia('exp_proj_fecha_ini','La fecha de inicio del proyecto es obligatoria.'); return; }
+    }
+
     mostrarConfirmacionExperiencia('guardar');
 }
 
@@ -252,6 +322,18 @@ function confirmarCancelarExperiencia() {
     } else {
         cerrarModalExperiencia();
     }
+}
+
+// ============================================================
+// RESET FORMULARIO DE PROYECTO
+// ============================================================
+function resetProyectoForm() {
+    document.getElementById('exp_proj_nombre').value       = '';
+    document.getElementById('exp_proj_descripcion').value  = '';
+    document.getElementById('exp_proj_fecha_ini').value    = '';
+    document.getElementById('exp_proj_fecha_fin').value    = '';
+    document.getElementById('exp_proj_tecnologias').value  = '';
+    document.getElementById('exp_proj_estado').value       = 'en_progreso';
 }
 
 // ============================================================
@@ -267,6 +349,10 @@ function abrirModalExperiencia() {
     document.getElementById('exp_fecha_fin').disabled = false;
     document.getElementById('exp_trabajo_actual').checked = false;
 
+    // Mostrar sección de proyecto (solo al crear)
+    document.getElementById('exp_proyecto_wrapper').classList.remove('hidden');
+    resetProyectoForm();
+
     document.getElementById('modalExperiencia').classList.remove('hidden');
     document.getElementById('modalExperiencia').classList.add('flex');
 }
@@ -276,6 +362,8 @@ function abrirModalExperiencia() {
 // ============================================================
 function abrirModalEditarExperiencia(exp) {
     document.getElementById('modalExperienciaTitulo').textContent = 'Editar Experiencia Laboral';
+    // Ocultar sección de proyecto al editar (solo aplica al crear)
+    document.getElementById('exp_proyecto_wrapper').classList.add('hidden');
     document.getElementById('exp_id_experiencia').value = exp.id_experiencia;
     document.getElementById('exp_cargo').value          = exp.cargo       ?? '';
     document.getElementById('exp_empresa').value        = exp.empresa     ?? '';
@@ -307,6 +395,7 @@ function cerrarModalExperiencia() {
     document.getElementById('modalExperiencia').classList.add('hidden');
     document.getElementById('modalExperiencia').classList.remove('flex');
     experienciaEditandoId = null;
+    resetProyectoForm();
 }
 
 function cerrarModalExperienciaFondo(event) {
@@ -339,7 +428,20 @@ function escapeHtmlExp(text) {
     return div.innerHTML;
 }
 
-function buildCardHTMLExperiencia(experiencia) {
+// Navega a la sección proyectos y resalta el proyecto indicado
+function verProyectoDesdeExp(idProyecto) {
+    if (typeof cambiarSeccion === 'function') cambiarSeccion('proyectos');
+    setTimeout(() => {
+        const card = document.querySelector(`[data-proyecto-id="${idProyecto}"]`);
+        if (card) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            card.classList.add('ring-2', 'ring-[#1e3a5f]', 'ring-offset-2');
+            setTimeout(() => card.classList.remove('ring-2', 'ring-[#1e3a5f]', 'ring-offset-2'), 1800);
+        }
+    }, 150);
+}
+
+function buildCardHTMLExperiencia(experiencia, proyectos = []) {
     const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
     let fechaInicioStr = '';
@@ -385,6 +487,21 @@ function buildCardHTMLExperiencia(experiencia) {
     </div>
 
     ${descripcion ? `<p class="text-xs text-gray-500 leading-relaxed line-clamp-2">${descripcion}</p>` : ''}
+
+    <div class="pt-2 border-t border-gray-100" id="exp-proyectos-${experiencia.id_experiencia}">
+        ${proyectos.length ? `
+        <p class="text-xs font-medium text-gray-400 mb-1.5">
+            <i class="fas fa-folder text-[#1e3a5f]/50 mr-1"></i> Proyectos relacionados
+        </p>
+        <div class="flex flex-col gap-1">
+            ${proyectos.map(p => `
+            <a href="#" onclick="verProyectoDesdeExp(${p.id_proyecto}); return false;"
+               class="flex items-center gap-1.5 text-xs text-[#1e3a5f] hover:text-[#e11d48] transition-colors group">
+                <i class="fas fa-code-branch text-[#1e3a5f]/40 group-hover:text-[#e11d48]/60 text-[10px]"></i>
+                <span class="truncate">${escapeHtmlExp(p.nombre)}</span>
+            </a>`).join('')}
+        </div>` : ''}
+    </div>
 
     <div class="flex gap-2 pt-2 border-t border-gray-100 mt-auto">
         <button onclick='abrirModalEditarExperiencia(${expJson})'
@@ -465,23 +582,93 @@ function submitExperiencia() {
         return r.json();
     })
     .then(res => {
-        if (res.success) {
-            const exp    = res.experiencia;
-            const lista  = document.getElementById('experiencias-lista');
-            const cardHTML = buildCardHTMLExperiencia(exp);
+        if (!res.success) {
+            mostrarToastExp(res.error || 'Error al guardar', 'error');
+            return;
+        }
 
-            if (experienciaEditandoId) {
-                const existing = lista?.querySelector(`[data-experiencia-id="${exp.id_experiencia}"]`);
-                if (existing) existing.outerHTML = cardHTML;
-            } else {
-                lista?.insertAdjacentHTML('afterbegin', cardHTML);
-            }
+        const exp      = res.experiencia;
+        const lista    = document.getElementById('experiencias-lista');
+        const cardHTML = buildCardHTMLExperiencia(exp);
 
-            recalcularStatsExperiencia();
+        if (experienciaEditandoId) {
+            const existing = lista?.querySelector(`[data-experiencia-id="${exp.id_experiencia}"]`);
+            if (existing) existing.outerHTML = cardHTML;
+        } else {
+            lista?.insertAdjacentHTML('afterbegin', cardHTML);
+        }
+
+        recalcularStatsExperiencia();
+
+        // Crear proyecto asociado (obligatorio al crear experiencia)
+        if (!experienciaEditandoId) {
+            const idExpRecienCreada = exp.id_experiencia;
+            const projNombre   = document.getElementById('exp_proj_nombre').value.trim();
+            const projFechaIni = document.getElementById('exp_proj_fecha_ini').value;
+
+            fetch('/proyectos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify({
+                    user_id:        EXP_USER_ID,
+                    id_experiencia: exp.id_experiencia,
+                    nombre:         projNombre,
+                    descripcion:    document.getElementById('exp_proj_descripcion').value,
+                    fecha_ini:      projFechaIni,
+                    fecha_fin:      document.getElementById('exp_proj_fecha_fin').value || null,
+                    tecnologias:    document.getElementById('exp_proj_tecnologias').value,
+                    estado:         document.getElementById('exp_proj_estado').value,
+                    visible:        1,
+                }),
+            })
+            .then(r => r.json())
+            .then(projRes => {
+                if (projRes.success) {
+                    const proyecto = projRes.proyecto;
+
+                    // Inyectar en grid de Mis Proyectos
+                    if (typeof buildCardHTML === 'function') {
+                        const grid = document.getElementById('proyectos-grid');
+                        if (grid) {
+                            grid.insertAdjacentHTML('afterbegin', buildCardHTML(proyecto));
+                            if (typeof recalcularStats === 'function') recalcularStats();
+                        }
+                    }
+
+                    // Actualizar la tarjeta de experiencia recién creada para mostrar el proyecto
+                    const contenedorProyectos = document.getElementById(`exp-proyectos-${idExpRecienCreada}`);
+                    if (contenedorProyectos) {
+                        contenedorProyectos.innerHTML = `
+                            <p class="text-xs font-medium text-gray-400 mb-1.5">
+                                <i class="fas fa-folder text-[#1e3a5f]/50 mr-1"></i> Proyectos relacionados
+                            </p>
+                            <div class="flex flex-col gap-1">
+                                <a href="#" onclick="verProyectoDesdeExp(${proyecto.id_proyecto}); return false;"
+                                   class="flex items-center gap-1.5 text-xs text-[#1e3a5f] hover:text-[#e11d48] transition-colors group">
+                                    <i class="fas fa-code-branch text-[#1e3a5f]/40 group-hover:text-[#e11d48]/60 text-[10px]"></i>
+                                    <span class="truncate">${escapeHtmlExp(proyecto.nombre)}</span>
+                                </a>
+                            </div>`;
+                    }
+                }
+                cerrarModalExperiencia();
+                mostrarToastExp(
+                    projRes.success
+                        ? 'Experiencia y proyecto guardados correctamente'
+                        : 'Experiencia guardada, pero el proyecto no pudo crearse',
+                    projRes.success ? 'success' : 'error'
+                );
+            })
+            .catch(() => {
+                cerrarModalExperiencia();
+                mostrarToastExp('Experiencia guardada, pero hubo un problema al crear el proyecto', 'error');
+            });
+        } else {
             cerrarModalExperiencia();
             mostrarToastExp('Experiencia guardada correctamente', 'success');
-        } else {
-            mostrarToastExp(res.error || 'Error al guardar', 'error');
         }
     })
     .catch(err => {

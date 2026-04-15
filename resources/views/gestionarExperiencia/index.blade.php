@@ -14,6 +14,15 @@
               ->get()
         : collect();
 
+    // Proyectos vinculados a experiencias de este perfil, agrupados por id_experiencia
+    $proyectosPorExp = $perfilIdExp
+        ? DB::table('proyectos')
+              ->where('id_perfil', $perfilIdExp)
+              ->whereNotNull('id_experiencia')
+              ->get()
+              ->groupBy('id_experiencia')
+        : collect();
+
     $totalExp      = $experiencias->count();
     $actualesExp   = $experiencias->where('trabajo_actual', 1)->count();
     $finalizadasExp = $experiencias->where('trabajo_actual', 0)->count();
@@ -128,6 +137,27 @@
                 {{-- Descripción --}}
                 @if($exp->descripcion)
                 <p class="text-xs text-gray-500 leading-relaxed line-clamp-2">{{ $exp->descripcion }}</p>
+                @endif
+
+                {{-- Proyectos vinculados --}}
+                @php $proyectosExp = $proyectosPorExp->get($exp->id_experiencia, collect()); @endphp
+                @if($proyectosExp->isNotEmpty())
+                <div class="pt-2 border-t border-gray-100">
+                    <p class="text-xs font-medium text-gray-400 mb-1.5">
+                        <i class="fas fa-folder text-[#1e3a5f]/50 mr-1"></i> Proyectos relacionados
+                    </p>
+                    <div class="flex flex-col gap-1" id="exp-proyectos-{{ $exp->id_experiencia }}">
+                        @foreach($proyectosExp as $proy)
+                        <a href="#" onclick="verProyectoDesdeExp({{ $proy->id_proyecto }}); return false;"
+                           class="flex items-center gap-1.5 text-xs text-[#1e3a5f] hover:text-[#e11d48] transition-colors group">
+                            <i class="fas fa-code-branch text-[#1e3a5f]/40 group-hover:text-[#e11d48]/60 text-[10px]"></i>
+                            <span class="truncate">{{ $proy->nombre }}</span>
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+                @else
+                <div class="pt-2 border-t border-gray-100" id="exp-proyectos-{{ $exp->id_experiencia }}"></div>
                 @endif
 
                 {{-- Acciones --}}

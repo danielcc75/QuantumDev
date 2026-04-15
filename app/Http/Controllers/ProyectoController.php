@@ -30,16 +30,17 @@ class ProyectoController extends Controller
         }
 
         $proyecto = Proyecto::create([
-            'id_perfil'   => $perfil->id_perfil,
-            'nombre'      => $request->nombre,
-            'descripcion' => $request->descripcion,
-            'url_link'    => $request->url_link,
-            'referencias' => $request->referencias,
-            'tecnologias' => $request->tecnologias,
-            'fecha_ini'   => $request->fecha_ini,
-            'fecha_fin'   => $request->fecha_fin ?: null,
-            'estado'      => $request->estado ?? 'pendiente',
-            'visible'     => $request->visible ?? 1,
+            'id_perfil'      => $perfil->id_perfil,
+            'id_experiencia' => $request->id_experiencia ?: null,
+            'nombre'         => $request->nombre,
+            'descripcion'    => $request->descripcion,
+            'url_link'       => $request->url_link,
+            'referencias'    => $request->referencias,
+            'tecnologias'    => $request->tecnologias,
+            'fecha_ini'      => $request->fecha_ini,
+            'fecha_fin'      => $request->fecha_fin ?: null,
+            'estado'         => $request->estado ?? 'pendiente',
+            'visible'        => $request->visible ?? 1,
         ]);
 
         return response()->json(['success' => true, 'proyecto' => $proyecto]);
