@@ -1,24 +1,26 @@
 {{-- resources/views/gestionarProyectos/_modal.blade.php
      Modal crear / editar proyectos con diseño tipo página completa dentro de overlay. --}}
 
+@php
+    $inputCls    = 'w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/40 focus:border-[#1e3a5f]';
+    $selectCls   = $inputCls . ' appearance-none bg-white pr-8';
+    $textareaCls = $inputCls . ' resize-none';
+@endphp
+
 {{-- ── Modal de Confirmación ─────────────────────────────────────────────── --}}
 <div id="modalConfirmacion" class="fixed inset-0 bg-black bg-opacity-60 z-[60] hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
 
-        {{-- Franja superior de color --}}
         <div id="confirmHeader" class="h-1.5 w-full"></div>
 
-        {{-- Icono + contenido --}}
         <div class="px-6 pt-6 pb-4 text-center">
-            <div id="confirmIconWrapper"
-                class="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <div id="confirmIconWrapper" class="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <i id="confirmIcon" class="text-2xl"></i>
             </div>
             <h4 id="confirmTitulo" class="text-base font-bold text-[#1e3a5f] mb-1.5"></h4>
             <p id="confirmMensaje" class="text-xs text-gray-500 leading-relaxed"></p>
         </div>
 
-        {{-- Acciones --}}
         <div class="flex gap-3 px-6 pb-6">
             <button type="button" onclick="cerrarConfirmacion()"
                 class="flex-1 px-4 py-2.5 text-sm border border-gray-200 text-gray-500 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition font-medium">
@@ -77,14 +79,14 @@
                             Nombre del Proyecto <span class="text-[#e11d48]">*</span>
                         </label>
                         <input type="text" id="proj_nombre" required
-                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/40 focus:border-[#1e3a5f]"
+                            class="{{ $inputCls }}"
                             placeholder="Ej: Sistema de Gestión de Inventario">
                     </div>
 
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Descripción</label>
                         <textarea id="proj_descripcion" rows="3"
-                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/40 focus:border-[#1e3a5f] resize-none"
+                            class="{{ $textareaCls }}"
                             placeholder="Describe brevemente el proyecto y su objetivo principal..."></textarea>
                     </div>
                 </div>
@@ -97,10 +99,9 @@
                     </div>
                     <p class="text-xs text-gray-400 mb-4">Agrega las tecnologías, lenguajes y frameworks que usaste</p>
 
-                    {{-- Selector de categoría --}}
                     <div class="relative mb-3">
                         <select id="proj_categoria_select" onchange="filtrarTecnologias()"
-                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/40 focus:border-[#1e3a5f] appearance-none bg-white pr-8 text-gray-500">
+                            class="{{ $selectCls }} text-gray-500">
                             <option value="">Selecciona una categoría</option>
                             <option value="Frontend">Frontend</option>
                             <option value="Backend">Backend</option>
@@ -117,7 +118,6 @@
                         <i class="fas fa-chevron-down text-gray-400 text-xs absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
                     </div>
 
-                    {{-- Chips de tecnologías disponibles --}}
                     <div id="proj_chips_container" class="hidden mb-2">
                         <div id="proj_chips" class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-1"></div>
                         <div class="flex items-center justify-between mt-2">
@@ -129,7 +129,6 @@
                         </div>
                     </div>
 
-                    {{-- Tags agregados --}}
                     <div id="proj_tags" class="flex flex-wrap gap-2 mt-1"></div>
                     <input type="hidden" id="proj_tecnologias">
                 </div>
@@ -142,8 +141,7 @@
                     <div class="mb-4">
                         <label class="block text-xs font-medium text-gray-700 mb-1">Estado del Proyecto</label>
                         <div class="relative">
-                            <select id="proj_estado"
-                                class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/40 focus:border-[#1e3a5f] appearance-none bg-white pr-8">
+                            <select id="proj_estado" class="{{ $selectCls }}">
                                 <option value="pendiente">Pendiente</option>
                                 <option value="en_progreso" selected>En Curso</option>
                                 <option value="completado">Completado</option>
@@ -188,7 +186,7 @@
                     </label>
                     <div class="relative flex items-center gap-2">
                         <input type="url" id="proj_url_link"
-                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/40 focus:border-[#1e3a5f] pr-9"
+                            class="{{ $inputCls }} pr-9"
                             placeholder="https://proyecto-cliente.com">
                         <span id="url_status" class="hidden absolute right-3 text-sm pointer-events-none"></span>
                     </div>
@@ -205,7 +203,7 @@
 
                     <label class="block text-xs font-medium text-gray-700 mb-1">Referencias</label>
                     <textarea id="proj_referencias" rows="4"
-                        class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/40 focus:border-[#1e3a5f] resize-none"
+                        class="{{ $textareaCls }}"
                         placeholder="Ej: Juan Pérez - Supervisor de Proyecto&#10;Email: juan@ejemplo.com&#10;Teléfono: +123456789"></textarea>
                     <p class="text-xs text-gray-400 mt-1">Nombre, cargo, email y teléfono de las personas que pueden dar referencias</p>
                 </div>
@@ -222,14 +220,13 @@
                         <label class="block text-xs font-medium text-gray-700 mb-1">
                             Fecha de Inicio <span class="text-[#e11d48]">*</span>
                         </label>
-                        <input type="date" id="proj_fecha_ini" required
-                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/40 focus:border-[#1e3a5f]">
+                        <input type="date" id="proj_fecha_ini" required class="{{ $inputCls }}">
                     </div>
 
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Fecha de Finalización</label>
                         <input type="date" id="proj_fecha_fin" onchange="verificarFechaFinProyecto()"
-                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/40 focus:border-[#1e3a5f]">
+                            class="{{ $inputCls }}">
                     </div>
                 </div>
 

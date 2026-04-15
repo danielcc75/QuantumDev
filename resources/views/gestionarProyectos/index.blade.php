@@ -4,23 +4,17 @@
 
 @php
     use Illuminate\Support\Facades\DB;
-    $perfilProy       = DB::table('perfil')->where('id_usuario', $userId)->first();
-    $perfilIdProy     = $perfilProy->id_perfil ?? null;
 
-    $proyectos = $perfilIdProy
-        ? DB::table('proyectos')->where('id_perfil', $perfilIdProy)->orderBy('created_at', 'desc')->get()
+    $perfil   = DB::table('perfil')->where('id_usuario', $userId)->first();
+    $perfilId = $perfil->id_perfil ?? null;
+
+    $proyectos = $perfilId
+        ? DB::table('proyectos')->where('id_perfil', $perfilId)->orderBy('created_at', 'desc')->get()
         : collect();
 
     $totalProyectos = $proyectos->count();
     $enCurso        = $proyectos->where('estado', 'en_progreso')->count();
     $finalizados    = $proyectos->where('estado', 'completado')->count();
-
-    $estadoBadge = [
-        'en_progreso' => ['label' => 'en curso',   'class' => 'bg-[#1e3a5f]/10 text-[#1e3a5f]'],
-        'completado'  => ['label' => 'finalizado',  'class' => 'bg-indigo-100 text-indigo-700'],
-        'pendiente'   => ['label' => 'pendiente',   'class' => 'bg-gray-100 text-gray-600'],
-        'cancelado'   => ['label' => 'cancelado',   'class' => 'bg-red-100 text-[#e11d48]'],
-    ];
 @endphp
 
 <div class="ml-80 mr-80">
@@ -62,10 +56,7 @@
         {{-- Grid de tarjetas --}}
         <div id="proyectos-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5 {{ $proyectos->isEmpty() ? 'hidden' : '' }}">
             @foreach($proyectos as $proyecto)
-                @include('gestionarProyectos._card', [
-                    'proyecto'    => $proyecto,
-                    'estadoBadge' => $estadoBadge,
-                ])
+                @include('gestionarProyectos._card', ['proyecto' => $proyecto])
             @endforeach
         </div>
 

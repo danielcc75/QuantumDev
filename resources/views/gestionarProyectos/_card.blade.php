@@ -1,7 +1,14 @@
 {{-- resources/views/gestionarProyectos/_card.blade.php
-     Tarjeta individual de un proyecto. Recibe $proyecto y $estadoBadge. --}}
+     Tarjeta individual de un proyecto. Recibe $proyecto. --}}
 
 @php
+    $estadoBadge = [
+        'en_progreso' => ['label' => 'en curso',   'class' => 'bg-[#1e3a5f]/10 text-[#1e3a5f]'],
+        'completado'  => ['label' => 'finalizado',  'class' => 'bg-indigo-100 text-indigo-700'],
+        'pendiente'   => ['label' => 'pendiente',   'class' => 'bg-gray-100 text-gray-600'],
+        'cancelado'   => ['label' => 'cancelado',   'class' => 'bg-red-100 text-[#e11d48]'],
+    ];
+
     $badge    = $estadoBadge[$proyecto->estado] ?? ['label' => $proyecto->estado, 'class' => 'bg-gray-100 text-gray-600'];
     $tags     = $proyecto->tecnologias
         ? array_filter(array_map('trim', explode(',', $proyecto->tecnologias)))
@@ -58,25 +65,27 @@
     {{-- Toggle visibilidad --}}
     <div class="flex items-center gap-2 text-xs text-gray-500">
         <span>Visibilidad:</span>
-        <span class="font-medium {{ $esPublico ? 'text-[#1e3a5f]' : 'text-gray-400' }}">
+        <span @class(['font-medium', 'text-[#1e3a5f]' => $esPublico, 'text-gray-400' => !$esPublico])>
             {{ $esPublico ? 'Público' : 'Privado' }}
         </span>
         <button onclick="toggleVisibilidad({{ $proyecto->id_proyecto }}, this)"
             data-visible="{{ $esPublico ? '1' : '0' }}"
-            class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors
-                   {{ $esPublico ? 'bg-[#1e3a5f]' : 'bg-gray-300' }}">
-            <span class="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform
-                         {{ $esPublico ? 'translate-x-4' : 'translate-x-1' }}"></span>
+            @class(['relative inline-flex h-5 w-9 items-center rounded-full transition-colors',
+                    'bg-[#1e3a5f]' => $esPublico,
+                    'bg-gray-300'  => !$esPublico])>
+            <span @class(['inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform',
+                          'translate-x-4' => $esPublico,
+                          'translate-x-1' => !$esPublico])></span>
         </button>
     </div>
 
     {{-- Acciones editar / eliminar --}}
     <div class="flex gap-2 pt-1 border-t border-gray-100 mt-auto">
-        <button onclick="abrirModalEditar({{ $proyecto->id_proyecto }})"
+        <button onclick="confirmarEditar({{ $proyecto->id_proyecto }})"
             class="flex-1 flex items-center justify-center gap-1.5 text-xs border border-[#1e3a5f]/30 text-[#1e3a5f] hover:bg-[#1e3a5f]/5 px-3 py-1.5 rounded-lg transition">
             <i class="fas fa-pencil-alt"></i> Editar
         </button>
-        <button onclick="eliminarProyecto({{ $proyecto->id_proyecto }})"
+        <button onclick="confirmarEliminar({{ $proyecto->id_proyecto }})"
             class="flex-1 flex items-center justify-center gap-1.5 text-xs bg-[#e11d48] hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition">
             <i class="fas fa-trash"></i> Eliminar
         </button>
