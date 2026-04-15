@@ -4,7 +4,25 @@
 const CSRF    = document.querySelector('meta[name="csrf-token"]').content;
 const USER_ID = {{ $userId }};
 
-// ── Helpers de stats ──────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function apiFetch(url, options = {}) {
+    return fetch(url, {
+        ...options,
+        headers: { 'X-CSRF-TOKEN': CSRF, ...options.headers },
+    });
+}
+
+function isValidUrl(str) {
+    try { new URL(str); return true; } catch (_) { return false; }
+}
+
+function setModalVisible(id, show) {
+    document.getElementById(id).classList.toggle('hidden', !show);
+    document.getElementById(id).classList.toggle('flex',   show);
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────────────
 
 function recalcularStats() {
     const cards = document.querySelectorAll('#proyectos-grid [data-proyecto-id]');
@@ -14,23 +32,21 @@ function recalcularStats() {
         if (c.dataset.estado === 'en_progreso') enCurso++;
         if (c.dataset.estado === 'completado')  finalizados++;
     });
-    document.getElementById('stat-total').textContent      = total;
-    document.getElementById('stat-en-curso').textContent   = enCurso;
+    document.getElementById('stat-total').textContent       = total;
+    document.getElementById('stat-en-curso').textContent    = enCurso;
     document.getElementById('stat-finalizados').textContent = finalizados;
 
-    const grid  = document.getElementById('proyectos-grid');
-    const empty = document.getElementById('empty-state');
-    if (total === 0) { grid.classList.add('hidden'); empty.classList.remove('hidden'); }
-    else             { grid.classList.remove('hidden'); empty.classList.add('hidden'); }
+    document.getElementById('proyectos-grid').classList.toggle('hidden', total === 0);
+    document.getElementById('empty-state').classList.toggle('hidden',   total !== 0);
 }
 
-// ── Construir HTML de tarjeta desde datos JS ──────────────────────────────────
+// ── Construir HTML de tarjeta ─────────────────────────────────────────────────
 
 const ESTADO_BADGE = {
-    en_progreso: { label: 'en curso',   cls: 'bg-[#1e3a5f]/10 text-[#1e3a5f]'  },
-    completado:  { label: 'finalizado', cls: 'bg-indigo-100 text-indigo-700'      },
-    pendiente:   { label: 'pendiente',  cls: 'bg-gray-100 text-gray-600'         },
-    cancelado:   { label: 'cancelado',  cls: 'bg-red-100 text-[#e11d48]'         },
+    en_progreso: { label: 'en curso',   cls: 'bg-[#1e3a5f]/10 text-[#1e3a5f]' },
+    completado:  { label: 'finalizado', cls: 'bg-indigo-100 text-indigo-700'   },
+    pendiente:   { label: 'pendiente',  cls: 'bg-gray-100 text-gray-600'       },
+    cancelado:   { label: 'cancelado',  cls: 'bg-red-100 text-[#e11d48]'       },
 };
 
 const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
@@ -51,7 +67,6 @@ function buildCardHTML(p) {
     const badge    = ESTADO_BADGE[p.estado] ?? { label: p.estado, cls: 'bg-gray-100 text-gray-600' };
     const tags     = p.tecnologias ? p.tecnologias.split(',').map(t => t.trim()).filter(Boolean) : [];
     const esPublico = !!p.visible;
-    const fechaIni  = formatFecha(p.fecha_ini);
     const fechaFin  = p.fecha_fin ? formatFecha(p.fecha_fin) : 'Presente';
 
     const tagsHTML = tags.map(t =>
@@ -66,9 +81,8 @@ function buildCardHTML(p) {
            </a>`
         : '';
 
-    const toggleColor = esPublico ? 'bg-[#1e3a5f]'  : 'bg-gray-300';
+    const toggleColor = esPublico ? 'bg-[#1e3a5f]' : 'bg-gray-300';
     const thumbPos    = esPublico ? 'translate-x-4' : 'translate-x-1';
-    const visLabel    = esPublico ? 'Público' : 'Privado';
     const visLabelCls = esPublico ? 'text-[#1e3a5f]' : 'text-gray-400';
 
     return `
@@ -89,7 +103,7 @@ function buildCardHTML(p) {
 
     <div class="flex items-center text-xs text-gray-400 gap-1.5">
         <i class="fas fa-calendar-alt text-[#1e3a5f]/50"></i>
-        <span>${fechaIni} – ${fechaFin}</span>
+        <span>${formatFecha(p.fecha_ini)} – ${fechaFin}</span>
     </div>
 
     ${tags.length ? `<div class="flex flex-wrap gap-1.5">${tagsHTML}</div>` : ''}
@@ -98,7 +112,7 @@ function buildCardHTML(p) {
 
     <div class="flex items-center gap-2 text-xs text-gray-500">
         <span>Visibilidad:</span>
-        <span class="font-medium ${visLabelCls}">${visLabel}</span>
+        <span class="font-medium ${visLabelCls}">${esPublico ? 'Público' : 'Privado'}</span>
         <button onclick="toggleVisibilidad(${p.id_proyecto}, this)"
             data-visible="${esPublico ? '1' : '0'}"
             class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${toggleColor}">
@@ -107,11 +121,11 @@ function buildCardHTML(p) {
     </div>
 
     <div class="flex gap-2 pt-1 border-t border-gray-100 mt-auto">
-        <button onclick="abrirModalEditar(${p.id_proyecto})"
+        <button onclick="confirmarEditar(${p.id_proyecto})"
             class="flex-1 flex items-center justify-center gap-1.5 text-xs border border-[#1e3a5f]/30 text-[#1e3a5f] hover:bg-[#1e3a5f]/5 px-3 py-1.5 rounded-lg transition">
             <i class="fas fa-pencil-alt"></i> Editar
         </button>
-        <button onclick="eliminarProyecto(${p.id_proyecto})"
+        <button onclick="confirmarEliminar(${p.id_proyecto})"
             class="flex-1 flex items-center justify-center gap-1.5 text-xs bg-[#e11d48] hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition">
             <i class="fas fa-trash"></i> Eliminar
         </button>
@@ -166,27 +180,21 @@ const CONFIRM_CONFIG = {
 
 function mostrarConfirmacion(tipo) {
     const cfg = CONFIRM_CONFIG[tipo];
-    document.getElementById('confirmTitulo').textContent  = cfg.titulo;
-    document.getElementById('confirmMensaje').textContent = cfg.mensaje;
-    document.getElementById('confirmHeader').className    = `h-1.5 w-full ${cfg.headerColor}`;
-
-    const wrapper = document.getElementById('confirmIconWrapper');
-    wrapper.className = `w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 ${cfg.iconBg}`;
-
-    const icon = document.getElementById('confirmIcon');
-    icon.className = `${cfg.icon} text-2xl ${cfg.iconColor}`;
+    document.getElementById('confirmTitulo').textContent    = cfg.titulo;
+    document.getElementById('confirmMensaje').textContent   = cfg.mensaje;
+    document.getElementById('confirmHeader').className      = `h-1.5 w-full ${cfg.headerColor}`;
+    document.getElementById('confirmIconWrapper').className = `w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 ${cfg.iconBg}`;
+    document.getElementById('confirmIcon').className        = `${cfg.icon} text-2xl ${cfg.iconColor}`;
 
     const btn = document.getElementById('confirmBtn');
     btn.className = `flex-1 px-4 py-2.5 text-sm text-white rounded-xl font-medium transition ${cfg.btnClass}`;
-    btn.onclick = () => { cerrarConfirmacion(); cfg.accion(); };
+    btn.onclick   = () => { cerrarConfirmacion(); cfg.accion(); };
 
-    document.getElementById('modalConfirmacion').classList.remove('hidden');
-    document.getElementById('modalConfirmacion').classList.add('flex');
+    setModalVisible('modalConfirmacion', true);
 }
 
 function cerrarConfirmacion() {
-    document.getElementById('modalConfirmacion').classList.add('hidden');
-    document.getElementById('modalConfirmacion').classList.remove('flex');
+    setModalVisible('modalConfirmacion', false);
 }
 
 document.getElementById('modalConfirmacion').addEventListener('click', function(e) {
@@ -201,7 +209,6 @@ function confirmarGuardar() {
     const fechaFin = document.getElementById('proj_fecha_fin').value;
     const urlLink  = document.getElementById('proj_url_link').value.trim();
 
-    // Nombre obligatorio y máx. 100 caracteres
     if (!nombre) {
         resaltarError('proj_nombre', 'El nombre del proyecto es obligatorio.');
         return;
@@ -210,34 +217,23 @@ function confirmarGuardar() {
         resaltarError('proj_nombre', 'El nombre no puede superar los 100 caracteres.');
         return;
     }
-
-    // Fecha de inicio obligatoria
     if (!fechaIni) {
         resaltarError('proj_fecha_ini', 'La fecha de inicio es obligatoria.');
         return;
     }
-
-    // Fecha de finalización no puede ser anterior a inicio
     if (fechaFin && fechaFin < fechaIni) {
         resaltarError('proj_fecha_fin', 'La fecha de finalización no puede ser anterior a la de inicio.');
         return;
     }
 
-    // Si la fecha de fin es anterior a hoy, el enlace es obligatorio
     const hoy = new Date().toISOString().split('T')[0];
-    if (fechaFin && fechaFin < hoy) {
-        if (!urlLink) {
-            resaltarError('proj_url_link', 'El proyecto ya finalizó. El enlace es obligatorio.');
-            return;
-        }
+    if (fechaFin && fechaFin < hoy && !urlLink) {
+        resaltarError('proj_url_link', 'El proyecto ya finalizó. El enlace es obligatorio.');
+        return;
     }
-
-    // URL válida (si se proporcionó)
-    if (urlLink) {
-        try { new URL(urlLink); } catch (_) {
-            resaltarError('proj_url_link', 'Ingresa una URL válida (ej: https://miproyecto.com).');
-            return;
-        }
+    if (urlLink && !isValidUrl(urlLink)) {
+        resaltarError('proj_url_link', 'Ingresa una URL válida (ej: https://miproyecto.com).');
+        return;
     }
 
     mostrarConfirmacion('guardar');
@@ -270,13 +266,13 @@ function resaltarError(campoId, mensaje) {
     const prev = el.parentElement.querySelector('.error-msg');
     if (prev) prev.remove();
     const msg = document.createElement('p');
-    msg.className = 'error-msg text-xs text-red-500 mt-1';
+    msg.className   = 'error-msg text-xs text-red-500 mt-1';
     msg.textContent = mensaje;
     el.parentElement.appendChild(msg);
     setTimeout(() => msg.remove(), 2500);
 }
 
-// ── Datos de tecnologías por categoría ───────────────────────────────────────
+// ── Tecnologías por categoría ─────────────────────────────────────────────────
 
 window.TECNOLOGIAS_POR_CATEGORIA = {
     'Frontend':              ['React', 'Vue.js', 'Angular', 'Svelte', 'Next.js', 'Nuxt.js', 'HTML', 'CSS', 'Tailwind CSS', 'Bootstrap', 'jQuery', 'TypeScript'],
@@ -292,10 +288,14 @@ window.TECNOLOGIAS_POR_CATEGORIA = {
     'Gestión de Proyectos':  ['Git', 'GitHub', 'GitLab', 'Jira', 'Trello', 'Notion', 'Slack', 'Linear'],
 };
 
+const CHIP_ACTIVE_CLS   = 'text-xs px-2.5 py-1 rounded-full border border-[#1e3a5f] bg-[#1e3a5f] text-white transition cursor-pointer select-none';
+const CHIP_INACTIVE_CLS = 'text-xs px-2.5 py-1 rounded-full border border-[#1e3a5f]/20 bg-white text-[#1e3a5f] hover:bg-[#1e3a5f]/10 transition cursor-pointer select-none';
+const CHIP_DISABLED_CLS = 'text-xs px-2.5 py-1 rounded-full border border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed';
+
 function filtrarTecnologias() {
-    const categoria  = document.getElementById('proj_categoria_select').value;
-    const container  = document.getElementById('proj_chips_container');
-    const chipsDiv   = document.getElementById('proj_chips');
+    const categoria = document.getElementById('proj_categoria_select').value;
+    const container = document.getElementById('proj_chips_container');
+    const chipsDiv  = document.getElementById('proj_chips');
 
     chipsDiv.innerHTML = '';
 
@@ -308,16 +308,15 @@ function filtrarTecnologias() {
 
     TECNOLOGIAS_POR_CATEGORIA[categoria].forEach(tec => {
         const chip = document.createElement('button');
-        chip.type      = 'button';
+        chip.type        = 'button';
         chip.dataset.tec = tec;
         chip.textContent = tec;
 
         if (yaAgregadas.includes(tec)) {
-            // Ya está en los tags → mostrar deshabilitado
-            chip.className = 'text-xs px-2.5 py-1 rounded-full border border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed';
+            chip.className = CHIP_DISABLED_CLS;
             chip.disabled  = true;
         } else {
-            chip.className = 'text-xs px-2.5 py-1 rounded-full border border-[#1e3a5f]/20 bg-white text-[#1e3a5f] hover:bg-[#1e3a5f]/10 transition cursor-pointer select-none';
+            chip.className = CHIP_INACTIVE_CLS;
             chip.addEventListener('click', () => toggleChip(chip));
         }
 
@@ -329,23 +328,16 @@ function filtrarTecnologias() {
 
 function toggleChip(chip) {
     const activo = chip.dataset.activo === '1';
-    if (activo) {
-        chip.dataset.activo = '0';
-        chip.className = 'text-xs px-2.5 py-1 rounded-full border border-[#1e3a5f]/20 bg-white text-[#1e3a5f] hover:bg-[#1e3a5f]/10 transition cursor-pointer select-none';
-    } else {
-        chip.dataset.activo = '1';
-        chip.className = 'text-xs px-2.5 py-1 rounded-full border border-[#1e3a5f] bg-[#1e3a5f] text-white transition cursor-pointer select-none';
-    }
+    chip.dataset.activo = activo ? '0' : '1';
+    chip.className      = activo ? CHIP_INACTIVE_CLS : CHIP_ACTIVE_CLS;
 }
 
-// ── Fecha fin → estado y enlace obligatorio ───────────────────────────────────
+// ── Fecha fin → estado ────────────────────────────────────────────────────────
 
 function verificarFechaFinProyecto() {
     const fechaFin = document.getElementById('proj_fecha_fin').value;
     const hoy      = new Date().toISOString().split('T')[0];
-    const pasado   = fechaFin && fechaFin < hoy;
-
-    document.getElementById('proj_estado').value = pasado ? 'completado' : 'en_progreso';
+    document.getElementById('proj_estado').value = (fechaFin && fechaFin < hoy) ? 'completado' : 'en_progreso';
 }
 
 // ── Tags de tecnologías ───────────────────────────────────────────────────────
@@ -377,15 +369,13 @@ function agregarTecnologia() {
 
     const tags = getTags();
     seleccionados.forEach(chip => {
-        const tec = chip.dataset.tec;
-        if (!tags.includes(tec)) tags.push(tec);
+        if (!tags.includes(chip.dataset.tec)) tags.push(chip.dataset.tec);
     });
     setTags(tags);
 
-    // Marcar los chips agregados como deshabilitados
     seleccionados.forEach(chip => {
         chip.dataset.activo = '0';
-        chip.className = 'text-xs px-2.5 py-1 rounded-full border border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed';
+        chip.className = CHIP_DISABLED_CLS;
         chip.disabled  = true;
         chip.removeEventListener('click', toggleChip);
     });
@@ -403,70 +393,50 @@ document.getElementById('proj_url_link').addEventListener('input', function() {
     const val    = this.value.trim();
     const status = document.getElementById('url_status');
     const hint   = document.getElementById('url_hint');
-    const input  = this;
 
     if (!val) {
-        // Campo vacío → estado neutro
         status.classList.add('hidden');
-        input.classList.remove('border-[#1e3a5f]', 'border-red-400', 'ring-2', 'ring-[#1e3a5f]/20', 'ring-red-200');
-        input.classList.add('border-gray-200');
+        this.classList.remove('border-[#1e3a5f]', 'border-red-400', 'ring-2', 'ring-[#1e3a5f]/20', 'ring-red-200');
+        this.classList.add('border-gray-200');
         hint.textContent = 'Enlace a la aplicación o sitio web en producción desarrollada para el cliente';
         hint.className   = 'text-xs text-gray-400 mt-1';
         return;
     }
 
-    let valid = false;
-    try { new URL(val); valid = true; } catch (_) {}
-
+    const valid = isValidUrl(val);
     status.classList.remove('hidden');
-    input.classList.remove('border-gray-200', 'border-[#1e3a5f]', 'border-red-400', 'ring-[#1e3a5f]/20', 'ring-red-200');
-    input.classList.add('ring-2');
+    this.classList.remove('border-gray-200', 'border-[#1e3a5f]', 'border-red-400', 'ring-[#1e3a5f]/20', 'ring-red-200');
+    this.classList.add('ring-2');
 
     if (valid) {
-        status.innerHTML  = '<i class="fas fa-check-circle text-[#1e3a5f]"></i>';
-        input.classList.add('border-[#1e3a5f]', 'ring-[#1e3a5f]/20');
+        status.innerHTML = '<i class="fas fa-check-circle text-[#1e3a5f]"></i>';
+        this.classList.add('border-[#1e3a5f]', 'ring-[#1e3a5f]/20');
         hint.textContent = '✓ URL válida';
         hint.className   = 'text-xs text-[#1e3a5f] mt-1 font-medium';
     } else {
-        status.innerHTML  = '<i class="fas fa-times-circle text-red-400"></i>';
-        input.classList.add('border-red-400', 'ring-red-200');
+        status.innerHTML = '<i class="fas fa-times-circle text-red-400"></i>';
+        this.classList.add('border-red-400', 'ring-red-200');
         hint.textContent = 'URL no válida. Debe comenzar con https:// o http://';
         hint.className   = 'text-xs text-red-500 mt-1';
     }
 });
 
-
-// ── Toggle visible en modal ───────────────────────────────────────────────────
+// ── Toggle visible (modal) ────────────────────────────────────────────────────
 
 function toggleVisibleModal() {
-    const btn   = document.getElementById('toggleVisible');
-    const thumb = document.getElementById('toggleThumb');
-    const input = document.getElementById('proj_visible');
-    const isOn  = btn.dataset.on === '1';
-    if (isOn) {
-        btn.dataset.on = '0';
-        btn.classList.replace('bg-[#1e3a5f]', 'bg-gray-300');
-        thumb.classList.replace('translate-x-6', 'translate-x-1');
-        input.value = '0';
-    } else {
-        btn.dataset.on = '1';
-        btn.classList.replace('bg-gray-300', 'bg-[#1e3a5f]');
-        thumb.classList.replace('translate-x-1', 'translate-x-6');
-        input.value = '1';
-    }
+    const btn = document.getElementById('toggleVisible');
+    resetToggle(btn.dataset.on !== '1');
 }
-
-// ── Modal Proyecto ────────────────────────────────────────────────────────────
 
 function resetToggle(on) {
     const btn   = document.getElementById('toggleVisible');
     const thumb = document.getElementById('toggleThumb');
     btn.dataset.on = on ? '1' : '0';
     if (on) {
-        btn.classList.add('bg-[#1e3a5f]');   btn.classList.remove('bg-gray-300');
+        btn.classList.add('bg-[#1e3a5f]');    btn.classList.remove('bg-gray-300');
         thumb.classList.add('translate-x-6'); thumb.classList.remove('translate-x-1');
     } else {
-        btn.classList.add('bg-gray-300');    btn.classList.remove('bg-[#1e3a5f]');
+        btn.classList.add('bg-gray-300');     btn.classList.remove('bg-[#1e3a5f]');
         thumb.classList.add('translate-x-1'); thumb.classList.remove('translate-x-6');
     }
     document.getElementById('proj_visible').value = on ? '1' : '0';
@@ -483,6 +453,8 @@ function resetUrlStatus() {
     hint.className   = 'text-xs text-gray-400 mt-1';
 }
 
+// ── Modal Proyecto ────────────────────────────────────────────────────────────
+
 function abrirModalProyecto() {
     document.getElementById('proyectoId').value = '';
     document.getElementById('formProyecto').reset();
@@ -494,13 +466,11 @@ function abrirModalProyecto() {
     document.getElementById('modalProyectoTitulo').textContent = 'Crear Nuevo Proyecto';
     resetToggle(true);
     resetUrlStatus();
-    document.getElementById('modalProyecto').classList.remove('hidden');
-    document.getElementById('modalProyecto').classList.add('flex');
+    setModalVisible('modalProyecto', true);
 }
 
 function cerrarModalProyecto() {
-    document.getElementById('modalProyecto').classList.add('hidden');
-    document.getElementById('modalProyecto').classList.remove('flex');
+    setModalVisible('modalProyecto', false);
 }
 
 document.getElementById('modalProyecto').addEventListener('click', function(e) {
@@ -510,31 +480,30 @@ document.getElementById('modalProyecto').addEventListener('click', function(e) {
 // ── Editar ────────────────────────────────────────────────────────────────────
 
 function ejecutarAbrirEditar(id) {
-    fetch(`/proyectos/${id}`)
+    apiFetch(`/proyectos/${id}`)
         .then(r => r.json())
         .then(p => {
-            document.getElementById('proyectoId').value       = p.id_proyecto;
-            document.getElementById('proj_nombre').value      = p.nombre       ?? '';
-            document.getElementById('proj_descripcion').value = p.descripcion  ?? '';
-            document.getElementById('proj_fecha_ini').value   = toInputDate(p.fecha_ini);
-            document.getElementById('proj_fecha_fin').value   = toInputDate(p.fecha_fin);
-            document.getElementById('proj_estado').value      = p.estado       ?? 'pendiente';
+            document.getElementById('proyectoId').value            = p.id_proyecto;
+            document.getElementById('proj_nombre').value           = p.nombre      ?? '';
+            document.getElementById('proj_descripcion').value      = p.descripcion ?? '';
+            document.getElementById('proj_fecha_ini').value        = toInputDate(p.fecha_ini);
+            document.getElementById('proj_fecha_fin').value        = toInputDate(p.fecha_fin);
+            document.getElementById('proj_estado').value           = p.estado      ?? 'pendiente';
+            document.getElementById('proj_referencias').value      = p.referencias ?? '';
+            document.getElementById('proj_categoria_select').value = '';
+            document.getElementById('proj_chips').innerHTML        = '';
+            document.getElementById('proj_chips_container').classList.add('hidden');
+
             const urlInput = document.getElementById('proj_url_link');
             urlInput.value = p.url_link ?? '';
             urlInput.dispatchEvent(new Event('input')); // activa el indicador visual
-            document.getElementById('proj_referencias').value = p.referencias  ?? '';
-            document.getElementById('proj_categoria_select').value = '';
-            document.getElementById('proj_chips').innerHTML = '';
-            document.getElementById('proj_chips_container').classList.add('hidden');
+
             setTags(p.tecnologias ? p.tecnologias.split(',').map(t => t.trim()).filter(Boolean) : []);
             resetToggle(!!p.visible);
             document.getElementById('modalProyectoTitulo').textContent = 'Editar Proyecto';
-            document.getElementById('modalProyecto').classList.remove('hidden');
-            document.getElementById('modalProyecto').classList.add('flex');
+            setModalVisible('modalProyecto', true);
         });
 }
-
-function abrirModalEditar(id) { confirmarEditar(id); }
 
 // ── Crear / Actualizar ────────────────────────────────────────────────────────
 
@@ -543,9 +512,9 @@ function submitProyecto() {
     const url    = id ? `/proyectos/${id}` : '/proyectos';
     const method = id ? 'PUT' : 'POST';
 
-    fetch(url, {
+    apiFetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             user_id:     USER_ID,
             nombre:      document.getElementById('proj_nombre').value.trim(),
@@ -570,19 +539,16 @@ function submitProyecto() {
         return r.json();
     })
     .then(data => {
-        if (!data || !data.success) { alert(data?.message ?? 'Error al guardar'); return; }
+        if (!data?.success) { alert(data?.message ?? 'Error al guardar'); return; }
 
         cerrarModalProyecto();
-        const p        = data.proyecto;
-        const cardHTML = buildCardHTML(p);
+        const cardHTML = buildCardHTML(data.proyecto);
         const grid     = document.getElementById('proyectos-grid');
 
         if (id) {
-            // Editar: reemplazar tarjeta existente
-            const existing = grid.querySelector(`[data-proyecto-id="${p.id_proyecto}"]`);
+            const existing = grid.querySelector(`[data-proyecto-id="${data.proyecto.id_proyecto}"]`);
             if (existing) existing.outerHTML = cardHTML;
         } else {
-            // Crear: insertar al inicio del grid
             grid.insertAdjacentHTML('afterbegin', cardHTML);
         }
 
@@ -598,36 +564,29 @@ document.getElementById('formProyecto').addEventListener('submit', function(e) {
 // ── Eliminar ──────────────────────────────────────────────────────────────────
 
 function ejecutarEliminar(id) {
-    fetch(`/proyectos/${id}`, {
-        method: 'DELETE',
-        headers: { 'X-CSRF-TOKEN': CSRF }
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (!data.success) return;
-        const card = document.querySelector(`[data-proyecto-id="${id}"]`);
-        if (card) card.remove();
-        recalcularStats();
-    });
+    apiFetch(`/proyectos/${id}`, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.success) return;
+            document.querySelector(`[data-proyecto-id="${id}"]`)?.remove();
+            recalcularStats();
+        });
 }
 
-function eliminarProyecto(id) { confirmarEliminar(id); }
-
-// ── Toggle visibilidad (en la tarjeta) ───────────────────────────────────────
+// ── Toggle visibilidad (tarjeta) ──────────────────────────────────────────────
 
 function toggleVisibilidad(id, btn) {
     const visible = btn.dataset.visible === '1' ? 0 : 1;
-    fetch(`/proyectos/${id}`, {
+    apiFetch(`/proyectos/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ visible })
     })
     .then(r => r.json())
     .then(data => {
         if (!data.success) return;
-        const p    = data.proyecto;
         const card = document.querySelector(`[data-proyecto-id="${id}"]`);
-        if (card) card.outerHTML = buildCardHTML(p);
+        if (card) card.outerHTML = buildCardHTML(data.proyecto);
     });
 }
 </script>
