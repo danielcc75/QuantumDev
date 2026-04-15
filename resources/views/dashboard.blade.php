@@ -225,9 +225,9 @@
                     <span class="font-medium">Mi perfil</span>
                 </a>
 
-                <a href="#" data-seccion="proyectos" class="seccion-link flex items-center px-6 py-3 text-gray-700 transition-all">
-                    <i class="fas fa-folder-open w-5 h-5 mr-3 text-gray-500"></i>
-                    <span class="font-medium">Mis Proyectos</span>
+                <a href="#" data-seccion="habilidades" class="seccion-link flex items-center px-6 py-3 text-gray-700 transition-all">
+                    <i class="fas fa-code w-5 h-5 mr-3 text-gray-500"></i>
+                    <span class="font-medium">Mis Habilidades</span>
                 </a>
 
                 <a href="#" data-seccion="experiencia" class="seccion-link flex items-center px-6 py-3 text-gray-700 transition-all">
@@ -240,9 +240,9 @@
                     <span class="font-medium">Formación Académica</span>
                 </a>
 
-                <a href="#" data-seccion="habilidades" class="seccion-link flex items-center px-6 py-3 text-gray-700 transition-all">
-                    <i class="fas fa-code w-5 h-5 mr-3 text-gray-500"></i>
-                    <span class="font-medium">Mis Habilidades</span>
+                <a href="#" data-seccion="proyectos" class="seccion-link flex items-center px-6 py-3 text-gray-700 transition-all">
+                    <i class="fas fa-folder-open w-5 h-5 mr-3 text-gray-500"></i>
+                    <span class="font-medium">Mis Proyectos</span>
                 </a>
             </nav>
         </aside>
