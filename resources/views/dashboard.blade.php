@@ -462,7 +462,8 @@
             });
         });
 
-        cambiarSeccion('resumen');
+        const seccionInicial = new URLSearchParams(window.location.search).get('seccion') ?? 'resumen';
+        cambiarSeccion(seccionInicial);
 
         // ── Animación barra de progreso ───────────────────────────────────────
         window.addEventListener('load', () => {

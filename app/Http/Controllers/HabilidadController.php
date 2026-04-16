@@ -44,7 +44,7 @@ class HabilidadController extends Controller
             'id_perfil'         => $usuario->perfil->id_perfil,
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Habilidad creada correctamente');
+        return redirect(route('dashboard') . '?seccion=habilidades')->with('success', 'Habilidad creada correctamente');
     }
 
     // =========================
@@ -79,7 +79,7 @@ class HabilidadController extends Controller
             'descripcion'        => $request->descripcion,
         ]);
 
-        return redirect()->route('dashboard')
+        return redirect(route('dashboard') . '?seccion=habilidades')
             ->with('success', 'Habilidad actualizada correctamente');
     }
 
@@ -90,6 +90,6 @@ class HabilidadController extends Controller
     {
         Habilidad::findOrFail($id)->delete();
 
-        return back()->with('success', 'Habilidad eliminada correctamente');
+        return redirect(route('dashboard') . '?seccion=habilidades')->with('success', 'Habilidad eliminada correctamente');
     }
 }
