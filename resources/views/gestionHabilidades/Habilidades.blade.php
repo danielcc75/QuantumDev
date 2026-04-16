@@ -1,6 +1,5 @@
-<form method="POST"
-      action="{{ isset($habilidad) ? route('habilidades.update', $habilidad->id_habilidad) : route('habilidades.store') }}"
-      class="space-y-6">
+<form id="formHabilidad" method="POST"
+      action="{{ isset($habilidad) ? route('habilidades.update', $habilidad->id_habilidad) : route('habilidades.store') }}">
 
     @csrf
 
@@ -8,92 +7,78 @@
         @method('PUT')
     @endif
 
-    <!-- GRID -->
-    <div class="grid grid-cols-2 gap-6">
-
-        <!-- NOMBRE -->
-        <div>
-            <label class="block mb-1 font-medium">
-                Nombre de la Habilidad <span class="text-red-500">*</span>
-            </label>
-
-            <input type="text"
-                name="nombreHabilidad"
-                placeholder="Ej: React, Node.js, PostgreSQL"
-                value="{{ old('nombreHabilidad', $habilidad->nombre ?? '') }}"
-                class="w-full p-3 border border-gray-300 rounded-lg bg-gray-200 focus:outline-none">
-        </div>
-
-        <!-- CATEGORIA -->
-        <div>
-            <label class="block mb-1 font-medium">
-                Categoría <span class="text-red-500">*</span>
-            </label>
-
-            <select name="categoria"
-                class="w-full p-3 border border-gray-300 rounded-lg bg-gray-200">
-
-                <option value="">Selecciona una categoría</option>
-
-                @foreach ($categorias as $categoria)
-                    <option value="{{ $categoria->id_categoria }}"
-                        {{ old('categoria', $habilidad->id_categoria ?? '') == $categoria->id_categoria ? 'selected' : '' }}>
-                        {{ $categoria->nombre }}
-                    </option>
-                @endforeach
-
-            </select>
-        </div>
-
+    <!-- NOMBRE -->
+    <div class="mb-4">
+        <label class="block text-xs font-medium text-gray-700 mb-1">
+            Nombre de la Habilidad <span class="text-red-500">*</span>
+        </label>
+        <input type="text"
+            id="hab_nombre"
+            name="nombreHabilidad"
+            placeholder="Ej: React, Node.js, PostgreSQL"
+            value="{{ old('nombreHabilidad', $habilidad->nombre ?? '') }}"
+            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
     </div>
 
-    <!-- AÑOS -->
-    <div>
-        <label class="block mb-1 font-medium">
+    <!-- CATEGORÍA -->
+    <div class="mb-4">
+        <label class="block text-xs font-medium text-gray-700 mb-1">
+            Categoría <span class="text-red-500">*</span>
+        </label>
+        <select id="hab_categoria"
+            name="categoria"
+            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+
+            <option value="">Selecciona una categoría</option>
+
+            @foreach ($categorias as $categoria)
+                <option value="{{ $categoria->id_categoria }}"
+                    {{ old('categoria', $habilidad->id_categoria ?? '') == $categoria->id_categoria ? 'selected' : '' }}>
+                    {{ $categoria->nombre }}
+                </option>
+            @endforeach
+
+        </select>
+    </div>
+
+    <!-- AÑOS DE EXPERIENCIA -->
+    <div class="mb-4">
+        <label class="block text-xs font-medium text-gray-700 mb-1">
             Años de Experiencia <span class="text-red-500">*</span>
         </label>
-
         <input type="number"
-            step="0.5"
+            id="hab_anios"
+            step="1"
+            min="0"
             name="anosExperiencia"
-            placeholder="Ej: 2.5"
+            placeholder="Ej: 3"
             value="{{ old('anosExperiencia', $habilidad->anios_experiencia ?? '') }}"
-            class="w-full p-3 border border-gray-300 rounded-lg bg-gray-200">
+            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
     </div>
 
     <!-- DESCRIPCIÓN -->
-    <div>
-        <label class="block mb-1 font-medium">
+    <div class="mb-4">
+        <label class="block text-xs font-medium text-gray-700 mb-1">
             Descripción <span class="text-red-500">*</span>
         </label>
-
-        <textarea name="descripcion"
+        <textarea id="hab_descripcion"
+            name="descripcion"
+            rows="3"
             placeholder="Describe tu experiencia y proyectos realizados..."
-            class="w-full p-3 border border-gray-300 rounded-lg bg-gray-200 min-h-32">{{ old('descripcion', $habilidad->descripcion ?? '') }}</textarea>
-
-        <p class="text-sm text-gray-500 mt-1">
-            Mínimo 20 caracteres, máximo 500 caracteres
-        </p>
+            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none">{{ old('descripcion', $habilidad->descripcion ?? '') }}</textarea>
+        <p class="text-xs text-gray-400 mt-1">Mínimo 20 caracteres, máximo 500</p>
     </div>
 
     <!-- BOTONES -->
-    <div class="grid grid-cols-2 gap-4 pt-4">
-
-        <!-- CANCELAR -->
-        <button type="button"
-            onclick="document.getElementById('modal-habilidades').classList.add('hidden')"
-            class="py-4 text-lg border border-gray-300 rounded-lg bg-white hover:bg-gray-100">
-            ✖ Cancelar
+    <div class="flex gap-3 mt-6 pt-4 border-t border-gray-100">
+        <button type="button" onclick="confirmarCancelarHabilidad()"
+            class="flex-1 px-4 py-2 text-sm border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition">
+            Cancelar
         </button>
-
-        <!-- GUARDAR -->
-        <button type="submit"
-            class="py-4 text-lg rounded-lg text-white bg-black hover:bg-gray-800 transition">
-
-            {{ isset($habilidad) ? '💾 Actualizar Habilidad' : '💾 Guardar Habilidad' }}
-
+        <button type="button" onclick="confirmarGuardarHabilidad()"
+            class="flex-1 px-4 py-2 text-sm bg-[#1e3a5f] hover:bg-[#e11d48] text-white rounded-lg font-medium transition">
+            <i class="fas fa-save text-xs mr-1"></i> Guardar
         </button>
-
     </div>
 
 </form>
