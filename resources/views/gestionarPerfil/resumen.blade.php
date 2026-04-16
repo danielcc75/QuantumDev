@@ -70,18 +70,25 @@
                     <h3 class="text-lg font-bold text-[#1e3a5f]">Proyectos recientes</h3>
                     <div class="h-0.5 w-10 bg-[#e11d48] rounded-full mt-1"></div>
                 </div>
-                <span class="text-xs text-gray-400">Últimos {{ $proyectosRecientes->count() }} registros</span>
+                <span id="resumen-proyectos-count" class="text-xs text-gray-400">Últimos {{ $proyectosRecientes->count() }} registros</span>
             </div>
 
             @if($proyectosRecientes->isEmpty())
-                <div class="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center">
+                <div id="resumen-proyectos-empty" class="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center">
                     <div class="w-14 h-14 rounded-full bg-[#1e3a5f]/8 flex items-center justify-center mx-auto mb-3">
                         <i class="fas fa-folder-open text-2xl text-[#1e3a5f]/40"></i>
                     </div>
                     <p class="text-gray-500 font-medium text-sm">No hay proyectos registrados</p>
                 </div>
+                <div id="resumen-proyectos-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4 hidden"></div>
             @else
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div id="resumen-proyectos-empty" class="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center hidden">
+                    <div class="w-14 h-14 rounded-full bg-[#1e3a5f]/8 flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-folder-open text-2xl text-[#1e3a5f]/40"></i>
+                    </div>
+                    <p class="text-gray-500 font-medium text-sm">No hay proyectos registrados</p>
+                </div>
+                <div id="resumen-proyectos-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     @foreach($proyectosRecientes as $i => $proyecto)
                     @php
                         $cfg    = $estadoConfig[$proyecto->estado] ?? $estadoConfig['pendiente'];
@@ -139,6 +146,7 @@
                 </div>
             @endif
         </div>
+        <script>window._resumenProyectosIniciales = {{ $proyectosRecientes->count() }};</script>
 
         <!-- Habilidades técnicas -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">

@@ -111,6 +111,106 @@
                 </p>
             </div>
 
+            <!-- Datos del Perfil en formato lista -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-5 flex items-center">
+                    <i class="fas fa-id-card text-blue-500 mr-2"></i>
+                    Mi Perfil
+                </h2>
+
+                <!-- Datos Personales -->
+                <div class="mb-5">
+                    <h3 class="text-base font-semibold text-blue-600 uppercase tracking-wide mb-3 flex items-center gap-2">
+                        <i class="fas fa-user text-blue-400"></i> Datos Personales
+                    </h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3 text-base text-gray-700">
+                            <span class="w-5 text-gray-400 flex-shrink-0"><i class="fas fa-user"></i></span>
+                            <span class="font-medium text-gray-500 w-36 flex-shrink-0">Nombre:</span>
+                            <span>{{ $usuario->nombre ?? '—' }} {{ $usuario->apellido ?? '' }}</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-base text-gray-700">
+                            <span class="w-5 text-gray-400 flex-shrink-0"><i class="fas fa-envelope"></i></span>
+                            <span class="font-medium text-gray-500 w-36 flex-shrink-0">Correo:</span>
+                            <span>{{ $usuario->correo_electronico ?? '—' }}</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-base text-gray-700">
+                            <span class="w-5 text-gray-400 flex-shrink-0"><i class="fas fa-phone"></i></span>
+                            <span class="font-medium text-gray-500 w-36 flex-shrink-0">Teléfono:</span>
+                            <span>{{ $usuario->telefono ?? '—' }}</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <hr class="border-gray-100 mb-5">
+
+                <!-- Información Profesional -->
+                <div class="mb-5">
+                    <h3 class="text-base font-semibold text-blue-600 uppercase tracking-wide mb-3 flex items-center gap-2">
+                        <i class="fas fa-briefcase text-blue-400"></i> Información Profesional
+                    </h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3 text-base text-gray-700">
+                            <span class="w-5 text-gray-400 flex-shrink-0"><i class="fas fa-briefcase"></i></span>
+                            <span class="font-medium text-gray-500 w-36 flex-shrink-0">Título:</span>
+                            <span>{{ $usuario->perfil->titulo_profesional ?? '—' }}</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-base text-gray-700">
+                            <span class="w-5 text-gray-400 flex-shrink-0"><i class="fas fa-map-marker-alt"></i></span>
+                            <span class="font-medium text-gray-500 w-36 flex-shrink-0">Ubicación:</span>
+                            <span>{{ $usuario->perfil->ubicacion ?? '—' }}</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <hr class="border-gray-100 mb-5">
+
+                <!-- Redes Sociales -->
+                <div>
+                    <h3 class="text-base font-semibold text-blue-600 uppercase tracking-wide mb-3 flex items-center gap-2">
+                        <i class="fas fa-share-alt text-blue-400"></i> Redes Sociales
+                    </h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3 text-base text-gray-700">
+                            <span class="w-5 text-gray-800 flex-shrink-0"><i class="fab fa-github"></i></span>
+                            <span class="font-medium text-gray-500 w-36 flex-shrink-0">GitHub:</span>
+                            @if($links['github'] ?? false)
+                                <a href="{{ $links['github'] }}" target="_blank" class="text-blue-500 hover:underline truncate">{{ $links['github'] }}</a>
+                            @else
+                                <span class="text-gray-400">—</span>
+                            @endif
+                        </li>
+                        <li class="flex items-center gap-3 text-base text-gray-700">
+                            <span class="w-5 text-blue-700 flex-shrink-0"><i class="fab fa-linkedin"></i></span>
+                            <span class="font-medium text-gray-500 w-36 flex-shrink-0">LinkedIn:</span>
+                            @if($links['linkedin'] ?? false)
+                                <a href="{{ $links['linkedin'] }}" target="_blank" class="text-blue-500 hover:underline truncate">{{ $links['linkedin'] }}</a>
+                            @else
+                                <span class="text-gray-400">—</span>
+                            @endif
+                        </li>
+                        <li class="flex items-center gap-3 text-base text-gray-700">
+                            <span class="w-5 text-blue-400 flex-shrink-0"><i class="fab fa-twitter"></i></span>
+                            <span class="font-medium text-gray-500 w-36 flex-shrink-0">Twitter / X:</span>
+                            @if($links['twitter'] ?? false)
+                                <a href="{{ $links['twitter'] }}" target="_blank" class="text-blue-500 hover:underline truncate">{{ $links['twitter'] }}</a>
+                            @else
+                                <span class="text-gray-400">—</span>
+                            @endif
+                        </li>
+                        <li class="flex items-center gap-3 text-base text-gray-700">
+                            <span class="w-5 text-green-600 flex-shrink-0"><i class="fas fa-globe"></i></span>
+                            <span class="font-medium text-gray-500 w-36 flex-shrink-0">Portafolio:</span>
+                            @if($links['portfolio'] ?? false)
+                                <a href="{{ $links['portfolio'] }}" target="_blank" class="text-blue-500 hover:underline truncate">{{ $links['portfolio'] }}</a>
+                            @else
+                                <span class="text-gray-400">—</span>
+                            @endif
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
         </div>
     </main>
 </div>

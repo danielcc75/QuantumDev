@@ -550,6 +550,7 @@ function submitProyecto() {
             if (existing) existing.outerHTML = cardHTML;
         } else {
             grid.insertAdjacentHTML('afterbegin', cardHTML);
+            actualizarResumenProyectos(data.proyecto, 'crear');
         }
 
         recalcularStats();
@@ -569,8 +570,95 @@ function ejecutarEliminar(id) {
         .then(data => {
             if (!data.success) return;
             document.querySelector(`[data-proyecto-id="${id}"]`)?.remove();
+            actualizarResumenProyectos(id, 'eliminar');
             recalcularStats();
         });
+}
+
+// ── Proyectos Recientes (Resumen) ─────────────────────────────────────────────
+
+const RESUMEN_ACCENTS = ['bg-[#1e3a5f]', 'bg-[#e11d48]', 'bg-indigo-600'];
+
+const RESUMEN_ESTADO = {
+    en_progreso: { label: 'En curso',   icon: 'fa-spinner',      bg: 'bg-[#1e3a5f]/10', text: 'text-[#1e3a5f]' },
+    completado:  { label: 'Finalizado', icon: 'fa-check-circle', bg: 'bg-indigo-100',   text: 'text-indigo-700' },
+    pendiente:   { label: 'Pendiente',  icon: 'fa-clock',        bg: 'bg-gray-100',     text: 'text-gray-600' },
+    cancelado:   { label: 'Cancelado',  icon: 'fa-times-circle', bg: 'bg-red-100',      text: 'text-[#e11d48]' },
+};
+
+function buildResumenCardHTML(p, index) {
+    const cfg    = RESUMEN_ESTADO[p.estado] ?? RESUMEN_ESTADO['pendiente'];
+    const accent = RESUMEN_ACCENTS[index % RESUMEN_ACCENTS.length];
+    const tags   = p.tecnologias
+        ? p.tecnologias.split(',').map(t => t.trim()).filter(Boolean).slice(0, 3)
+        : [];
+
+    const tagsHTML = tags.map(t =>
+        `<span class="text-xs bg-[#1e3a5f]/5 text-[#1e3a5f] border border-[#1e3a5f]/15 px-2 py-0.5 rounded-md font-medium">${t}</span>`
+    ).join('');
+
+    const fecha = p.fecha_ini ? formatFecha(p.fecha_ini) : '—';
+
+    return `
+<div class="bg-white rounded-2xl border border-gray-100 shadow-md hover:-translate-y-1 hover:shadow-xl transition-all duration-200 overflow-hidden flex flex-col"
+     data-resumen-id="${p.id_proyecto}">
+    <div class="h-1.5 w-full ${accent}"></div>
+    <div class="p-5 flex flex-col gap-3 flex-1">
+        <div class="flex items-start gap-3">
+            <div class="w-9 h-9 rounded-xl ${accent} flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-code-branch text-white text-sm"></i>
+            </div>
+            <div class="min-w-0">
+                <p class="font-semibold text-[#1e3a5f] text-sm leading-snug line-clamp-1">${p.nombre}</p>
+                <p class="text-xs text-gray-400 mt-0.5"><i class="fas fa-calendar-alt mr-1"></i>${fecha}</p>
+            </div>
+        </div>
+        <p class="text-xs text-gray-500 leading-relaxed line-clamp-2">${p.descripcion ?? 'Sin descripción'}</p>
+        ${tags.length ? `<div class="flex flex-wrap gap-1">${tagsHTML}</div>` : ''}
+        <div class="mt-auto pt-3 border-t border-gray-100">
+            <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${cfg.bg} ${cfg.text}">
+                <i class="fas ${cfg.icon} text-xs"></i> ${cfg.label}
+            </span>
+        </div>
+    </div>
+</div>`;
+}
+
+function actualizarResumenProyectos(proyecto, accion) {
+    const grid  = document.getElementById('resumen-proyectos-grid');
+    const empty = document.getElementById('resumen-proyectos-empty');
+    const count = document.getElementById('resumen-proyectos-count');
+    if (!grid) return;
+
+    if (accion === 'crear') {
+        // Insertar al inicio y dejar solo los 3 más recientes
+        grid.insertAdjacentHTML('afterbegin', buildResumenCardHTML(proyecto, 0));
+
+        // Recolorar acentos de los 3 primeros
+        const cards = grid.querySelectorAll('[data-resumen-id]');
+        cards.forEach((card, i) => {
+            const franja = card.querySelector('.h-1\\.5');
+            const icono  = card.querySelector('.w-9.h-9');
+            RESUMEN_ACCENTS.forEach(cls => {
+                franja?.classList.remove(cls);
+                icono?.classList.remove(cls);
+            });
+            franja?.classList.add(RESUMEN_ACCENTS[i % RESUMEN_ACCENTS.length]);
+            icono?.classList.add(RESUMEN_ACCENTS[i % RESUMEN_ACCENTS.length]);
+
+            if (i >= 3) card.remove(); // máximo 3
+        });
+    } else if (accion === 'eliminar') {
+        const card = grid.querySelector(`[data-resumen-id="${proyecto}"]`);
+        if (card) card.remove();
+    }
+
+    const total = grid.querySelectorAll('[data-resumen-id]').length;
+    if (count) count.textContent = `Últimos ${total} registros`;
+
+    const vacio = total === 0;
+    grid.classList.toggle('hidden', vacio);
+    if (empty) empty.classList.toggle('hidden', !vacio);
 }
 
 // ── Toggle visibilidad (tarjeta) ──────────────────────────────────────────────
