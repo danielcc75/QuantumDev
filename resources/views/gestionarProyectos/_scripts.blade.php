@@ -38,6 +38,12 @@ function recalcularStats() {
 
     document.getElementById('proyectos-grid').classList.toggle('hidden', total === 0);
     document.getElementById('empty-state').classList.toggle('hidden',   total !== 0);
+
+    // Actualizar stats del Resumen general
+    const resumenRepos = document.getElementById('resumen-stat-repos');
+    if (resumenRepos) resumenRepos.textContent = total;
+    const resumenActividades = document.getElementById('resumen-stat-actividades');
+    if (resumenActividades) resumenActividades.textContent = (total * 45).toLocaleString();
 }
 
 // ── Construir HTML de tarjeta ─────────────────────────────────────────────────

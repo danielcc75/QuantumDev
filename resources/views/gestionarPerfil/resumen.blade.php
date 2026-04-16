@@ -25,11 +25,11 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center stat-card">
-                <div class="text-3xl font-bold text-blue-600">{{ $stats['repos'] }}</div>
+                <div id="resumen-stat-repos" class="text-3xl font-bold text-blue-600">{{ $stats['repos'] }}</div>
                 <div class="text-sm text-gray-500 mt-1">Proyectos</div>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center stat-card">
-                <div class="text-3xl font-bold text-green-600">{{ number_format($stats['commits']) }}</div>
+                <div id="resumen-stat-actividades" class="text-3xl font-bold text-green-600">{{ number_format($stats['commits']) }}</div>
                 <div class="text-sm text-gray-500 mt-1">Actividades</div>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center stat-card">
