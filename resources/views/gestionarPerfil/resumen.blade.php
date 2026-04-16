@@ -149,44 +149,83 @@
         <script>window._resumenProyectosIniciales = {{ $proyectosRecientes->count() }};</script>
 
         <!-- Habilidades técnicas -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
-            <h3 class="font-semibold text-gray-800 mb-4">Habilidades técnicas</h3>
-            @php
-                $habilidades = $perfilId ? DB::table('habilidades')
-                    ->join('categoria', 'habilidades.id_categoria', '=', 'categoria.id_categoria')
-                    ->where('habilidades.id_perfil', $perfilId)
-                    ->select('habilidades.*', 'categoria.nombre as nombre_categoria')
-                    ->get()
-                    ->groupBy('nombre_categoria') : collect();
-            @endphp
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                @forelse($habilidades as $categoria => $items)
+        @php
+            $habilidadesResumen = $perfilId ? DB::table('habilidades')
+                ->join('categoria', 'habilidades.id_categoria', '=', 'categoria.id_categoria')
+                ->where('habilidades.id_perfil', $perfilId)
+                ->select('habilidades.*', 'categoria.nombre as nombre_categoria')
+                ->orderBy('habilidades.anios_experiencia', 'desc')
+                ->get() : collect();
+
+            $catColors = [
+                0 => ['border' => 'border-l-[#1e3a5f]', 'icon_bg' => 'bg-[#1e3a5f]',   'badge_bg' => 'bg-[#1e3a5f]/10',  'badge_text' => 'text-[#1e3a5f]'],
+                1 => ['border' => 'border-l-[#e11d48]', 'icon_bg' => 'bg-[#e11d48]',   'badge_bg' => 'bg-red-50',        'badge_text' => 'text-[#e11d48]'],
+                2 => ['border' => 'border-l-indigo-500','icon_bg' => 'bg-indigo-500',   'badge_bg' => 'bg-indigo-50',     'badge_text' => 'text-indigo-600'],
+                3 => ['border' => 'border-l-emerald-500','icon_bg'=> 'bg-emerald-500',  'badge_bg' => 'bg-emerald-50',    'badge_text' => 'text-emerald-600'],
+                4 => ['border' => 'border-l-amber-500', 'icon_bg' => 'bg-amber-500',    'badge_bg' => 'bg-amber-50',      'badge_text' => 'text-amber-600'],
+            ];
+
+            $catIndex = [];
+            $colorIdx = 0;
+        @endphp
+
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
                 <div>
-                    <p class="font-medium text-gray-700 mb-2 capitalize">{{ $categoria }}</p>
-                    <div class="flex flex-wrap gap-2">
-                        @foreach($items as $habilidad)
-                        <span class="px-2 py-1 bg-{{ 
-                            $categoria == 'frontend' ? 'blue' : 
-                            ($categoria == 'backend' ? 'green' : 
-                            ($categoria == 'devops' ? 'purple' : 'gray')) 
-                        }}-100 text-{{ 
-                            $categoria == 'frontend' ? 'blue' : 
-                            ($categoria == 'backend' ? 'green' : 
-                            ($categoria == 'devops' ? 'purple' : 'gray')) 
-                        }}-700 rounded-lg text-xs">
-                            {{ $habilidad->nombre }}
-                        </span>
-                        @endforeach
-                    </div>
+                    <h3 class="text-lg font-bold text-[#1e3a5f]">Habilidades técnicas</h3>
+                    <div class="h-0.5 w-10 bg-[#e11d48] rounded-full mt-1"></div>
                 </div>
-                @empty
-                    <div class="col-span-3 text-center py-4 text-gray-500">
-                        <i class="fas fa-code text-2xl mb-2"></i>
-                        <p class="text-sm">No hay habilidades registradas</p>
-                    </div>
-                @endforelse
+                <span class="text-xs text-gray-400">{{ $habilidadesResumen->count() }} registradas</span>
             </div>
+
+            @if($habilidadesResumen->isEmpty())
+                <div class="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center">
+                    <div class="w-14 h-14 rounded-full bg-[#1e3a5f]/8 flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-code text-2xl text-[#1e3a5f]/40"></i>
+                    </div>
+                    <p class="text-gray-500 font-medium text-sm">No hay habilidades registradas</p>
+                </div>
+            @else
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach($habilidadesResumen as $hab)
+                        @php
+                            $cat = $hab->nombre_categoria ?? 'Otra';
+                            if (!isset($catIndex[$cat])) {
+                                $catIndex[$cat] = $colorIdx % count($catColors);
+                                $colorIdx++;
+                            }
+                            $c = $catColors[$catIndex[$cat]];
+                        @endphp
+                        <div class="bg-white rounded-2xl border border-gray-200 shadow-md border-l-4 {{ $c['border'] }} p-5 flex flex-col gap-2 hover:-translate-y-1 hover:shadow-xl transition-all duration-200">
+
+                            {{-- Encabezado: ícono + nombre --}}
+                            <div class="flex items-start gap-3">
+                                <div class="w-9 h-9 rounded-xl {{ $c['icon_bg'] }} flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-code text-white text-sm"></i>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <p class="font-semibold text-[#1e3a5f] text-sm leading-snug truncate">{{ $hab->nombre }}</p>
+                                    <span class="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full {{ $c['badge_bg'] }} {{ $c['badge_text'] }} mt-0.5">
+                                        <i class="fas fa-tag text-[10px]"></i>
+                                        {{ $cat }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {{-- Descripción --}}
+                            @if(!empty($hab->descripcion))
+                                <p class="text-xs text-gray-500 leading-relaxed line-clamp-2">{{ $hab->descripcion }}</p>
+                            @endif
+
+                            {{-- Años de experiencia --}}
+                            <div class="mt-auto pt-2 border-t border-gray-100 flex items-center gap-1.5 text-xs text-gray-500">
+                                <i class="fas fa-clock text-gray-400 text-[11px]"></i>
+                                <span>{{ $hab->anios_experiencia }} {{ $hab->anios_experiencia == 1 ? 'año' : 'años' }} de experiencia</span>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
     </main>
 </div>

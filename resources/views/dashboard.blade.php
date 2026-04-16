@@ -464,6 +464,10 @@
 
         const seccionInicial = new URLSearchParams(window.location.search).get('seccion') ?? 'resumen';
         cambiarSeccion(seccionInicial);
+        // Limpiar el parámetro de la URL para que al recargar no vuelva a la misma sección
+        if (window.location.search) {
+            history.replaceState(null, '', window.location.pathname);
+        }
 
         // ── Animación barra de progreso ───────────────────────────────────────
         window.addEventListener('load', () => {
