@@ -39,30 +39,30 @@
     <div class="bg-gray-300 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh] overflow-y-auto flex flex-col">
 
         {{-- Header --}}
-        <div class="bg-[#1e3a5f] text-white px-8 py-5 flex items-center justify-between rounded-t-2xl sticky top-0 z-10">
-            <div class="flex items-center gap-4">
-                <button type="button" onclick="confirmarCancelar()" class="text-white hover:text-red-300 transition">
+        <div class="bg-[#1e3a5f] text-white px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 rounded-t-2xl sticky top-0 z-10">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <button type="button" onclick="confirmarCancelar()" class="text-white hover:text-red-300 transition flex-shrink-0">
                     <i class="fas fa-arrow-left text-lg"></i>
                 </button>
-                <div>
-                    <h3 id="modalProyectoTitulo" class="text-xl font-bold">Crear Nuevo Proyecto</h3>
-                    <p class="text-blue-200 text-xs mt-0.5">Completa la información de tu proyecto</p>
+                <div class="min-w-0">
+                    <h3 id="modalProyectoTitulo" class="text-lg sm:text-xl font-bold truncate">Crear Nuevo Proyecto</h3>
+                    <p class="text-blue-200 text-xs mt-0.5 hidden sm:block">Completa la información de tu proyecto</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3 justify-end">
                 <button type="button" onclick="confirmarCancelar()"
-                    class="px-4 py-2 text-sm border border-white/30 text-white rounded-lg hover:bg-white/10 transition">
+                    class="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm border border-white/30 text-white rounded-lg hover:bg-white/10 transition">
                     Cancelar
                 </button>
                 <button type="button" onclick="confirmarGuardar()"
-                    class="flex items-center gap-2 px-4 py-2 text-sm bg-[#e11d48] hover:bg-red-600 text-white rounded-lg font-medium transition">
-                    <i class="fas fa-save text-xs"></i> Guardar Proyecto
+                    class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm bg-[#e11d48] hover:bg-red-600 text-white rounded-lg font-medium transition whitespace-nowrap">
+                    <i class="fas fa-save text-xs"></i> <span>Guardar</span><span class="hidden sm:inline"> Proyecto</span>
                 </button>
             </div>
         </div>
 
         {{-- Body --}}
-        <form id="formProyecto" class="p-6 grid grid-cols-2 gap-5">
+        <form id="formProyecto" class="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
             @csrf
             <input type="hidden" id="proyectoId" value="">
 

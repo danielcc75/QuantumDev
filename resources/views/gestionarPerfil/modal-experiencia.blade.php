@@ -4,18 +4,18 @@
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
 
         {{-- Header --}}
-        <div class="bg-[#1e3a5f] text-white px-6 py-4 flex items-center justify-between rounded-t-2xl sticky top-0 z-10">
-            <div>
-                <h3 id="modalExperienciaTitulo" class="text-lg font-bold">Agregar Experiencia Laboral</h3>
-                <p class="text-blue-200 text-xs mt-0.5">Completa los detalles de tu experiencia</p>
+        <div class="bg-[#1e3a5f] text-white px-4 sm:px-6 py-4 flex items-center justify-between gap-3 rounded-t-2xl sticky top-0 z-10">
+            <div class="min-w-0">
+                <h3 id="modalExperienciaTitulo" class="text-base sm:text-lg font-bold truncate">Agregar Experiencia Laboral</h3>
+                <p class="text-blue-200 text-xs mt-0.5 hidden sm:block">Completa los detalles de tu experiencia</p>
             </div>
-            <button type="button" onclick="confirmarCancelarExperiencia()" class="text-white hover:text-blue-200 transition">
+            <button type="button" onclick="confirmarCancelarExperiencia()" class="text-white hover:text-blue-200 transition flex-shrink-0">
                 <i class="fas fa-times text-lg"></i>
             </button>
         </div>
 
         {{-- Body --}}
-        <form id="formExperiencia" class="p-6">
+        <form id="formExperiencia" class="p-4 sm:p-6">
             @csrf
             <input type="hidden" id="exp_id_experiencia" name="id_experiencia">
 
@@ -37,7 +37,7 @@
                     placeholder="Ej: Google, Microsoft, Startup X">
             </div>
 
-            <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="block text-xs font-medium text-gray-700 mb-1">
                         Fecha Inicio <span class="text-red-500">*</span>
@@ -91,7 +91,7 @@
                             placeholder="Breve descripción del proyecto..."></textarea>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">
                                 Fecha Inicio <span class="text-red-500">*</span>

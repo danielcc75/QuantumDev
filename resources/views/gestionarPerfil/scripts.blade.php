@@ -120,108 +120,90 @@ function resaltarErrorPerfil(campoId, mensaje) {
     setTimeout(() => msg.remove(), 2500);
 }
 
-// ── Actualizar la interfaz con los nuevos datos (CORREGIDO) ───────────────────
+// ── Actualizar la interfaz con los nuevos datos ───────────────────────────────
 
 function actualizarInterfazPerfil(data) {
-    // 1. Actualizar nombre completo en el header (dropdown)
-    const nombreCompleto = data.usuario.nombre + ' ' + data.usuario.apellido;
-    const headerNombre = document.querySelector('header .text-sm.font-medium.text-gray-700');
-    if (headerNombre) headerNombre.textContent = nombreCompleto;
-    
-    // 2. Actualizar nombre en el perfil (h1 principal)
-    const nombrePerfil = document.querySelector('.max-w-4xl.mx-auto .bg-white.rounded-2xl h1');
-    if (nombrePerfil) nombrePerfil.textContent = nombreCompleto;
-    
-    // 3. Actualizar título profesional
-    const tituloPerfil = document.querySelector('.max-w-4xl.mx-auto .bg-white.rounded-2xl .text-gray-500.mt-1');
-    if (tituloPerfil && data.perfil.titulo_profesional) {
-        tituloPerfil.textContent = data.perfil.titulo_profesional;
+    const u = data.usuario || {};
+    const p = data.perfil  || {};
+
+    const nombreCompleto = `${u.nombre ?? ''} ${u.apellido ?? ''}`.trim() || 'Usuario';
+    const iniciales = ((u.nombre?.charAt(0) || 'U') + (u.apellido?.charAt(0) || 'S')).toUpperCase();
+
+    const setText = (id, value, fallback = '—') => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = (value && String(value).trim() !== '') ? value : fallback;
+    };
+
+    // ── Header del dashboard ──────────────────────────────────────────────────
+    setText('header-nombre-usuario', nombreCompleto, 'Usuario');
+
+    const headerAvatar = document.getElementById('header-avatar');
+    if (headerAvatar) {
+        headerAvatar.innerHTML = p.foto_perfil
+            ? `<img src="${p.foto_perfil}" alt="Foto perfil" class="w-10 h-10 rounded-full object-cover shadow-md">`
+            : `<span class="w-10 h-10 bg-gradient-to-br from-[#1e3a5f] to-indigo-600 rounded-full flex items-center justify-center shadow-md">
+                   <span class="text-white text-sm font-bold">${iniciales}</span>
+               </span>`;
     }
-    
-    // 4. Actualizar ubicación
-    const ubicacionSpan = document.querySelector('.max-w-4xl.mx-auto .bg-white.rounded-2xl .flex.flex-wrap .flex.items-center:first-child span:last-child');
-    if (ubicacionSpan && data.perfil.ubicacion) {
-        ubicacionSpan.textContent = data.perfil.ubicacion;
-    }
-    
-    // 5. Actualizar correo electrónico
-    const emailSpan = document.querySelector('.max-w-4xl.mx-auto .bg-white.rounded-2xl .flex.flex-wrap .flex.items-center:last-child span:last-child');
-    if (emailSpan && data.usuario.correo_electronico) {
-        emailSpan.textContent = data.usuario.correo_electronico;
-    }
-    
-    // 6. Actualizar biografía
-    const bioParrafo = document.querySelector('#perfil_biografia_texto');
-    if (bioParrafo) {
-        bioParrafo.textContent = data.perfil.biografia || 'Sin biografía. Haz clic en "Editar Perfil" para agregar una descripción.';
-    }
-    
-    // 7. Actualizar foto en el header (dropdown)
-    const dropdownButton = document.querySelector('header .dropdown button');
-    if (dropdownButton) {
-        let avatarContainer = dropdownButton.querySelector('.w-10.h-10, div:first-child');
-        if (avatarContainer) {
-            if (data.perfil.foto_perfil) {
-                avatarContainer.innerHTML = `<img src="${data.perfil.foto_perfil}" class="w-full h-full rounded-full object-cover">`;
-                avatarContainer.className = 'w-10 h-10 rounded-full object-cover shadow-md';
-            } else {
-                const iniciales = (data.usuario.nombre?.charAt(0) || 'U') + (data.usuario.apellido?.charAt(0) || 'S');
-                avatarContainer.innerHTML = `<div class="w-full h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
-                                                <span class="text-white text-sm font-bold">${iniciales.toUpperCase()}</span>
-                                            </div>`;
-                avatarContainer.className = 'w-10 h-10';
-            }
-        }
-    }
-    
-    // 8. Actualizar foto en el perfil
-    const fotoContainer = document.querySelector('.max-w-4xl.mx-auto .bg-white.rounded-2xl .flex-shrink-0');
+
+    // ── Cabecera del perfil ───────────────────────────────────────────────────
+    setText('perfil-nombre-header',    nombreCompleto, 'Usuario');
+    setText('perfil-titulo-header',    p.titulo_profesional, 'Desarrollador');
+    setText('perfil-ubicacion-header', p.ubicacion, 'Ubicación no especificada');
+    setText('perfil-correo-header',    u.correo_electronico, '___');
+
+    const fotoContainer = document.getElementById('perfil-foto-container');
     if (fotoContainer) {
-        if (data.perfil.foto_perfil) {
-            fotoContainer.innerHTML = `<img src="${data.perfil.foto_perfil}" alt="Foto de perfil" class="w-32 h-32 rounded-full object-cover border-4 border-blue-100">`;
-        } else {
-            const iniciales = (data.usuario.nombre?.charAt(0) || 'U') + (data.usuario.apellido?.charAt(0) || 'S');
-            fotoContainer.innerHTML = `<div class="w-32 h-32 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center border-4 border-blue-100">
-                                        <span class="text-white text-4xl font-bold">${iniciales.toUpperCase()}</span>
-                                      </div>`;
+        fotoContainer.innerHTML = p.foto_perfil
+            ? `<img src="${p.foto_perfil}" alt="Foto de perfil" class="w-32 h-32 rounded-full object-cover border-4 border-blue-100">`
+            : `<div class="w-32 h-32 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center border-4 border-blue-100">
+                   <span class="text-white text-4xl font-bold">${iniciales}</span>
+               </div>`;
+    }
+
+    // ── Biografía ─────────────────────────────────────────────────────────────
+    setText('perfil_biografia_texto', p.biografia,
+        'Sin biografía. Haz clic en "Editar Perfil" para agregar una descripción.');
+
+    // ── Lista de datos ────────────────────────────────────────────────────────
+    setText('perfil-datos-nombre',    nombreCompleto);
+    setText('perfil-datos-correo',    u.correo_electronico);
+    setText('perfil-datos-telefono',  u.telefono);
+    setText('perfil-datos-titulo',    p.titulo_profesional);
+    setText('perfil-datos-ubicacion', p.ubicacion);
+
+    // ── Links / Redes sociales ────────────────────────────────────────────────
+    const linksMap = {};
+    (data.links || []).forEach(l => { linksMap[l.tipo] = l.url; });
+
+    const linksConfig = {
+        github:    { icon: 'fab fa-github',   color: 'hover:text-gray-900' },
+        linkedin:  { icon: 'fab fa-linkedin', color: 'hover:text-blue-700' },
+        twitter:   { icon: 'fab fa-twitter',  color: 'hover:text-blue-400' },
+        portfolio: { icon: 'fas fa-globe',    color: 'hover:text-green-600' },
+    };
+
+    // Iconos del encabezado
+    const socialContainer = document.getElementById('perfil-social-container');
+    if (socialContainer) {
+        socialContainer.innerHTML = '';
+        for (const [tipo, cfg] of Object.entries(linksConfig)) {
+            const url = linksMap[tipo];
+            const html = (url && url.trim() !== '')
+                ? `<a href="${url}" target="_blank" class="text-gray-600 ${cfg.color} transition-colors"><i class="${cfg.icon} text-xl"></i></a>`
+                : `<span class="text-gray-300"><i class="${cfg.icon} text-xl"></i></span>`;
+            socialContainer.insertAdjacentHTML('beforeend', html);
         }
     }
-    
-    // 9. Actualizar links de redes sociales
-    // Crear mapa de links
-    const linksMap = {};
-    (data.links || []).forEach(link => {
-        linksMap[link.tipo] = link.url;
-    });
-    
-    // Obtener el contenedor de redes sociales
-    const socialContainer = document.querySelector('.max-w-4xl.mx-auto .bg-white.rounded-2xl .flex.flex-wrap.justify-center.md\\:justify-start.gap-3.mt-4');
-    if (socialContainer) {
-        // Limpiar y regenerar los links
-        const linksConfig = {
-            github: { icon: 'fab fa-github', color: 'hover:text-gray-900' },
-            linkedin: { icon: 'fab fa-linkedin', color: 'hover:text-blue-700' },
-            twitter: { icon: 'fab fa-twitter', color: 'hover:text-blue-400' },
-            portfolio: { icon: 'fas fa-globe', color: 'hover:text-green-600' }
-        };
-        
-        socialContainer.innerHTML = '';
-        
-        for (const [tipo, config] of Object.entries(linksConfig)) {
-            if (linksMap[tipo] && linksMap[tipo].trim() !== '') {
-                const link = document.createElement('a');
-                link.href = linksMap[tipo];
-                link.target = '_blank';
-                link.className = `text-gray-600 ${config.color} transition-colors`;
-                link.innerHTML = `<i class="${config.icon} text-xl"></i>`;
-                socialContainer.appendChild(link);
-            } else {
-                const span = document.createElement('span');
-                span.className = 'text-gray-300';
-                span.innerHTML = `<i class="${config.icon} text-xl"></i>`;
-                socialContainer.appendChild(span);
-            }
-        }
+
+    // Lista de redes en el panel de datos
+    for (const tipo of Object.keys(linksConfig)) {
+        const cell = document.getElementById(`perfil-datos-${tipo}`);
+        if (!cell) continue;
+        const url = linksMap[tipo];
+        cell.innerHTML = (url && url.trim() !== '')
+            ? `<a href="${url}" target="_blank" class="text-blue-500 hover:underline truncate">${url}</a>`
+            : `<span class="text-gray-400">—</span>`;
     }
 }
 

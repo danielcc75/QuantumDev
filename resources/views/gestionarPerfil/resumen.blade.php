@@ -1,12 +1,12 @@
 {{-- resources/views/gestionarPerfil/resumen.blade.php --}}
 
 <!-- Contenido central - Fluye naturalmente -->
-<div class="ml-80 mr-80">
-    <main class="p-8">
+<div class="w-full">
+    <main class="p-4 sm:p-6 lg:p-8">
         <!-- Saludo -->
-        <div class="mb-8">
+        <div class="mb-6 md:mb-8">
             <div class="px-1 py-2 text-xs text-gray-400">Dashboard / Mi Perfil / Proyectos</div>
-            <h2 class="text-3xl font-bold text-gray-800 mt-2">Hola, {{ $nombreUsuario ?? 'Usuario' }}</h2>
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mt-2">Hola, {{ $nombreUsuario ?? 'Usuario' }}</h2>
             <p class="text-sm text-gray-500 mt-1">Resumen de tu actividad, proyectos y rendimiento reciente en el sistema.</p>
         </div>
 
