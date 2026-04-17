@@ -8,6 +8,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        #sidebar-izquierdo,
+        #sidebar-derecho {
+            scroll-behavior: smooth;
+        }
+
+        .seccion-contenido {
+            scroll-margin-top: 6rem;
+        }
+
         .transition-all {
             transition: all 0.3s ease;
         }
@@ -61,13 +74,6 @@
             min-height: calc(100vh - 4rem);
         }
 
-        .seccion-contenido {
-            display: none;
-        }
-
-        .seccion-contenido.active {
-            display: block;
-        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -291,44 +297,44 @@
 
         <!-- contenido central -->
         <div id="contenido-central" class="flex-1 min-w-0 order-2 lg:order-none">
-            <div id="seccion-resumen" class="seccion-contenido active">
+            <section id="seccion-resumen" class="seccion-contenido">
                 @include('gestionarPerfil.resumen', [
                     'userId' => $usuario->id_usuario,
                     'nombreUsuario' => $nombreUsuario
                 ])
-            </div>
+            </section>
 
-            <div id="seccion-perfil" class="seccion-contenido">
+            <section id="seccion-perfil" class="seccion-contenido">
                 @include('gestionarPerfil.perfil', [
                     'userId' => $usuario->id_usuario,
                     'nombreUsuario' => $nombreUsuario
                 ])
-            </div>
+            </section>
 
-            <div id="seccion-proyectos" class="seccion-contenido">
-                @include('gestionarPerfil.proyectos', [
-                    'userId' => $usuario->id_usuario,
-                    'nombreUsuario' => $nombreUsuario
-                ])
-            </div>
+            <section id="seccion-habilidades" class="seccion-contenido">
+                @include('gestionHabilidades.index', ['categorias' => $categorias, 'habilidades' => $habilidades])
+            </section>
 
-            <div id="seccion-experiencia" class="seccion-contenido">
+            <section id="seccion-experiencia" class="seccion-contenido">
                 @include('gestionarPerfil.experiencia', [
                     'userId'        => $usuario->id_usuario,
                     'nombreUsuario' => $nombreUsuario
                 ])
-            </div>
+            </section>
 
-            <div id="seccion-formacion" class="seccion-contenido">
+            <section id="seccion-formacion" class="seccion-contenido">
                 @include('gestionarPerfil.formacion', [
                     'userId'        => $usuario->id_usuario,
                     'nombreUsuario' => $nombreUsuario
                 ])
-            </div>
+            </section>
 
-            <div id="seccion-habilidades" class="seccion-contenido">
-                @include('gestionHabilidades.index', ['categorias' => $categorias, 'habilidades' => $habilidades])
-            </div>
+            <section id="seccion-proyectos" class="seccion-contenido">
+                @include('gestionarPerfil.proyectos', [
+                    'userId' => $usuario->id_usuario,
+                    'nombreUsuario' => $nombreUsuario
+                ])
+            </section>
         </div>
 
         <!-- sidebar derecho -->
@@ -454,16 +460,7 @@
             }
         });
 
-        function cambiarSeccion(seccionId) {
-            document.querySelectorAll('.seccion-contenido').forEach(seccion => {
-                seccion.classList.remove('active');
-            });
-
-            const seccionActiva = document.getElementById('seccion-' + seccionId);
-            if (seccionActiva) {
-                seccionActiva.classList.add('active');
-            }
-
+        function resaltarLink(seccionId) {
             document.querySelectorAll('.seccion-link').forEach(link => {
                 link.classList.remove('bg-[#1e3a5f]', 'border-r-4', 'border-[#e11d48]', 'shadow-sm');
                 link.classList.add('text-gray-700');
@@ -492,6 +489,14 @@
             }
         }
 
+        function cambiarSeccion(seccionId) {
+            const seccionActiva = document.getElementById('seccion-' + seccionId);
+            if (seccionActiva) {
+                seccionActiva.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            resaltarLink(seccionId);
+        }
+
         document.querySelectorAll('.seccion-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -502,6 +507,21 @@
                 }
             });
         });
+
+        // ── Scroll-spy: resalta el link según la sección visible ───────────────
+        const seccionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id.replace('seccion-', '');
+                    resaltarLink(id);
+                }
+            });
+        }, {
+            rootMargin: '-30% 0px -60% 0px',
+            threshold: 0,
+        });
+
+        document.querySelectorAll('.seccion-contenido').forEach(s => seccionObserver.observe(s));
 
         // ── Sidebars móviles / tablet ──────────────────────────────────────────
         const sidebarIzq     = document.getElementById('sidebar-izquierdo');
@@ -551,7 +571,11 @@
         });
 
         const seccionInicial = new URLSearchParams(window.location.search).get('seccion') ?? 'resumen';
-        cambiarSeccion(seccionInicial);
+        const elInicial = document.getElementById('seccion-' + seccionInicial);
+        if (elInicial && seccionInicial !== 'resumen') {
+            elInicial.scrollIntoView({ behavior: 'auto', block: 'start' });
+        }
+        resaltarLink(seccionInicial);
         // Limpiar el parámetro de la URL para que al recargar no vuelva a la misma sección
         if (window.location.search) {
             history.replaceState(null, '', window.location.pathname);
