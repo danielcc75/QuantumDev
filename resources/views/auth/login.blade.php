@@ -69,10 +69,10 @@
                         <!-- boton ojo -->
                         <button
                             type="button"
-                            onclick="togglePassword()"
+                            onclick="togglePassword('loginContrasenia', 'loginPasswordIcon')"
                             class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#1e3a5f]"
                         >
-                            <i id="iconPassword" class="fas fa-eye"></i>
+                            <i id="loginPasswordIcon" class="fas fa-eye"></i>
                         </button>
                     </div>
 
