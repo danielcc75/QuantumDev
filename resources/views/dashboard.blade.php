@@ -8,19 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        html {
-            scroll-behavior: smooth;
-        }
-
-        #sidebar-izquierdo,
-        #sidebar-derecho {
-            scroll-behavior: smooth;
-        }
-
-        .seccion-contenido {
-            scroll-margin-top: 6rem;
-        }
-
         .transition-all {
             transition: all 0.3s ease;
         }
@@ -71,9 +58,16 @@
         }
 
         .main-container {
-            min-height: calc(100vh - 4rem);
+            min-height: 100vh;
         }
 
+        .seccion-contenido {
+            display: none;
+        }
+
+        .seccion-contenido.active {
+            display: block;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -100,27 +94,19 @@
 
     <!-- barra superior -->
     <header class="bg-white shadow-md sticky top-0 z-20">
-        <div class="flex justify-between items-center px-4 md:px-8 py-3 md:py-4 gap-3 md:gap-6">
+        <div class="flex justify-between items-center px-8 py-4 gap-6">
 
-            <!-- izquierda: hamburguesa + logo agrupados -->
-            <div class="flex items-center gap-3 md:gap-4 flex-shrink-0 min-w-0">
-                <button id="btn-menu-mobile"
-                    class="lg:hidden text-gray-600 hover:text-[#1e3a5f] focus:outline-none flex-shrink-0">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
-
-                <!-- logo -->
-                <a href="{{ url('/') }}" class="flex items-center gap-2 md:gap-3 transition-all-soft hover-scale flex-shrink-0">
-                    <img src="/logo.png" class="h-8 md:h-11" alt="Logo">
-                    <div class="hidden sm:flex flex-col leading-none">
-                        <span class="font-bold text-[#1e3a5f] text-base md:text-lg">Portafolio</span>
-                        <span class="text-[#e11d48] font-semibold text-sm md:text-base -mt-2">Digital</span>
-                    </div>
-                </a>
-            </div>
+            <!-- logo -->
+            <a href="{{ url('/') }}" class="flex items-center gap-3 transition-all-soft hover-scale flex-shrink-0">
+                <img src="/logo.png" class="h-10 md:h-11" alt="Logo">
+                <div class="flex flex-col leading-none">
+                    <span class="font-bold text-[#1e3a5f] text-lg">Portafolio</span>
+                    <span class="text-[#e11d48] font-semibold text-base -mt-2">Digital</span>
+                </div>
+            </a>
 
             <!-- buscador central -->
-            <div class="flex-1 max-w-md relative hidden md:block">
+            <div class="flex-1 max-w-md relative">
                 <div class="flex items-center bg-gray-100 rounded-xl px-4 py-2 gap-2 focus-within:ring-2 focus-within:ring-[#1e3a5f]/30 focus-within:bg-white transition-all border border-transparent focus-within:border-[#1e3a5f]/20">
                     <i class="fas fa-search text-gray-400 text-sm flex-shrink-0"></i>
                     <input
@@ -140,18 +126,7 @@
             </div>
 
             <!-- derecha -->
-            <div class="flex items-center space-x-3 md:space-x-6 flex-shrink-0">
-
-                <!-- icono buscador móvil -->
-                <button id="btn-buscador-mobile" class="md:hidden text-gray-500 hover:text-[#1e3a5f]">
-                    <i class="fas fa-search text-lg"></i>
-                </button>
-
-                <!-- toggle sidebar derecho (tablet) -->
-                <button id="btn-sidebar-derecho" class="xl:hidden text-gray-500 hover:text-[#1e3a5f]">
-                    <i class="fas fa-calendar-alt text-lg"></i>
-                </button>
-
+            <div class="flex items-center space-x-6 flex-shrink-0">
 
                 <!-- campana -->
                 <div class="relative dropdown">
@@ -183,16 +158,14 @@
                             $fotoPerfilHeader = $usuario->perfil->foto_perfil ?? null;
                         @endphp
 
-                        <span id="header-avatar" class="block">
-                            @if($fotoPerfilHeader)
-                                <img src="{{ $fotoPerfilHeader }}" alt="Foto perfil" class="w-10 h-10 rounded-full object-cover shadow-md">
-                            @else
-                                <span class="w-10 h-10 bg-gradient-to-br from-[#1e3a5f] to-indigo-600 rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-white text-sm font-bold">{{ $iniciales }}</span>
-                                </span>
-                            @endif
-                        </span>
-                        <span id="header-nombre-usuario" class="text-sm font-medium text-gray-700 hidden md:inline">{{ $nombreUsuario }}</span>
+                        @if($fotoPerfilHeader)
+                            <img src="{{ $fotoPerfilHeader }}" alt="Foto perfil" class="w-10 h-10 rounded-full object-cover shadow-md">
+                        @else
+                            <div class="w-10 h-10 bg-gradient-to-br from-[#1e3a5f] to-indigo-600 rounded-full flex items-center justify-center shadow-md">
+                                <span class="text-white text-sm font-bold">{{ $iniciales }}</span>
+                            </div>
+                        @endif
+                        <span class="text-sm font-medium text-gray-700 hidden md:inline">{{ $nombreUsuario }}</span>
                         <i class="fas fa-chevron-down text-xs text-gray-500 hidden md:inline"></i>
                     </button>
                     <!-- resto del dropdown -->
@@ -217,9 +190,9 @@
         </div>
 
         <!-- barra de progreso del perfil -->
-        <div class="px-4 md:px-8 pb-3">
+        <div class="px-8 pb-3">
             <div class="flex items-center gap-3">
-                <span class="text-xs text-gray-500 flex-shrink-0 hidden sm:inline">{{ $progresoLabel }}</span>
+                <span class="text-xs text-gray-500 flex-shrink-0">{{ $progresoLabel }}</span>
                 <div class="flex-1 bg-gray-100 rounded-full h-1.5 overflow-hidden">
                     <div id="barra-progreso"
                         class="h-1.5 rounded-full transition-all duration-1000"
@@ -230,34 +203,13 @@
                 <span class="text-xs font-semibold flex-shrink-0" style="color: {{ $progresoColor }};">{{ $progreso }}%</span>
             </div>
         </div>
-
-        <!-- buscador móvil expandible -->
-        <div id="buscador-mobile-wrapper" class="md:hidden hidden px-4 pb-3">
-            <div class="flex items-center bg-gray-100 rounded-xl px-4 py-2 gap-2">
-                <i class="fas fa-search text-gray-400 text-sm"></i>
-                <input id="buscador-global-mobile" type="text" placeholder="Buscar proyectos..."
-                    class="bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none w-full">
-            </div>
-        </div>
     </header>
 
-    <!-- overlay para sidebars móviles -->
-    <div id="sidebar-overlay"
-        class="fixed inset-0 bg-black/50 z-30 hidden"></div>
-
     <!-- contenedor principal -->
-    <div class="main-container flex">
+    <div class="main-container">
 
         <!-- sidebar izquierdo -->
-        <aside id="sidebar-izquierdo"
-            class="fixed lg:sticky top-0 lg:top-16 left-0 z-40 lg:z-0 w-72 bg-white shadow-lg border-r border-gray-200
-                   h-screen lg:h-[calc(100vh-4rem)] overflow-y-auto flex-shrink-0
-                   transform -translate-x-full lg:translate-x-0 transition-transform duration-300">
-            <!-- botón cerrar drawer (móvil) -->
-            <button type="button" onclick="cerrarSidebars()"
-                class="lg:hidden absolute top-3 right-3 w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition">
-                <i class="fas fa-times"></i>
-            </button>
+        <aside class="w-72 bg-white shadow-lg border-r border-gray-200 sticky top-16 self-start h-[calc(100vh-4rem)] overflow-y-auto float-left">
             <nav class="mt-6 pb-6">
                 <div class="px-4 mb-2">
                     <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Submenu</p>
@@ -295,58 +247,8 @@
             </nav>
         </aside>
 
-        <!-- contenido central -->
-        <div id="contenido-central" class="flex-1 min-w-0 order-2 lg:order-none">
-            <section id="seccion-resumen" class="seccion-contenido">
-                @include('gestionarPerfil.resumen', [
-                    'userId' => $usuario->id_usuario,
-                    'nombreUsuario' => $nombreUsuario
-                ])
-            </section>
-
-            <section id="seccion-perfil" class="seccion-contenido">
-                @include('gestionarPerfil.perfil', [
-                    'userId' => $usuario->id_usuario,
-                    'nombreUsuario' => $nombreUsuario
-                ])
-            </section>
-
-            <section id="seccion-habilidades" class="seccion-contenido">
-                @include('gestionHabilidades.index', ['categorias' => $categorias, 'habilidades' => $habilidades])
-            </section>
-
-            <section id="seccion-experiencia" class="seccion-contenido">
-                @include('gestionarPerfil.experiencia', [
-                    'userId'        => $usuario->id_usuario,
-                    'nombreUsuario' => $nombreUsuario
-                ])
-            </section>
-
-            <section id="seccion-formacion" class="seccion-contenido">
-                @include('gestionarPerfil.formacion', [
-                    'userId'        => $usuario->id_usuario,
-                    'nombreUsuario' => $nombreUsuario
-                ])
-            </section>
-
-            <section id="seccion-proyectos" class="seccion-contenido">
-                @include('gestionarPerfil.proyectos', [
-                    'userId' => $usuario->id_usuario,
-                    'nombreUsuario' => $nombreUsuario
-                ])
-            </section>
-        </div>
-
         <!-- sidebar derecho -->
-        <aside id="sidebar-derecho"
-            class="fixed xl:sticky top-0 xl:top-16 right-0 z-40 xl:z-0 w-80 max-w-[85vw] bg-white shadow-lg border-l border-gray-200
-                   h-screen xl:h-[calc(100vh-4rem)] overflow-y-auto flex-shrink-0
-                   transform translate-x-full xl:translate-x-0 transition-transform duration-300">
-            <!-- botón cerrar drawer (móvil / tablet) -->
-            <button type="button" onclick="cerrarSidebars()"
-                class="xl:hidden absolute top-3 right-3 w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition z-10">
-                <i class="fas fa-times"></i>
-            </button>
+        <aside class="w-80 bg-white shadow-lg border-l border-gray-200 float-right">
             <div class="p-6 space-y-6">
 
                 <div class="bg-gray-50 rounded-xl p-4 right-sidebar-item">
@@ -434,6 +336,50 @@
             </div>
         </aside>
 
+        <!-- contenido central -->
+        <div id="contenido-central">
+
+            <div id="seccion-resumen" class="seccion-contenido active">
+                @include('gestionarPerfil.resumen', [
+                    'userId' => $usuario->id_usuario,
+                    'nombreUsuario' => $nombreUsuario
+                ])
+            </div>
+
+            <div id="seccion-perfil" class="seccion-contenido">
+                @include('gestionarPerfil.perfil', [
+                    'userId' => $usuario->id_usuario,
+                    'nombreUsuario' => $nombreUsuario
+                ])
+            </div>
+
+            <div id="seccion-proyectos" class="seccion-contenido">
+                @include('gestionarPerfil.proyectos', [
+                    'userId' => $usuario->id_usuario,
+                    'nombreUsuario' => $nombreUsuario
+                ])
+            </div>
+
+            <div id="seccion-experiencia" class="seccion-contenido">
+                @include('gestionarPerfil.experiencia', [
+                    'userId'        => $usuario->id_usuario,
+                    'nombreUsuario' => $nombreUsuario
+                ])
+            </div>
+
+            <div id="seccion-formacion" class="seccion-contenido">
+                @include('gestionarPerfil.formacion', [
+                    'userId'        => $usuario->id_usuario,
+                    'nombreUsuario' => $nombreUsuario
+                ])
+            </div>
+
+            <div id="seccion-habilidades" class="seccion-contenido">
+                @include('gestionHabilidades.index', ['categorias' => $categorias, 'habilidades' => $habilidades])
+            </div>
+        </div>
+
+        <div class="clear-both"></div>
     </div>
 
     <script>
@@ -460,7 +406,16 @@
             }
         });
 
-        function resaltarLink(seccionId) {
+        function cambiarSeccion(seccionId) {
+            document.querySelectorAll('.seccion-contenido').forEach(seccion => {
+                seccion.classList.remove('active');
+            });
+
+            const seccionActiva = document.getElementById('seccion-' + seccionId);
+            if (seccionActiva) {
+                seccionActiva.classList.add('active');
+            }
+
             document.querySelectorAll('.seccion-link').forEach(link => {
                 link.classList.remove('bg-[#1e3a5f]', 'border-r-4', 'border-[#e11d48]', 'shadow-sm');
                 link.classList.add('text-gray-700');
@@ -489,77 +444,14 @@
             }
         }
 
-        function cambiarSeccion(seccionId) {
-            const seccionActiva = document.getElementById('seccion-' + seccionId);
-            if (seccionActiva) {
-                seccionActiva.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-            resaltarLink(seccionId);
-        }
-
         document.querySelectorAll('.seccion-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const seccion = link.getAttribute('data-seccion');
                 if (seccion) {
                     cambiarSeccion(seccion);
-                    cerrarSidebars();
                 }
             });
-        });
-
-        // ── Scroll-spy: resalta el link según la sección visible ───────────────
-        const seccionObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const id = entry.target.id.replace('seccion-', '');
-                    resaltarLink(id);
-                }
-            });
-        }, {
-            rootMargin: '-30% 0px -60% 0px',
-            threshold: 0,
-        });
-
-        document.querySelectorAll('.seccion-contenido').forEach(s => seccionObserver.observe(s));
-
-        // ── Sidebars móviles / tablet ──────────────────────────────────────────
-        const sidebarIzq     = document.getElementById('sidebar-izquierdo');
-        const sidebarDer     = document.getElementById('sidebar-derecho');
-        const sidebarOverlay = document.getElementById('sidebar-overlay');
-        const btnMenu        = document.getElementById('btn-menu-mobile');
-        const btnSidebarDer  = document.getElementById('btn-sidebar-derecho');
-
-        function abrirSidebarIzq() {
-            sidebarIzq.classList.remove('-translate-x-full');
-            sidebarOverlay.classList.remove('hidden');
-        }
-        function abrirSidebarDer() {
-            sidebarDer.classList.remove('translate-x-full');
-            sidebarOverlay.classList.remove('hidden');
-        }
-        function cerrarSidebars() {
-            if (window.innerWidth < 1024) sidebarIzq.classList.add('-translate-x-full');
-            if (window.innerWidth < 1280) sidebarDer.classList.add('translate-x-full');
-            sidebarOverlay.classList.add('hidden');
-        }
-
-        btnMenu?.addEventListener('click', abrirSidebarIzq);
-        btnSidebarDer?.addEventListener('click', abrirSidebarDer);
-        sidebarOverlay?.addEventListener('click', cerrarSidebars);
-
-        // Reset al redimensionar
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 1024) sidebarIzq.classList.remove('-translate-x-full');
-            if (window.innerWidth >= 1280) sidebarDer.classList.remove('translate-x-full');
-            if (window.innerWidth >= 1280) sidebarOverlay.classList.add('hidden');
-        });
-
-        // ── Buscador móvil ─────────────────────────────────────────────────────
-        const btnBuscadorMobile = document.getElementById('btn-buscador-mobile');
-        const buscadorMobileWrapper = document.getElementById('buscador-mobile-wrapper');
-        btnBuscadorMobile?.addEventListener('click', () => {
-            buscadorMobileWrapper?.classList.toggle('hidden');
         });
 
         document.querySelectorAll('a[href="#"]').forEach(link => {
@@ -571,11 +463,7 @@
         });
 
         const seccionInicial = new URLSearchParams(window.location.search).get('seccion') ?? 'resumen';
-        const elInicial = document.getElementById('seccion-' + seccionInicial);
-        if (elInicial && seccionInicial !== 'resumen') {
-            elInicial.scrollIntoView({ behavior: 'auto', block: 'start' });
-        }
-        resaltarLink(seccionInicial);
+        cambiarSeccion(seccionInicial);
         // Limpiar el parámetro de la URL para que al recargar no vuelva a la misma sección
         if (window.location.search) {
             history.replaceState(null, '', window.location.pathname);
