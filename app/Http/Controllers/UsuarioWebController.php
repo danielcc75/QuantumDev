@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 
 
 class UsuarioWebController extends Controller
@@ -28,7 +29,11 @@ class UsuarioWebController extends Controller
             'apellido'            => 'required|string|max:50',
             'correo_electronico'  => 'required|email|unique:usuario,correo_electronico',
             'telefono'            => 'nullable|string|max:50',
-            'contrasenia'         => 'required|min:6|confirmed'
+            'contrasenia' => [
+                'required',
+                'confirmed',
+                Password::min(8)->mixedCase()->numbers()->symbols()
+            ]
         ], [
             'contrasenia.confirmed' => 'Las contraseñas no coinciden.',
             'correo_electronico.unique' => 'Ese correo electrónico ya está registrado.'
