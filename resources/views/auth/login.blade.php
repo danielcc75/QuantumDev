@@ -56,16 +56,29 @@
                         <i class="fas fa-lock text-[#1e3a5f] text-xs"></i>
                         Contraseña <span class="text-[#e11d48]">*</span>
                     </label>
-                    <input
-                        id="loginContrasenia"
-                        type="password"
-                        name="contrasenia"
-                        placeholder="Ingresa tu contraseña"
-                        class="{{ $inputClass }}"
-                    >
+
+                    <div class="relative">
+                        <input
+                            id="loginContrasenia"
+                            type="password"
+                            name="contrasenia"
+                            placeholder="Ingresa tu contraseña"
+                            class="{{ $inputClass }} pr-10"
+                        >
+
+                        <!-- boton ojo -->
+                        <button
+                            type="button"
+                            onclick="togglePassword('loginContrasenia', 'loginPasswordIcon')"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#1e3a5f]"
+                        >
+                            <i id="loginPasswordIcon" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+
                     <p id="loginContraseniaError" class="hidden mt-1 text-sm text-red-600"></p>
                 </div>
-
+                
                 <div class="text-right">
                     <a href="#" class="text-sm font-medium text-[#1e3a5f] hover:text-[#e11d48] transition">
                         ¿Olvidaste tu contraseña?

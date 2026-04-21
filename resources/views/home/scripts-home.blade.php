@@ -341,8 +341,20 @@
             if (!contrasenia) {
                 marcarInputErrorRegister(registerContrasenia, registerContraseniaError, 'Debes ingresar una contraseña.');
                 hayErrores = true;
-            } else if (contrasenia.length < 6) {
-                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, 'La contraseña debe tener al menos 6 caracteres.');
+            } else if (contrasenia.length < 8) {
+                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, 'La contraseña debe tener al menos 8 caracteres.');
+                hayErrores = true;
+            } else if (!/[a-z]/.test(contrasenia)) {
+                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, 'La contraseña debe incluir al menos una letra minúscula.');
+                hayErrores = true;
+            } else if (!/[A-Z]/.test(contrasenia)) {
+                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, 'La contraseña debe incluir al menos una letra mayúscula.');
+                hayErrores = true;
+            } else if (!/[0-9]/.test(contrasenia)) {
+                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, 'La contraseña debe incluir al menos un número.');
+                hayErrores = true;
+            } else if (!/[^A-Za-z0-9]/.test(contrasenia)) {
+                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, 'La contraseña debe incluir al menos un símbolo.');
                 hayErrores = true;
             }
 
@@ -354,7 +366,11 @@
             if (hayErrores) return;
 
             if (contrasenia !== confirmacion) {
-                mostrarErrorGeneralRegister('Las contraseñas no coinciden.');
+                marcarInputErrorRegister(
+                    registerContraseniaConfirmacion,
+                    registerContraseniaConfirmacionError,
+                    'Las contraseñas no coinciden.'
+                );
                 return;
             }
 
@@ -434,5 +450,22 @@
                 });
             }
         });
+    }
+
+    function togglePassword(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+
+        if (!input || !icon) return;
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
     }
 </script>

@@ -76,7 +76,29 @@
                         <i class="fas fa-lock text-[#1e3a5f] text-xs"></i>
                         Contraseña <span class="text-[#e11d48]">*</span>
                     </label>
-                    <input id="registerContrasenia" type="password" name="contrasenia" placeholder="Minimo 6 caracteres" class="{{ $inputClass }}">
+
+                    <div class="relative">
+                        <input
+                            id="registerContrasenia"
+                            type="password"
+                            name="contrasenia"
+                            placeholder="Minimo 8 caracteres"
+                            class="{{ $inputClass }} pr-10"
+                        >
+
+                        <button
+                            type="button"
+                            onclick="togglePassword('registerContrasenia', 'registerPasswordIcon')"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#1e3a5f] transition"
+                        >
+                            <i id="registerPasswordIcon" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    
+                    <p class="mt-1 text-xs text-gray-500">
+                        Debe tener al menos 8 caracteres, una mayuscula, una minuscula, un numero y un simbolo.
+                    </p>
+
                     <p id="registerContraseniaError" class="hidden mt-1 text-sm text-red-600"></p>
                 </div>
 
@@ -85,7 +107,25 @@
                         <i class="fas fa-lock text-[#1e3a5f] text-xs"></i>
                         Confirmar contraseña <span class="text-[#e11d48]">*</span>
                     </label>
-                    <input id="registerContraseniaConfirmacion" type="password" name="contrasenia_confirmation" placeholder="Repite tu contraseña" class="{{ $inputClass }}">
+
+                    <div class="relative">
+                        <input
+                            id="registerContraseniaConfirmacion"
+                            type="password"
+                            name="contrasenia_confirmation"
+                            placeholder="Repite tu contraseña"
+                            class="{{ $inputClass }} pr-10"
+                        >
+
+                        <button
+                            type="button"
+                            onclick="togglePassword('registerContraseniaConfirmacion', 'registerPasswordConfirmIcon')"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#1e3a5f] transition"
+                        >
+                            <i id="registerPasswordConfirmIcon" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+
                     <p id="registerContraseniaConfirmacionError" class="hidden mt-1 text-sm text-red-600"></p>
                 </div>
 
