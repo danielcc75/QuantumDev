@@ -227,6 +227,16 @@ function confirmarGuardar() {
         resaltarError('proj_fecha_ini', 'La fecha de inicio es obligatoria.');
         return;
     }
+    const estado = document.getElementById('proj_estado').value;
+    if (estado === 'completado' && !fechaFin) {
+        resaltarError('proj_fecha_fin', 'La fecha de finalización es obligatoria si el estado es Completado.');
+        return;
+    }
+    const hoyStr = new Date().toISOString().split('T')[0];
+    if (estado === 'completado' && fechaFin && fechaFin > hoyStr) {
+        resaltarError('proj_fecha_fin', 'La fecha de finalización no puede ser posterior a la fecha actual.');
+        return;
+    }
     if (fechaFin && fechaFin < fechaIni) {
         resaltarError('proj_fecha_fin', 'La fecha de finalización no puede ser anterior a la de inicio.');
         return;
@@ -338,12 +348,28 @@ function toggleChip(chip) {
     chip.className      = activo ? CHIP_INACTIVE_CLS : CHIP_ACTIVE_CLS;
 }
 
-// ── Fecha fin → estado ────────────────────────────────────────────────────────
+// ── Estado → fecha fin ────────────────────────────────────────────────────────
 
-function verificarFechaFinProyecto() {
-    const fechaFin = document.getElementById('proj_fecha_fin').value;
-    const hoy      = new Date().toISOString().split('T')[0];
-    document.getElementById('proj_estado').value = (fechaFin && fechaFin < hoy) ? 'completado' : 'en_progreso';
+function actualizarFechaFinSegunEstado() {
+    const estado    = document.getElementById('proj_estado').value;
+    const fechaFin  = document.getElementById('proj_fecha_fin');
+    const required  = document.getElementById('proj_fecha_fin_required');
+    const hint      = document.getElementById('proj_fecha_fin_hint');
+    const completado = estado === 'completado';
+
+    fechaFin.disabled = !completado;
+    required.classList.toggle('hidden', !completado);
+
+    if (completado) {
+        fechaFin.max     = new Date().toISOString().split('T')[0];
+        hint.textContent = 'Obligatoria para proyectos completados (no puede ser posterior a hoy)';
+        hint.className   = 'text-xs text-[#e11d48] mt-1';
+    } else {
+        fechaFin.value   = '';
+        fechaFin.removeAttribute('max');
+        hint.textContent = 'Disponible solo cuando el estado es "Completado"';
+        hint.className   = 'text-xs text-gray-400 mt-1';
+    }
 }
 
 // ── Tags de tecnologías ───────────────────────────────────────────────────────
@@ -472,6 +498,7 @@ function abrirModalProyecto() {
     document.getElementById('modalProyectoTitulo').textContent = 'Crear Nuevo Proyecto';
     resetToggle(true);
     resetUrlStatus();
+    actualizarFechaFinSegunEstado();
     setModalVisible('modalProyecto', true);
 }
 
@@ -506,6 +533,7 @@ function ejecutarAbrirEditar(id) {
 
             setTags(p.tecnologias ? p.tecnologias.split(',').map(t => t.trim()).filter(Boolean) : []);
             resetToggle(!!p.visible);
+            actualizarFechaFinSegunEstado();
             document.getElementById('modalProyectoTitulo').textContent = 'Editar Proyecto';
             setModalVisible('modalProyecto', true);
         });

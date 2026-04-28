@@ -141,7 +141,7 @@
                     <div class="mb-4">
                         <label class="block text-xs font-medium text-gray-700 mb-1">Estado del Proyecto</label>
                         <div class="relative">
-                            <select id="proj_estado" class="{{ $selectCls }}">
+                            <select id="proj_estado" onchange="actualizarFechaFinSegunEstado()" class="{{ $selectCls }}">
                                 <option value="pendiente">Pendiente</option>
                                 <option value="en_progreso" selected>En Curso</option>
                                 <option value="completado">Completado</option>
@@ -224,9 +224,13 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Fecha de Finalización</label>
-                        <input type="date" id="proj_fecha_fin" onchange="verificarFechaFinProyecto()"
-                            class="{{ $inputCls }}">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">
+                            Fecha de Finalización
+                            <span id="proj_fecha_fin_required" class="text-[#e11d48] hidden">*</span>
+                        </label>
+                        <input type="date" id="proj_fecha_fin" disabled
+                            class="{{ $inputCls }} disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-400">
+                        <p id="proj_fecha_fin_hint" class="text-xs text-gray-400 mt-1">Disponible solo cuando el estado es "Completado"</p>
                     </div>
                 </div>
 
