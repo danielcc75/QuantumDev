@@ -587,6 +587,11 @@ function submitProyecto() {
             actualizarResumenProyectos(data.proyecto, 'crear');
         }
 
+        // Sincronizar con la lista usada en el modal de Experiencia Laboral
+        if (typeof window.syncProyectoEnListaExp === 'function') {
+            window.syncProyectoEnListaExp(id ? 'update' : 'create', data.proyecto);
+        }
+
         recalcularStats();
     });
 }
@@ -605,6 +610,11 @@ function ejecutarEliminar(id) {
             if (!data.success) return;
             document.querySelector(`[data-proyecto-id="${id}"]`)?.remove();
             actualizarResumenProyectos(id, 'eliminar');
+
+            if (typeof window.syncProyectoEnListaExp === 'function') {
+                window.syncProyectoEnListaExp('delete', { id_proyecto: id });
+            }
+
             recalcularStats();
         });
 }

@@ -23,6 +23,14 @@
               ->groupBy('id_experiencia')
         : collect();
 
+    // Todos los proyectos del usuario (para selector de "vincular proyecto existente")
+    $proyectosUsuario = $perfilIdExp
+        ? DB::table('proyectos')
+              ->where('id_perfil', $perfilIdExp)
+              ->orderBy('nombre')
+              ->get(['id_proyecto', 'nombre', 'id_experiencia'])
+        : collect();
+
     $totalExp      = $experiencias->count();
     $actualesExp   = $experiencias->where('trabajo_actual', 1)->count();
     $finalizadasExp = $experiencias->where('trabajo_actual', 0)->count();
@@ -162,7 +170,7 @@
 
                 {{-- Acciones --}}
                 <div class="flex gap-2 pt-2 border-t border-gray-100 mt-auto">
-                    <button onclick='abrirModalEditarExperiencia(@json($exp))'
+                    <button onclick='editarExperienciaDesdeBoton(@json($exp))'
                         class="flex-1 flex items-center justify-center gap-1.5 text-xs border border-[#1e3a5f]/30 text-[#1e3a5f] hover:bg-[#1e3a5f]/5 px-3 py-1.5 rounded-lg transition">
                         <i class="fas fa-pencil-alt"></i> Editar
                     </button>
@@ -179,4 +187,4 @@
 </div>
 
 {{-- Modal crear / editar + scripts --}}
-@include('gestionarPerfil.modal-experiencia')
+@include('gestionarPerfil.modal-experiencia', ['proyectosUsuario' => $proyectosUsuario])

@@ -66,13 +66,47 @@
                     placeholder="Describe tus responsabilidades y logros..."></textarea>
             </div>
 
-            {{-- Sección obligatoria: agregar proyecto --}}
+            {{-- Sección opcional: vincular proyecto --}}
             <div id="exp_proyecto_wrapper" class="border-t border-gray-100 pt-4 mt-2">
                 <p class="text-sm font-medium text-[#1e3a5f] mb-3">
-                    <i class="fas fa-folder-plus text-xs mr-1"></i> Proyecto vinculado <span class="text-red-500">*</span>
+                    <i class="fas fa-folder-plus text-xs mr-1"></i> Proyecto vinculado
+                    <span class="text-gray-400 font-normal text-xs">(opcional)</span>
                 </p>
 
-                <div id="exp_proyecto_form" class="bg-[#1e3a5f]/5 border border-[#1e3a5f]/15 rounded-xl p-4 flex flex-col gap-3">
+                {{-- Selector de modo --}}
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
+                    <label class="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition text-xs">
+                        <input type="radio" name="exp_proj_modo" value="ninguno" class="text-[#1e3a5f]" checked>
+                        <span class="text-gray-700">Ninguno</span>
+                    </label>
+                    <label class="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition text-xs">
+                        <input type="radio" name="exp_proj_modo" value="existente" class="text-[#1e3a5f]">
+                        <span class="text-gray-700">Vincular existente</span>
+                    </label>
+                    <label class="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition text-xs">
+                        <input type="radio" name="exp_proj_modo" value="nuevo" class="text-[#1e3a5f]">
+                        <span class="text-gray-700">Crear nuevo</span>
+                    </label>
+                </div>
+
+                {{-- Proyectos ya vinculados (solo en modo edición) --}}
+                <div id="exp_proyectos_vinculados_wrapper" class="hidden mb-3">
+                    <p class="text-xs font-medium text-gray-600 mb-1.5">Proyectos vinculados actualmente:</p>
+                    <div id="exp_proyectos_vinculados" class="flex flex-wrap gap-1.5"></div>
+                </div>
+
+                {{-- Modo: vincular existente (multi-select por chips) --}}
+                <div id="exp_proyecto_existente" class="hidden bg-[#1e3a5f]/5 border border-[#1e3a5f]/15 rounded-xl p-4 flex flex-col gap-2">
+                    <label class="block text-xs font-medium text-gray-700">
+                        Selecciona uno o más proyectos <span class="text-red-500">*</span>
+                    </label>
+                    <div id="exp_proj_existente_chips" class="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto p-1"></div>
+                    <p id="exp_proj_existente_vacio" class="text-xs text-gray-400 italic hidden">No hay proyectos disponibles para vincular.</p>
+                    <p class="text-xs text-gray-500">Clic para seleccionar / deseleccionar. Los seleccionados se enlazarán a esta experiencia.</p>
+                </div>
+
+                {{-- Modo: crear nuevo --}}
+                <div id="exp_proyecto_form" class="hidden bg-[#1e3a5f]/5 border border-[#1e3a5f]/15 rounded-xl p-4 flex flex-col gap-3">
                     <p class="text-xs text-gray-500">El proyecto quedará vinculado a esta experiencia y también aparecerá en <strong>Mis Proyectos</strong>.</p>
 
                     <div>
@@ -221,6 +255,30 @@
 let experienciaEditandoId = null;
 const EXP_USER_ID = {{ $userId ?? 'null' }};
 
+// Lista de proyectos del usuario: [{id_proyecto, nombre, id_experiencia}, ...]
+window.PROYECTOS_USUARIO_LIST = @json(($proyectosUsuario ?? collect())->values());
+
+// Mantener PROYECTOS_USUARIO_LIST en sync con cambios desde Mis Proyectos
+window.syncProyectoEnListaExp = function(action, proyecto) {
+    if (!proyecto) return;
+    window.PROYECTOS_USUARIO_LIST = window.PROYECTOS_USUARIO_LIST || [];
+    const id = Number(proyecto.id_proyecto ?? proyecto);
+    const idx = window.PROYECTOS_USUARIO_LIST.findIndex(p => Number(p.id_proyecto) === id);
+
+    if (action === 'delete') {
+        if (idx !== -1) window.PROYECTOS_USUARIO_LIST.splice(idx, 1);
+        return;
+    }
+
+    const entry = {
+        id_proyecto:    id,
+        nombre:         proyecto.nombre,
+        id_experiencia: proyecto.id_experiencia ?? null,
+    };
+    if (idx === -1) window.PROYECTOS_USUARIO_LIST.push(entry);
+    else            window.PROYECTOS_USUARIO_LIST[idx] = entry;
+};
+
 
 // ============================================================
 // CONFIGURACIÓN DE CONFIRMACIÓN
@@ -357,8 +415,16 @@ function confirmarGuardarExperiencia() {
         return;
     }
 
-    // Validar campos obligatorios del proyecto (solo al crear)
-    if (!experienciaEditandoId) {
+    // Validar según modo de proyecto (aplica tanto al crear como al editar)
+    const modo = getModoProyectoExp();
+
+    if (modo === 'existente') {
+        const seleccionados = getProyectosExistentesSeleccionados();
+        if (seleccionados.length === 0) {
+            mostrarToastExp('Selecciona al menos un proyecto para vincular.', 'error');
+            return;
+        }
+    } else if (modo === 'nuevo') {
         const projNombre   = document.getElementById('exp_proj_nombre').value.trim();
         const projFechaIni = document.getElementById('exp_proj_fecha_ini').value;
         const projFechaFin = document.getElementById('exp_proj_fecha_fin').value;
@@ -409,7 +475,151 @@ function resetProyectoForm() {
     document.getElementById('exp_chips').innerHTML        = '';
     document.getElementById('exp_chips_container').classList.add('hidden');
     document.getElementById('exp_proj_tags').innerHTML    = '';
+
+    // Reset selector de modo y chips de proyectos existentes
+    const radios = document.querySelectorAll('input[name="exp_proj_modo"]');
+    radios.forEach(r => r.checked = (r.value === 'ninguno'));
+    const chipsCont = document.getElementById('exp_proj_existente_chips');
+    if (chipsCont) chipsCont.innerHTML = '';
+    aplicarModoProyectoExp();
 }
+
+// ============================================================
+// LISTA DE PROYECTOS DEL USUARIO (helpers)
+// ============================================================
+function popularChipsProyectosDisponibles(idExperienciaActual = null) {
+    const cont  = document.getElementById('exp_proj_existente_chips');
+    const vacio = document.getElementById('exp_proj_existente_vacio');
+    if (!cont) return;
+    cont.innerHTML = '';
+
+    const disponibles = (window.PROYECTOS_USUARIO_LIST || []).filter(p => {
+        // Excluir los que ya están vinculados a esta experiencia
+        return !idExperienciaActual || Number(p.id_experiencia) !== Number(idExperienciaActual);
+    });
+
+    if (disponibles.length === 0) {
+        if (vacio) vacio.classList.remove('hidden');
+        return;
+    }
+    if (vacio) vacio.classList.add('hidden');
+
+    disponibles.forEach(p => {
+        const yaVinculadoAOtra = p.id_experiencia && Number(p.id_experiencia) !== Number(idExperienciaActual);
+        const chip = document.createElement('button');
+        chip.type            = 'button';
+        chip.dataset.idProyecto = p.id_proyecto;
+        chip.dataset.activo  = '0';
+        chip.className       = 'text-xs px-2.5 py-1 rounded-full border border-[#1e3a5f]/20 bg-white text-[#1e3a5f] hover:bg-[#1e3a5f]/10 transition cursor-pointer select-none';
+        chip.innerHTML       = `<i class="fas fa-folder text-[10px] mr-1"></i>${escapeHtmlExp(p.nombre)}${yaVinculadoAOtra ? ' <span class="text-[10px] opacity-60">(en otra exp.)</span>' : ''}`;
+        chip.addEventListener('click', () => toggleChipProyectoExistente(chip));
+        cont.appendChild(chip);
+    });
+}
+
+function toggleChipProyectoExistente(chip) {
+    const activo = chip.dataset.activo === '1';
+    if (activo) {
+        chip.dataset.activo = '0';
+        chip.className = 'text-xs px-2.5 py-1 rounded-full border border-[#1e3a5f]/20 bg-white text-[#1e3a5f] hover:bg-[#1e3a5f]/10 transition cursor-pointer select-none';
+    } else {
+        chip.dataset.activo = '1';
+        chip.className = 'text-xs px-2.5 py-1 rounded-full border border-[#1e3a5f] bg-[#1e3a5f] text-white transition cursor-pointer select-none';
+    }
+}
+
+function getProyectosExistentesSeleccionados() {
+    return Array.from(document.querySelectorAll('#exp_proj_existente_chips [data-activo="1"]'))
+        .map(c => Number(c.dataset.idProyecto));
+}
+
+function renderProyectosVinculadosEnModal(idExperiencia, proyectos) {
+    const wrapper   = document.getElementById('exp_proyectos_vinculados_wrapper');
+    const container = document.getElementById('exp_proyectos_vinculados');
+    if (!wrapper || !container) return;
+    container.innerHTML = '';
+    if (!proyectos || proyectos.length === 0) {
+        wrapper.classList.add('hidden');
+        return;
+    }
+    proyectos.forEach(p => {
+        const chip = document.createElement('span');
+        chip.className = 'flex items-center gap-1 text-xs bg-[#1e3a5f]/5 text-[#1e3a5f] border border-[#1e3a5f]/20 px-2.5 py-1 rounded-full';
+        chip.dataset.idProyecto = p.id_proyecto;
+        chip.innerHTML = `
+            <i class="fas fa-folder text-[10px]"></i>
+            <span class="truncate max-w-[140px]">${escapeHtmlExp(p.nombre)}</span>
+            <button type="button" title="Desvincular" class="text-blue-400 hover:text-red-500 ml-1">
+                <i class="fas fa-times text-xs"></i>
+            </button>`;
+        chip.querySelector('button').addEventListener('click', () => desvincularProyectoExp(p.id_proyecto, idExperiencia, chip));
+        container.appendChild(chip);
+    });
+    wrapper.classList.remove('hidden');
+}
+
+function desvincularProyectoExp(idProyecto, idExperiencia, chipEl) {
+    fetch(`/proyectos/${idProyecto}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify({ id_experiencia: null }),
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (!res.success) { mostrarToastExp('No se pudo desvincular el proyecto', 'error'); return; }
+
+        // Actualizar lista global
+        const item = (window.PROYECTOS_USUARIO_LIST || []).find(p => Number(p.id_proyecto) === Number(idProyecto));
+        if (item) item.id_experiencia = null;
+
+        // Quitar chip
+        chipEl?.remove();
+        const container = document.getElementById('exp_proyectos_vinculados');
+        if (container && container.children.length === 0) {
+            document.getElementById('exp_proyectos_vinculados_wrapper')?.classList.add('hidden');
+        }
+
+        // Refrescar select de "vincular existente"
+        popularChipsProyectosDisponibles(idExperiencia);
+
+        // Limpiar bloque de proyectos en la tarjeta de experiencia (si era el último)
+        if (container && container.children.length === 0) {
+            const enTarjeta = document.getElementById(`exp-proyectos-${idExperiencia}`);
+            if (enTarjeta) enTarjeta.innerHTML = '';
+        } else {
+            // Quitar solo el link de ese proyecto en la tarjeta
+            const enTarjeta = document.getElementById(`exp-proyectos-${idExperiencia}`);
+            const link = enTarjeta?.querySelector(`a[onclick*="verProyectoDesdeExp(${idProyecto})"]`);
+            link?.remove();
+        }
+
+        mostrarToastExp('Proyecto desvinculado', 'success');
+    })
+    .catch(() => mostrarToastExp('Error al desvincular el proyecto', 'error'));
+}
+
+// ============================================================
+// MODO DE PROYECTO (ninguno / existente / nuevo)
+// ============================================================
+function getModoProyectoExp() {
+    const r = document.querySelector('input[name="exp_proj_modo"]:checked');
+    return r ? r.value : 'ninguno';
+}
+
+function aplicarModoProyectoExp() {
+    const modo      = getModoProyectoExp();
+    const existente = document.getElementById('exp_proyecto_existente');
+    const nuevo     = document.getElementById('exp_proyecto_form');
+    if (existente) existente.classList.toggle('hidden', modo !== 'existente');
+    if (nuevo)     nuevo.classList.toggle('hidden',     modo !== 'nuevo');
+}
+
+document.addEventListener('change', function(e) {
+    if (e.target && e.target.name === 'exp_proj_modo') aplicarModoProyectoExp();
+});
 
 // ============================================================
 // ABRIR MODAL CREAR
@@ -424,9 +634,11 @@ function abrirModalExperiencia() {
     document.getElementById('exp_fecha_fin').disabled = false;
     document.getElementById('exp_trabajo_actual').checked = false;
 
-    // Mostrar sección de proyecto (solo al crear)
+    // Mostrar sección de proyecto
     document.getElementById('exp_proyecto_wrapper').classList.remove('hidden');
     resetProyectoForm();
+    renderProyectosVinculadosEnModal(null, []);
+    popularChipsProyectosDisponibles(null);
 
     document.getElementById('modalExperiencia').classList.remove('hidden');
     document.getElementById('modalExperiencia').classList.add('flex');
@@ -435,10 +647,20 @@ function abrirModalExperiencia() {
 // ============================================================
 // ABRIR MODAL EDITAR
 // ============================================================
-function abrirModalEditarExperiencia(exp) {
+// Wrapper que se llama desde los botones de las tarjetas: deriva la lista
+// de proyectos vinculados al click (siempre fresca, no quemada en el HTML).
+function editarExperienciaDesdeBoton(exp) {
+    const proyectosVinculados = obtenerProyectosVinculadosDeExp(exp.id_experiencia);
+    abrirModalEditarExperiencia(exp, proyectosVinculados);
+}
+
+function abrirModalEditarExperiencia(exp, proyectosVinculados = []) {
     document.getElementById('modalExperienciaTitulo').textContent = 'Editar Experiencia Laboral';
-    // Ocultar sección de proyecto al editar (solo aplica al crear)
-    document.getElementById('exp_proyecto_wrapper').classList.add('hidden');
+    // Mostrar sección de proyecto también al editar
+    document.getElementById('exp_proyecto_wrapper').classList.remove('hidden');
+    resetProyectoForm();
+    renderProyectosVinculadosEnModal(exp.id_experiencia, proyectosVinculados);
+    popularChipsProyectosDisponibles(exp.id_experiencia);
     document.getElementById('exp_id_experiencia').value = exp.id_experiencia;
     document.getElementById('exp_cargo').value          = exp.cargo       ?? '';
     document.getElementById('exp_empresa').value        = exp.empresa     ?? '';
@@ -501,6 +723,23 @@ function escapeHtmlExp(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// Refresca el bloque de "proyectos relacionados" en la tarjeta de experiencia
+function actualizarTarjetaExpConProyecto(idExperiencia, proyecto) {
+    const contenedor = document.getElementById(`exp-proyectos-${idExperiencia}`);
+    if (!contenedor) return;
+    contenedor.innerHTML = `
+        <p class="text-xs font-medium text-gray-400 mb-1.5">
+            <i class="fas fa-folder text-[#1e3a5f]/50 mr-1"></i> Proyectos relacionados
+        </p>
+        <div class="flex flex-col gap-1">
+            <a href="#" onclick="verProyectoDesdeExp(${proyecto.id_proyecto}); return false;"
+               class="flex items-center gap-1.5 text-xs text-[#1e3a5f] hover:text-[#e11d48] transition-colors group">
+                <i class="fas fa-code-branch text-[#1e3a5f]/40 group-hover:text-[#e11d48]/60 text-[10px]"></i>
+                <span class="truncate">${escapeHtmlExp(proyecto.nombre)}</span>
+            </a>
+        </div>`;
 }
 
 // Navega a la sección proyectos y resalta el proyecto indicado
@@ -579,7 +818,7 @@ function buildCardHTMLExperiencia(experiencia, proyectos = []) {
     </div>
 
     <div class="flex gap-2 pt-2 border-t border-gray-100 mt-auto">
-        <button onclick='abrirModalEditarExperiencia(${expJson})'
+        <button onclick='editarExperienciaDesdeBoton(${expJson})'
             class="flex-1 flex items-center justify-center gap-1.5 text-xs border border-[#1e3a5f]/30 text-[#1e3a5f] hover:bg-[#1e3a5f]/5 px-3 py-1.5 rounded-lg transition">
             <i class="fas fa-pencil-alt"></i> Editar
         </button>
@@ -614,6 +853,141 @@ function mostrarToastExp(mensaje, tipo = 'success') {
         toast.style.transition = 'all 0.3s ease';
         setTimeout(() => { toast.remove(); if (!container.children.length) container.remove(); }, 300);
     }, 3000);
+}
+
+// ============================================================
+// HELPERS PARA SUBMIT
+// ============================================================
+function obtenerProyectosVinculadosDeExp(idExperiencia) {
+    return (window.PROYECTOS_USUARIO_LIST || [])
+        .filter(p => Number(p.id_experiencia) === Number(idExperiencia))
+        .map(p => ({ id_proyecto: p.id_proyecto, nombre: p.nombre }));
+}
+
+function refrescarTarjetaExpConVinculados(idExperiencia) {
+    const proyectos = obtenerProyectosVinculadosDeExp(idExperiencia);
+    const contenedor = document.getElementById(`exp-proyectos-${idExperiencia}`);
+    if (!contenedor) return;
+    if (proyectos.length === 0) {
+        contenedor.innerHTML = '';
+        return;
+    }
+    contenedor.innerHTML = `
+        <p class="text-xs font-medium text-gray-400 mb-1.5">
+            <i class="fas fa-folder text-[#1e3a5f]/50 mr-1"></i> Proyectos relacionados
+        </p>
+        <div class="flex flex-col gap-1">
+            ${proyectos.map(p => `
+            <a href="#" onclick="verProyectoDesdeExp(${p.id_proyecto}); return false;"
+               class="flex items-center gap-1.5 text-xs text-[#1e3a5f] hover:text-[#e11d48] transition-colors group">
+                <i class="fas fa-code-branch text-[#1e3a5f]/40 group-hover:text-[#e11d48]/60 text-[10px]"></i>
+                <span class="truncate">${escapeHtmlExp(p.nombre)}</span>
+            </a>`).join('')}
+        </div>`;
+}
+
+function manejarProyectoEnSubmit(idExperiencia, editing) {
+    const modo = getModoProyectoExp();
+
+    if (modo === 'ninguno') {
+        cerrarModalExperiencia();
+        mostrarToastExp(editing ? 'Experiencia actualizada correctamente' : 'Experiencia guardada correctamente', 'success');
+        return;
+    }
+
+    if (modo === 'existente') {
+        const ids = getProyectosExistentesSeleccionados();
+        const csrf = document.querySelector('meta[name="csrf-token"]').content;
+
+        const peticiones = ids.map(idProy =>
+            fetch(`/proyectos/${idProy}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
+                body: JSON.stringify({ id_experiencia: idExperiencia }),
+            })
+            .then(r => r.json())
+            .then(res => ({ idProy, ok: !!res.success }))
+            .catch(() => ({ idProy, ok: false }))
+        );
+
+        Promise.all(peticiones).then(resultados => {
+            const exitosos = resultados.filter(r => r.ok).map(r => r.idProy);
+            const fallidos = resultados.filter(r => !r.ok).map(r => r.idProy);
+
+            // Actualizar lista global con los exitosos
+            exitosos.forEach(idProy => {
+                const item = (window.PROYECTOS_USUARIO_LIST || []).find(p => Number(p.id_proyecto) === Number(idProy));
+                if (item) item.id_experiencia = idExperiencia;
+            });
+            if (exitosos.length) refrescarTarjetaExpConVinculados(idExperiencia);
+
+            cerrarModalExperiencia();
+            if (fallidos.length === 0) {
+                mostrarToastExp(`Experiencia guardada y ${exitosos.length} proyecto${exitosos.length === 1 ? '' : 's'} vinculado${exitosos.length === 1 ? '' : 's'}`, 'success');
+            } else if (exitosos.length === 0) {
+                mostrarToastExp('Experiencia guardada, pero no se pudo vincular ningún proyecto', 'error');
+            } else {
+                mostrarToastExp(`Experiencia guardada. ${exitosos.length} vinculado(s), ${fallidos.length} fallaron`, 'error');
+            }
+        });
+        return;
+    }
+
+    // modo === 'nuevo'
+    fetch('/proyectos', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify({
+            user_id:        EXP_USER_ID,
+            id_experiencia: idExperiencia,
+            nombre:         document.getElementById('exp_proj_nombre').value.trim(),
+            descripcion:    document.getElementById('exp_proj_descripcion').value,
+            fecha_ini:      document.getElementById('exp_proj_fecha_ini').value,
+            fecha_fin:      document.getElementById('exp_proj_fecha_fin').value || null,
+            tecnologias:    document.getElementById('exp_proj_tecnologias').value,
+            url_link:       document.getElementById('exp_proj_url_link').value.trim() || null,
+            estado:         document.getElementById('exp_proj_estado').value,
+            visible:        1,
+        }),
+    })
+    .then(r => r.json())
+    .then(projRes => {
+        if (projRes.success) {
+            const proyecto = projRes.proyecto;
+
+            // Agregar a lista global
+            (window.PROYECTOS_USUARIO_LIST = window.PROYECTOS_USUARIO_LIST || []).push({
+                id_proyecto: proyecto.id_proyecto,
+                nombre: proyecto.nombre,
+                id_experiencia: idExperiencia,
+            });
+
+            // Inyectar en grid de Mis Proyectos
+            if (typeof buildCardHTML === 'function') {
+                const grid = document.getElementById('proyectos-grid');
+                if (grid) {
+                    grid.insertAdjacentHTML('afterbegin', buildCardHTML(proyecto));
+                    if (typeof recalcularStats === 'function') recalcularStats();
+                }
+            }
+
+            refrescarTarjetaExpConVinculados(idExperiencia);
+        }
+        cerrarModalExperiencia();
+        mostrarToastExp(
+            projRes.success
+                ? 'Experiencia y proyecto guardados correctamente'
+                : 'Experiencia guardada, pero el proyecto no pudo crearse',
+            projRes.success ? 'success' : 'error'
+        );
+    })
+    .catch(() => {
+        cerrarModalExperiencia();
+        mostrarToastExp('Experiencia guardada, pero hubo un problema al crear el proyecto', 'error');
+    });
 }
 
 // ============================================================
@@ -662,11 +1036,14 @@ function submitExperiencia() {
             return;
         }
 
-        const exp      = res.experiencia;
-        const lista    = document.getElementById('experiencias-lista');
-        const cardHTML = buildCardHTMLExperiencia(exp);
+        const exp     = res.experiencia;
+        const editing = !!experienciaEditandoId;
 
-        if (experienciaEditandoId) {
+        // Insertar/actualizar tarjeta de experiencia (sin proyectos por ahora; se rellenan abajo)
+        const proyectosVinculados = obtenerProyectosVinculadosDeExp(exp.id_experiencia);
+        const lista    = document.getElementById('experiencias-lista');
+        const cardHTML = buildCardHTMLExperiencia(exp, proyectosVinculados);
+        if (editing) {
             const existing = lista?.querySelector(`[data-experiencia-id="${exp.id_experiencia}"]`);
             if (existing) existing.outerHTML = cardHTML;
         } else {
@@ -675,77 +1052,8 @@ function submitExperiencia() {
 
         recalcularStatsExperiencia();
 
-        // Crear proyecto asociado (obligatorio al crear experiencia)
-        if (!experienciaEditandoId) {
-            const idExpRecienCreada = exp.id_experiencia;
-            const projNombre   = document.getElementById('exp_proj_nombre').value.trim();
-            const projFechaIni = document.getElementById('exp_proj_fecha_ini').value;
-
-            fetch('/proyectos', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                },
-                body: JSON.stringify({
-                    user_id:        EXP_USER_ID,
-                    id_experiencia: exp.id_experiencia,
-                    nombre:         projNombre,
-                    descripcion:    document.getElementById('exp_proj_descripcion').value,
-                    fecha_ini:      projFechaIni,
-                    fecha_fin:      document.getElementById('exp_proj_fecha_fin').value || null,
-                    tecnologias:    document.getElementById('exp_proj_tecnologias').value,
-                    url_link:       document.getElementById('exp_proj_url_link').value.trim() || null,
-                    estado:         document.getElementById('exp_proj_estado').value,
-                    visible:        1,
-                }),
-            })
-            .then(r => r.json())
-            .then(projRes => {
-                if (projRes.success) {
-                    const proyecto = projRes.proyecto;
-
-                    // Inyectar en grid de Mis Proyectos
-                    if (typeof buildCardHTML === 'function') {
-                        const grid = document.getElementById('proyectos-grid');
-                        if (grid) {
-                            grid.insertAdjacentHTML('afterbegin', buildCardHTML(proyecto));
-                            if (typeof recalcularStats === 'function') recalcularStats();
-                        }
-                    }
-
-                    // Actualizar la tarjeta de experiencia recién creada para mostrar el proyecto
-                    const contenedorProyectos = document.getElementById(`exp-proyectos-${idExpRecienCreada}`);
-                    if (contenedorProyectos) {
-                        contenedorProyectos.innerHTML = `
-                            <p class="text-xs font-medium text-gray-400 mb-1.5">
-                                <i class="fas fa-folder text-[#1e3a5f]/50 mr-1"></i> Proyectos relacionados
-                            </p>
-                            <div class="flex flex-col gap-1">
-                                <a href="#" onclick="verProyectoDesdeExp(${proyecto.id_proyecto}); return false;"
-                                   class="flex items-center gap-1.5 text-xs text-[#1e3a5f] hover:text-[#e11d48] transition-colors group">
-                                    <i class="fas fa-code-branch text-[#1e3a5f]/40 group-hover:text-[#e11d48]/60 text-[10px]"></i>
-                                    <span class="truncate">${escapeHtmlExp(proyecto.nombre)}</span>
-                                </a>
-                            </div>`;
-                    }
-                }
-                cerrarModalExperiencia();
-                mostrarToastExp(
-                    projRes.success
-                        ? 'Experiencia y proyecto guardados correctamente'
-                        : 'Experiencia guardada, pero el proyecto no pudo crearse',
-                    projRes.success ? 'success' : 'error'
-                );
-            })
-            .catch(() => {
-                cerrarModalExperiencia();
-                mostrarToastExp('Experiencia guardada, pero hubo un problema al crear el proyecto', 'error');
-            });
-        } else {
-            cerrarModalExperiencia();
-            mostrarToastExp('Experiencia guardada correctamente', 'success');
-        }
+        // Manejar proyecto adicional según modo (aplica tanto al crear como al editar)
+        manejarProyectoEnSubmit(exp.id_experiencia, editing);
     })
     .catch(err => {
         if (err.message !== 'validation') {

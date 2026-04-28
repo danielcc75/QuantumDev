@@ -56,20 +56,22 @@ class ProyectoController extends Controller
         $proyecto = Proyecto::findOrFail($id);
 
         $request->validate([
-            'nombre'      => 'sometimes|string|max:100',
-            'descripcion' => 'nullable|string',
-            'url_link'    => 'nullable|url',
-            'referencias' => 'nullable|string',
-            'tecnologias' => 'nullable|string',
-            'fecha_ini'   => 'nullable|date',
-            'fecha_fin'   => 'nullable|date|after_or_equal:fecha_ini',
-            'estado'      => 'nullable|in:pendiente,en_progreso,completado,cancelado',
-            'visible'     => 'nullable|boolean',
+            'nombre'         => 'sometimes|string|max:100',
+            'descripcion'    => 'nullable|string',
+            'url_link'       => 'nullable|url',
+            'referencias'    => 'nullable|string',
+            'tecnologias'    => 'nullable|string',
+            'fecha_ini'      => 'nullable|date',
+            'fecha_fin'      => 'nullable|date|after_or_equal:fecha_ini',
+            'estado'         => 'nullable|in:pendiente,en_progreso,completado,cancelado',
+            'visible'        => 'nullable|boolean',
+            'id_experiencia' => 'nullable|integer|exists:experiencia_laboral,id_experiencia',
         ]);
 
         $data = $request->only([
             'nombre', 'descripcion', 'url_link', 'referencias',
-            'tecnologias', 'fecha_ini', 'fecha_fin', 'estado', 'visible'
+            'tecnologias', 'fecha_ini', 'fecha_fin', 'estado', 'visible',
+            'id_experiencia'
         ]);
 
         // Limpiar fecha_fin vacía
