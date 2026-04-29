@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
+use App\Models\HabilidadBlanda;
+use App\Models\PerfilHabilidadBlanda;
 
 
 class UsuarioWebController extends Controller
@@ -125,22 +127,35 @@ class UsuarioWebController extends Controller
     // =========================
     // DASHBOARD (NUEVO)
     // =========================
-    public function dashboard()
-    {
-        if (!session('usuario_id')) {
-            return redirect('/');
-        }
-
-        $usuario = Usuario::with('perfil')->find(session('usuario_id'));
-        $categorias = Categoria::all();
-
-        // 🔥 TRAER habilidades del usuario con su categoría
-        $habilidades = Habilidad::with('categoria')  
-            ->where('id_perfil', $usuario->perfil->id_perfil)
-            ->get();
- 
-        return view('dashboard', compact('usuario', 'categorias', 'habilidades'));
+ public function dashboard()
+{
+    if (!session('usuario_id')) {
+        return redirect('/');
     }
+
+    $usuario = Usuario::with('perfil')->find(session('usuario_id'));
+    $categorias = Categoria::all();
+
+    $habilidades = Habilidad::with('categoria')
+        ->where('id_perfil', $usuario->perfil->id_perfil)
+        ->get();
+
+    $habilidadesBlandasActivas = HabilidadBlanda::where('estado', 'activo')
+        ->orderBy('nombre', 'asc')
+        ->get();
+
+    $habilidadesBlandasSeleccionadas = PerfilHabilidadBlanda::where('id_perfil', $usuario->perfil->id_perfil)
+        ->pluck('id_habilidad_blanda')
+        ->toArray();
+
+    return view('dashboard', compact(
+        'usuario',
+        'categorias',
+        'habilidades',
+        'habilidadesBlandasActivas',
+        'habilidadesBlandasSeleccionadas'
+    ));
+}
 
     // =========================
     // LOGOUT (NUEVO)
@@ -414,5 +429,33 @@ class UsuarioWebController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Perfil actualizado correctamente']);
 
+    }
+
+    public function guardarHabilidadesBlandas(Request $request)
+    {
+        $request->validate([
+            'habilidades' => 'nullable|array|max:6'
+        ]);
+
+        $usuario = Usuario::with('perfil')->find(session('usuario_id'));
+
+        if (!$usuario || !$usuario->perfil) {
+            return response()->json(['ok' => false], 400);
+        }
+
+        $perfilId = $usuario->perfil->id_perfil;
+
+        // eliminar anteriores
+        PerfilHabilidadBlanda::where('id_perfil', $perfilId)->delete();
+
+        // guardar nuevas
+        foreach ($request->habilidades as $idHabilidad) {
+            PerfilHabilidadBlanda::create([
+                'id_perfil' => $perfilId,
+                'id_habilidad_blanda' => $idHabilidad
+            ]);
+        }
+
+        return response()->json(['ok' => true]);
     }
 }

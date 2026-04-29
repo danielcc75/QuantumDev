@@ -6,6 +6,7 @@ use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Database\Seeders\TecnologiasSeeder;
+use Database\Seeders\HabilidadesBlandasSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,5 +23,6 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call(TecnologiasSeeder::class);
+        $this->call(HabilidadesBlandasSeeder::class);
     }
 }

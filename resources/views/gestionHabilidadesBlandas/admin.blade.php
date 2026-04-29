@@ -207,11 +207,6 @@
             tituloFormulario.textContent = 'editar habilidad blanda';
             btnGuardar.textContent = 'actualizar habilidad';
             btnCancelar.classList.remove('hidden');
-
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
         }
 
         function cancelarEdicion() {

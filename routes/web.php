@@ -107,3 +107,6 @@ Route::put('/admin/habilidades-blandas/{id}', [HabilidadBlandaController::class,
 
 Route::delete('/admin/habilidades-blandas/{id}', [HabilidadBlandaController::class, 'destroy'])
     ->name('habilidades-blandas.destroy');
+
+Route::post('/habilidades-blandas/guardar', [UsuarioWebController::class, 'guardarHabilidadesBlandas'])
+    ->name('habilidades-blandas.guardar');
