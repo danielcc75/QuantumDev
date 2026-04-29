@@ -3,6 +3,7 @@
 use App\Http\Controllers\UsuarioWebController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\HabilidadController;
+use App\Http\Controllers\HabilidadBlandaController;
 use Illuminate\Support\Facades\Route;
 
 // =========================
@@ -90,3 +91,19 @@ Route::put('/habilidades/{id}', [HabilidadController::class, 'update'])
 Route::delete('/habilidades/{id}', [HabilidadController::class, 'destroy'])
     ->name('habilidades.destroy');
 
+
+//Rutas Habilidades blandas
+Route::get('/admin/habilidades-blandas', [HabilidadBlandaController::class, 'index'])
+    ->name('habilidades-blandas.index');
+
+Route::post('/admin/habilidades-blandas', [HabilidadBlandaController::class, 'store'])
+    ->name('habilidades-blandas.store');
+
+Route::post('/admin/habilidades-blandas/{id}/toggle', [HabilidadBlandaController::class, 'toggleEstado'])
+    ->name('habilidades-blandas.toggle');
+
+Route::put('/admin/habilidades-blandas/{id}', [HabilidadBlandaController::class, 'update'])
+    ->name('habilidades-blandas.update');
+
+Route::delete('/admin/habilidades-blandas/{id}', [HabilidadBlandaController::class, 'destroy'])
+    ->name('habilidades-blandas.destroy');
