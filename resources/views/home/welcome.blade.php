@@ -351,6 +351,7 @@
                             ->orderByDesc('fecha_ini')
                             ->get()
                             ->map(fn($pr) => [
+                                'id_proyecto' => $pr->id_proyecto,
                                 'nombre'      => $pr->nombre,
                                 'descripcion' => $pr->descripcion,
                                 'url_link'    => $pr->url_link,
@@ -359,6 +360,13 @@
                                 'estado'      => $pr->estado,
                                 'tecnologias' => $pr->tecnologias,
                             ])->all();
+
+                        // Habilidades blandas del perfil
+                        $habBlandas = DB::table('perfil_habilidad_blanda as phb')
+                            ->join('habilidades_blandas as hb', 'phb.id_habilidad_blanda', '=', 'hb.id_habilidad_blanda')
+                            ->where('phb.id_perfil', $p->id_perfil)
+                            ->pluck('hb.nombre')
+                            ->all();
 
                         // Formación académica
                         $formacion = DB::table('formacion_academica')
@@ -393,7 +401,8 @@
                             'email'       => $usuarioRow->correo_electronico ?? null,
                             'telefono'    => $usuarioRow->telefono ?? null,
                             'links'       => $links,
-                            'habilidades_grupos' => $habGrupos,
+                            'habilidades_grupos'  => $habGrupos,
+                            'habilidades_blandas' => $habBlandas,
                             'experiencias' => $experiencias,
                             'proyectos_lista' => $proyectosLista,
                             'formacion'   => $formacion,
@@ -586,8 +595,17 @@
                     <p id="mp_habilidades_empty" class="text-sm text-gray-400 italic text-center hidden">No hay habilidades registradas todavía.</p>
                 </section>
 
-                {{-- Experiencia laboral --}}
+                {{-- Habilidades Blandas --}}
                 <section class="px-6 sm:px-10 py-8 bg-gray-50">
+                    <h3 class="text-center text-lg font-bold text-[#1e3a5f] mb-5">
+                        <span class="inline-block border-b-2 border-[#e11d48] pb-1">Habilidades Blandas</span>
+                    </h3>
+                    <div id="mp_habilidades_blandas" class="flex flex-wrap gap-2 justify-center"></div>
+                    <p id="mp_habilidades_blandas_empty" class="text-sm text-gray-400 italic text-center hidden">No hay habilidades blandas registradas.</p>
+                </section>
+
+                {{-- Experiencia laboral --}}
+                <section class="px-6 sm:px-10 py-8">
                     <h3 class="text-center text-lg font-bold text-[#1e3a5f] mb-5">
                         <span class="inline-block border-b-2 border-[#e11d48] pb-1">Experiencia laboral</span>
                     </h3>
@@ -596,7 +614,7 @@
                 </section>
 
                 {{-- Formación académica --}}
-                <section class="px-6 sm:px-10 py-8">
+                <section class="px-6 sm:px-10 py-8 bg-gray-50">
                     <h3 class="text-center text-lg font-bold text-[#1e3a5f] mb-5">
                         <span class="inline-block border-b-2 border-[#e11d48] pb-1">Formación académica</span>
                     </h3>
@@ -605,7 +623,7 @@
                 </section>
 
                 {{-- Proyectos --}}
-                <section class="px-6 sm:px-10 py-8 bg-gray-50">
+                <section class="px-6 sm:px-10 py-8">
                     <h3 class="text-center text-lg font-bold text-[#1e3a5f] mb-5">
                         <span class="inline-block border-b-2 border-[#e11d48] pb-1">Proyectos</span>
                     </h3>
@@ -726,6 +744,23 @@
                 });
             }
 
+            // Habilidades blandas
+            const blandas      = data.habilidades_blandas || [];
+            const contBlandas  = document.getElementById('mp_habilidades_blandas');
+            const emptyBlandas = document.getElementById('mp_habilidades_blandas_empty');
+            contBlandas.innerHTML = '';
+            if (blandas.length === 0) {
+                emptyBlandas.classList.remove('hidden');
+            } else {
+                emptyBlandas.classList.add('hidden');
+                blandas.forEach(nombre => {
+                    const span = document.createElement('span');
+                    span.className = 'bg-[#1e3a5f] text-white px-3 py-1.5 rounded-full text-xs font-medium';
+                    span.textContent = nombre;
+                    contBlandas.appendChild(span);
+                });
+            }
+
             // Experiencias
             renderTimeline(
                 'mp_experiencias', 'mp_experiencias_empty',
@@ -739,8 +774,8 @@
                             </p>
                             <div class="flex flex-wrap gap-1.5">
                                 ${proys.map(pr => pr.url_link
-                                    ? `<a href="${pr.url_link}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-medium bg-[#1e3a5f]/8 hover:bg-[#1e3a5f]/15 text-[#1e3a5f] border border-[#1e3a5f]/15 px-2.5 py-1 rounded-full transition"><i class="fas fa-code-branch text-[10px]"></i>${escapeHtml(pr.nombre)}<i class="fas fa-external-link-alt text-[9px] opacity-70"></i></a>`
-                                    : `<span class="inline-flex items-center gap-1.5 text-xs font-medium bg-[#1e3a5f]/8 text-[#1e3a5f] border border-[#1e3a5f]/15 px-2.5 py-1 rounded-full"><i class="fas fa-code-branch text-[10px]"></i>${escapeHtml(pr.nombre)}</span>`
+                                    ? `<a href="${pr.url_link}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-medium bg-[#1e3a5f]/8 hover:bg-[#1e3a5f]/15 text-[#1e3a5f] border border-[#1e3a5f]/15 px-2.5 py-1 rounded-full transition cursor-pointer"><i class="fas fa-code-branch text-[10px]"></i>${escapeHtml(pr.nombre)}<i class="fas fa-external-link-alt text-[9px] opacity-70"></i></a>`
+                                    : `<button type="button" onclick="irAProyecto(${pr.id_proyecto})" class="inline-flex items-center gap-1.5 text-xs font-medium bg-[#1e3a5f]/8 hover:bg-[#1e3a5f]/15 text-[#1e3a5f] border border-[#1e3a5f]/15 px-2.5 py-1 rounded-full transition cursor-pointer"><i class="fas fa-code-branch text-[10px]"></i>${escapeHtml(pr.nombre)}<i class="fas fa-arrow-down text-[9px] opacity-70"></i></button>`
                                 ).join('')}
                             </div>
                         </div>` : '';
@@ -800,7 +835,7 @@
                     const estado = ESTADO_LABELS[pr.estado] || ESTADO_LABELS.pendiente;
                     const tags = (pr.tecnologias || '').split(',').map(t => t.trim()).filter(Boolean);
                     return `
-                    <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col gap-2">
+                    <div id="mp_proy_${pr.id_proyecto}" class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col gap-2">
                         <div class="flex items-start justify-between gap-2">
                             <h4 class="font-bold text-[#1e3a5f] text-sm leading-tight">${escapeHtml(pr.nombre)}</h4>
                             <span class="text-[10px] font-semibold uppercase tracking-wider ${estado.bg} ${estado.text} px-2 py-0.5 rounded-full whitespace-nowrap">${estado.label}</span>
@@ -819,6 +854,14 @@
             modal.classList.remove('hidden');
             modal.scrollTop = 0;
             document.body.style.overflow = 'hidden';
+        };
+
+        window.irAProyecto = function (idProyecto) {
+            const card = document.getElementById('mp_proy_' + idProyecto);
+            if (!card) return;
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            card.classList.add('ring-2', 'ring-[#e11d48]', 'ring-offset-2');
+            setTimeout(() => card.classList.remove('ring-2', 'ring-[#e11d48]', 'ring-offset-2'), 1800);
         };
 
         function renderTimeline(contId, emptyId, items, builder) {

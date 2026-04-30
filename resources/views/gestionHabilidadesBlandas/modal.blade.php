@@ -162,22 +162,46 @@
                 "X-CSRF-TOKEN": "{{ csrf_token() }}",
                 "Accept": "application/json"
             },
-            body: JSON.stringify({
-                habilidades: seleccionIds
-            })
+            body: JSON.stringify({ habilidades: seleccionIds })
         })
         .then(res => res.json())
         .then(data => {
             if (data.ok) {
                 cerrarModalHabilidadesBlandas();
-                window.location.href = "{{ route('dashboard') }}?seccion=habilidades#seccion-habilidades-blandas";
+                actualizarChipsBlandasEnVista();
             } else {
                 alert('No se pudieron guardar las habilidades blandas.');
             }
         })
         .catch(() => {
-            alert('Ocurrio un error al guardar las habilidades blandas.');
+            alert('Ocurrió un error al guardar las habilidades blandas.');
         });
+    }
+
+    function actualizarChipsBlandasEnVista() {
+        const display = document.getElementById('chips-blandas-display');
+        if (!display) return;
+
+        const seleccionados = [...document.querySelectorAll('.habilidad-blanda')]
+            .filter(btn => btn.classList.contains('bg-[#1e3a5f]'));
+
+        if (seleccionados.length === 0) {
+            display.innerHTML = `
+                <div class="flex flex-col items-center py-6 text-center">
+                    <div class="w-14 h-14 rounded-full bg-[#1e3a5f]/8 flex items-center justify-center mb-3">
+                        <i class="fas fa-user-friends text-2xl text-[#1e3a5f]/40"></i>
+                    </div>
+                    <p class="text-gray-600 font-semibold text-sm">Aún no agregaste habilidades blandas</p>
+                    <p class="text-xs text-gray-400 mt-1">Agrega habilidades interpersonales para completar tu perfil</p>
+                </div>`;
+            return;
+        }
+
+        const chips = seleccionados.map(btn =>
+            `<span class="bg-[#1e3a5f] text-white px-3 py-1.5 rounded-full text-xs font-medium">${btn.textContent.trim()}</span>`
+        ).join('');
+
+        display.innerHTML = `<div class="flex flex-wrap gap-2">${chips}</div>`;
     }
 
     document.getElementById('abrir-modal-habilidades-blandas')?.addEventListener('click', abrirModalHabilidadesBlandas);

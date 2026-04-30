@@ -489,10 +489,18 @@
             }
         }
 
+        function esEscritorio() {
+            return window.innerWidth >= 1024;
+        }
+
         function cambiarSeccion(seccionId) {
-            const seccionActiva = document.getElementById('seccion-' + seccionId);
-            if (seccionActiva) {
-                seccionActiva.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (esEscritorio()) {
+                document.querySelectorAll('.seccion-contenido').forEach(s => s.classList.add('hidden'));
+                const seccionActiva = document.getElementById('seccion-' + seccionId);
+                if (seccionActiva) seccionActiva.classList.remove('hidden');
+            } else {
+                const seccionActiva = document.getElementById('seccion-' + seccionId);
+                if (seccionActiva) seccionActiva.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
             resaltarLink(seccionId);
         }
@@ -508,7 +516,7 @@
             });
         });
 
-        // ── Scroll-spy: resalta el link según la sección visible ───────────────
+        // ── Scroll-spy: solo en móvil ──────────────────────────────────────────
         const seccionObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -521,7 +529,14 @@
             threshold: 0,
         });
 
-        document.querySelectorAll('.seccion-contenido').forEach(s => seccionObserver.observe(s));
+        function activarScrollSpy() {
+            document.querySelectorAll('.seccion-contenido').forEach(s => seccionObserver.observe(s));
+        }
+        function desactivarScrollSpy() {
+            seccionObserver.disconnect();
+        }
+
+        if (!esEscritorio()) activarScrollSpy();
 
         // ── Sidebars móviles / tablet ──────────────────────────────────────────
         const sidebarIzq     = document.getElementById('sidebar-izquierdo');
@@ -549,10 +564,29 @@
         sidebarOverlay?.addEventListener('click', cerrarSidebars);
 
         // Reset al redimensionar
+        let fueEscritorio = esEscritorio();
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 1024) sidebarIzq.classList.remove('-translate-x-full');
             if (window.innerWidth >= 1280) sidebarDer.classList.remove('translate-x-full');
             if (window.innerWidth >= 1280) sidebarOverlay.classList.add('hidden');
+
+            const ahoraEscritorio = esEscritorio();
+            if (ahoraEscritorio !== fueEscritorio) {
+                fueEscritorio = ahoraEscritorio;
+                if (ahoraEscritorio) {
+                    // Pasó a escritorio: modo tabs
+                    desactivarScrollSpy();
+                    const linkActivo = document.querySelector('.seccion-link.bg-\\[\\#1e3a5f\\]');
+                    const idActivo = linkActivo?.getAttribute('data-seccion') ?? 'resumen';
+                    document.querySelectorAll('.seccion-contenido').forEach(s => s.classList.add('hidden'));
+                    const elActivo = document.getElementById('seccion-' + idActivo);
+                    if (elActivo) elActivo.classList.remove('hidden');
+                } else {
+                    // Pasó a móvil: mostrar todas y activar scroll-spy
+                    document.querySelectorAll('.seccion-contenido').forEach(s => s.classList.remove('hidden'));
+                    activarScrollSpy();
+                }
+            }
         });
 
         // ── Buscador móvil ─────────────────────────────────────────────────────
@@ -571,9 +605,16 @@
         });
 
         const seccionInicial = new URLSearchParams(window.location.search).get('seccion') ?? 'resumen';
-        const elInicial = document.getElementById('seccion-' + seccionInicial);
-        if (elInicial && seccionInicial !== 'resumen') {
-            elInicial.scrollIntoView({ behavior: 'auto', block: 'start' });
+
+        if (esEscritorio()) {
+            document.querySelectorAll('.seccion-contenido').forEach(s => s.classList.add('hidden'));
+            const elInicial = document.getElementById('seccion-' + seccionInicial);
+            if (elInicial) elInicial.classList.remove('hidden');
+        } else {
+            const elInicial = document.getElementById('seccion-' + seccionInicial);
+            if (elInicial && seccionInicial !== 'resumen') {
+                elInicial.scrollIntoView({ behavior: 'auto', block: 'start' });
+            }
         }
         resaltarLink(seccionInicial);
         // Limpiar el parámetro de la URL para que al recargar no vuelva a la misma sección

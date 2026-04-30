@@ -449,7 +449,7 @@ class UsuarioWebController extends Controller
         PerfilHabilidadBlanda::where('id_perfil', $perfilId)->delete();
 
         // guardar nuevas
-        foreach ($request->habilidades as $idHabilidad) {
+        foreach ($request->habilidades ?? [] as $idHabilidad) {
             PerfilHabilidadBlanda::create([
                 'id_perfil' => $perfilId,
                 'id_habilidad_blanda' => $idHabilidad

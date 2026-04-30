@@ -1,7 +1,3 @@
-{{-- resources/views/gestionHabilidades/index.blade.php
-     Punto de entrada de la sección Mis Habilidades.
-     Carga datos y orquesta los sub-componentes. --}}
-
 @php
     $totalHab      = $habilidades->count();
     $categoriasHab = $habilidades->pluck('id_categoria')->unique()->count();
@@ -11,179 +7,193 @@
 @endphp
 
 <div class="w-full">
-    <main class="p-4 sm:p-6 lg:p-8">
+    <main class="p-4 sm:p-6 lg:p-8 flex flex-col gap-10">
 
-        {{-- Encabezado --}}
-        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6 md:mb-8">
-            <div>
-                <h2 class="text-2xl md:text-3xl font-bold text-[#1e3a5f]">Mis Habilidades</h2>
-                <p class="text-sm text-gray-500 mt-1">Administra tus habilidades técnicas y controla lo que muestras al mundo</p>
-                <div class="mt-2 h-1 w-16 rounded-full bg-[#e11d48]"></div>
-            </div>
-            <button id="agregar-habilidad-btn"
-                class="inline-flex items-center justify-center gap-2 bg-[#1e3a5f] hover:bg-[#e11d48] text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors duration-200 self-start sm:self-auto">
-                <i class="fas fa-plus text-xs"></i> Nueva Habilidad
-            </button>
-        </div>
+        {{-- ══════════════════════════════════════════════════════════
+             SECCIÓN 1 — HABILIDADES TÉCNICAS
+        ══════════════════════════════════════════════════════════ --}}
+        <section>
 
-        {{-- Habilidades blandas --}}
-        <div id="seccion-habilidades-blandas" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6 md:mb-8">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            {{-- Encabezado --}}
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
                 <div>
                     <div class="flex items-center gap-2 mb-1">
-                        <i class="fas fa-user-friends text-[#1e3a5f]"></i>
-                        <h3 class="text-lg font-bold text-[#1e3a5f]">Habilidades Blandas</h3>
+                        <i class="fas fa-code text-[#1e3a5f]"></i>
+                        <h2 class="text-2xl md:text-3xl font-bold text-[#1e3a5f]">Habilidades Técnicas</h2>
                     </div>
-                    <p class="text-xs text-gray-500">
-                        Selecciona hasta 6 habilidades interpersonales para mostrar en tu perfil
-                    </p>
+                    <p class="text-sm text-gray-500 mt-1">Administra tus habilidades técnicas y controla lo que muestras al mundo</p>
+                    <div class="mt-2 h-1 w-16 rounded-full bg-[#e11d48]"></div>
                 </div>
-
-                <button
-                    type="button"
-                    id="abrir-modal-habilidades-blandas"
-                    class="inline-flex items-center justify-center gap-2 bg-[#1e3a5f] hover:bg-[#e11d48] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors duration-200">
-                    <i class="fas fa-plus text-xs"></i>
-                    Agregar
+                <button id="agregar-habilidad-btn"
+                    class="inline-flex items-center justify-center gap-2 bg-[#1e3a5f] hover:bg-[#e11d48] text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors duration-200 self-start sm:self-auto">
+                    <i class="fas fa-plus text-xs"></i> Nueva Habilidad
                 </button>
             </div>
 
-            <div class="mt-4">
-                @if(count($habilidadesBlandasSeleccionadas) > 0)
-                    <div class="flex flex-wrap gap-2">
-                        @foreach($habilidadesBlandasActivas->whereIn('id_habilidad_blanda', $habilidadesBlandasSeleccionadas) as $hab)
-                            <span class="bg-[#1e3a5f] text-white px-3 py-1.5 rounded-full text-xs font-medium">
-                                {{ $hab->nombre }}
-                            </span>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="text-sm text-gray-400">
-                        Aún no agregaste habilidades blandas.
-                    </div>
-                @endif
-            </div>
-        </div>
+            {{-- Estadísticas --}}
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-5 mb-6">
 
-        {{-- Estadísticas --}}
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-5 mb-6 md:mb-8">
-
-            {{-- Total --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 border-l-4 border-l-[#1e3a5f]">
-                <div class="flex justify-between items-start mb-3">
-                    <p class="text-sm text-gray-500 font-medium">Total Habilidades</p>
-                    <div class="w-9 h-9 rounded-xl bg-[#1e3a5f]/8 flex items-center justify-center">
-                        <i class="fas fa-code text-[#1e3a5f] text-sm"></i>
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 border-l-4 border-l-[#1e3a5f]">
+                    <div class="flex justify-between items-start mb-3">
+                        <p class="text-sm text-gray-500 font-medium">Total Habilidades</p>
+                        <div class="w-9 h-9 rounded-xl bg-[#1e3a5f]/8 flex items-center justify-center">
+                            <i class="fas fa-code text-[#1e3a5f] text-sm"></i>
+                        </div>
                     </div>
+                    <p id="stat-hab-total" class="text-4xl font-bold text-[#1e3a5f]">{{ $totalHab }}</p>
+                    <p class="text-xs text-gray-400 mt-1">Todas las registradas</p>
                 </div>
-                <p id="stat-hab-total" class="text-4xl font-bold text-[#1e3a5f]">{{ $totalHab }}</p>
-                <p class="text-xs text-gray-400 mt-1">Todas las registradas</p>
-            </div>
 
-            {{-- Categorías --}}
-            <div class="bg-[#1e3a5f]/5 rounded-2xl border border-[#1e3a5f]/15 shadow-sm p-6 border-l-4 border-l-[#1e3a5f]">
-                <div class="flex justify-between items-start mb-3">
-                    <p class="text-sm text-[#1e3a5f] font-semibold">Categorías</p>
-                    <div class="w-9 h-9 rounded-xl bg-[#1e3a5f]/10 flex items-center justify-center">
-                        <i class="fas fa-layer-group text-[#1e3a5f] text-sm"></i>
+                <div class="bg-[#1e3a5f]/5 rounded-2xl border border-[#1e3a5f]/15 shadow-sm p-6 border-l-4 border-l-[#1e3a5f]">
+                    <div class="flex justify-between items-start mb-3">
+                        <p class="text-sm text-[#1e3a5f] font-semibold">Categorías</p>
+                        <div class="w-9 h-9 rounded-xl bg-[#1e3a5f]/10 flex items-center justify-center">
+                            <i class="fas fa-layer-group text-[#1e3a5f] text-sm"></i>
+                        </div>
                     </div>
+                    <p id="stat-hab-categorias" class="text-4xl font-bold text-[#1e3a5f]">{{ $categoriasHab }}</p>
+                    <p class="text-xs text-[#1e3a5f]/60 mt-1">Distintas áreas cubiertas</p>
                 </div>
-                <p id="stat-hab-categorias" class="text-4xl font-bold text-[#1e3a5f]">{{ $categoriasHab }}</p>
-                <p class="text-xs text-[#1e3a5f]/60 mt-1">Distintas áreas cubiertas</p>
+
+                <div class="bg-red-50 rounded-2xl border border-red-100 shadow-sm p-6 border-l-4 border-l-[#e11d48]">
+                    <div class="flex justify-between items-start mb-3">
+                        <p class="text-sm text-[#e11d48] font-semibold">Promedio Años</p>
+                        <div class="w-9 h-9 rounded-xl bg-[#e11d48]/10 flex items-center justify-center">
+                            <i class="fas fa-chart-line text-[#e11d48] text-sm"></i>
+                        </div>
+                    </div>
+                    <p id="stat-hab-promedio" class="text-4xl font-bold text-[#1e3a5f]">{{ $promedioAnios }}</p>
+                    <p class="text-xs text-[#e11d48]/70 mt-1">Años de experiencia promedio</p>
+                </div>
+
             </div>
 
-            {{-- Promedio --}}
-            <div class="bg-red-50 rounded-2xl border border-red-100 shadow-sm p-6 border-l-4 border-l-[#e11d48]">
-                <div class="flex justify-between items-start mb-3">
-                    <p class="text-sm text-[#e11d48] font-semibold">Promedio Años</p>
-                    <div class="w-9 h-9 rounded-xl bg-[#e11d48]/10 flex items-center justify-center">
-                        <i class="fas fa-chart-line text-[#e11d48] text-sm"></i>
+            {{-- Estado vacío --}}
+            <div id="empty-state-hab" class="{{ $habilidades->isEmpty() ? '' : 'hidden' }} bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
+                <div class="w-16 h-16 rounded-full bg-[#1e3a5f]/8 flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-code text-3xl text-[#1e3a5f]/40"></i>
+                </div>
+                <p class="text-gray-600 font-semibold">No tienes habilidades técnicas registradas aún</p>
+                <p class="text-xs text-gray-400 mt-1 mb-4">Comienza agregando tu primera habilidad técnica</p>
+                <button id="agregar-habilidad-btn-empty"
+                    class="inline-flex items-center gap-2 text-sm bg-[#1e3a5f] hover:bg-[#e11d48] text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium">
+                    <i class="fas fa-plus text-xs"></i> Agregar primera habilidad
+                </button>
+            </div>
+
+            {{-- Grid de tarjetas --}}
+            <div id="habilidades-lista" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 {{ $habilidades->isEmpty() ? 'hidden' : '' }}">
+                @foreach($habilidades as $habilidad)
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-md p-5 flex flex-col gap-2
+                            border-l-4 border-l-[#1e3a5f] hover:-translate-y-1 hover:shadow-xl transition-all duration-200"
+                     data-habilidad-id="{{ $habilidad->id_habilidad }}"
+                     data-categoria-id="{{ $habilidad->id_categoria }}">
+
+                    <div class="flex justify-center mb-1">
+                        <img src="{{ $habilidad->categoria->imagen ?? 'https://via.placeholder.com/100' }}"
+                             alt="{{ $habilidad->categoria->nombre }}"
+                             class="h-14 w-14 rounded-full object-cover border-2 border-[#1e3a5f]/10">
                     </div>
-                </div>
-                <p id="stat-hab-promedio" class="text-4xl font-bold text-[#1e3a5f]">{{ $promedioAnios }}</p>
-                <p class="text-xs text-[#e11d48]/70 mt-1">Años de experiencia promedio</p>
-            </div>
 
-        </div>
+                    <div class="text-center">
+                        <h3 class="font-semibold text-[#1e3a5f] text-sm leading-snug">{{ $habilidad->nombre }}</h3>
+                        <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-[#1e3a5f]/10 text-[#1e3a5f] whitespace-nowrap">
+                            {{ $habilidad->categoria->nombre }}
+                        </span>
+                    </div>
 
-        {{-- Estado vacío --}}
-        <div id="empty-state-hab" class="{{ $habilidades->isEmpty() ? '' : 'hidden' }} bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
-            <div class="w-16 h-16 rounded-full bg-[#1e3a5f]/8 flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-code text-3xl text-[#1e3a5f]/40"></i>
-            </div>
-            <p class="text-gray-600 font-semibold">No tienes habilidades registradas aún</p>
-            <p class="text-xs text-gray-400 mt-1 mb-4">Comienza agregando tu primera habilidad técnica</p>
-            <button id="agregar-habilidad-btn-empty"
-                class="inline-flex items-center gap-2 text-sm bg-[#1e3a5f] hover:bg-[#e11d48] text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium">
-                <i class="fas fa-plus text-xs"></i> Agregar primera habilidad
-            </button>
-        </div>
+                    <div class="flex items-center justify-center text-xs text-gray-400 gap-1.5">
+                        <i class="fas fa-calendar-alt text-[#1e3a5f]/50"></i>
+                        <span>{{ $habilidad->anios_experiencia }} {{ $habilidad->anios_experiencia == 1 ? 'año' : 'años' }} de experiencia</span>
+                    </div>
 
-        {{-- Grid de tarjetas --}}
-        <div id="habilidades-lista" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 {{ $habilidades->isEmpty() ? 'hidden' : '' }}">
-            @foreach($habilidades as $habilidad)
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-md p-5 flex flex-col gap-2
-                        border-l-4 border-l-[#1e3a5f] hover:-translate-y-1 hover:shadow-xl transition-all duration-200"
-                 data-habilidad-id="{{ $habilidad->id_habilidad }}"
-                 data-categoria-id="{{ $habilidad->id_categoria }}">
+                    @if($habilidad->descripcion)
+                    <p class="text-xs text-gray-500 leading-relaxed line-clamp-2 text-center">{{ $habilidad->descripcion }}</p>
+                    @endif
 
-                {{-- Icono de categoría --}}
-                <div class="flex justify-center mb-1">
-                    <img src="{{ $habilidad->categoria->imagen ?? 'https://via.placeholder.com/100' }}"
-                         alt="{{ $habilidad->categoria->nombre }}"
-                         class="h-14 w-14 rounded-full object-cover border-2 border-[#1e3a5f]/10">
-                </div>
-
-                {{-- Nombre + categoría --}}
-                <div class="text-center">
-                    <h3 class="font-semibold text-[#1e3a5f] text-sm leading-snug">{{ $habilidad->nombre }}</h3>
-                    <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-[#1e3a5f]/10 text-[#1e3a5f] whitespace-nowrap">
-                        {{ $habilidad->categoria->nombre }}
-                    </span>
-                </div>
-
-                {{-- Años de experiencia --}}
-                <div class="flex items-center justify-center text-xs text-gray-400 gap-1.5">
-                    <i class="fas fa-calendar-alt text-[#1e3a5f]/50"></i>
-                    <span>{{ $habilidad->anios_experiencia }} {{ $habilidad->anios_experiencia == 1 ? 'año' : 'años' }} de experiencia</span>
-                </div>
-
-                {{-- Descripción --}}
-                @if($habilidad->descripcion)
-                <p class="text-xs text-gray-500 leading-relaxed line-clamp-2 text-center">{{ $habilidad->descripcion }}</p>
-                @endif
-
-                {{-- Acciones --}}
-                <div class="flex gap-2 pt-2 border-t border-gray-100 mt-auto">
-                    <button class="editar-habilidad flex-1 flex items-center justify-center gap-1.5 text-xs border border-[#1e3a5f]/30 text-[#1e3a5f] hover:bg-[#1e3a5f]/5 px-3 py-1.5 rounded-lg transition"
-                        data-id="{{ $habilidad->id_habilidad }}"
-                        data-nombre="{{ $habilidad->nombre }}"
-                        data-categoria="{{ $habilidad->id_categoria }}"
-                        data-experiencia="{{ $habilidad->anios_experiencia }}"
-                        data-descripcion="{{ $habilidad->descripcion }}">
-                        <i class="fas fa-pencil-alt"></i> Editar
-                    </button>
-                    <form id="delete-hab-{{ $habilidad->id_habilidad }}"
-                          action="{{ route('habilidades.destroy', $habilidad->id_habilidad) }}"
-                          method="POST" class="flex-1">
-                        @csrf
-                        @method('DELETE')
-                        <button type="button"
-                            onclick="confirmarEliminarHabilidad({{ $habilidad->id_habilidad }})"
-                            class="w-full flex items-center justify-center gap-1.5 text-xs bg-[#e11d48] hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition">
-                            <i class="fas fa-trash"></i> Eliminar
+                    <div class="flex gap-2 pt-2 border-t border-gray-100 mt-auto">
+                        <button class="editar-habilidad flex-1 flex items-center justify-center gap-1.5 text-xs border border-[#1e3a5f]/30 text-[#1e3a5f] hover:bg-[#1e3a5f]/5 px-3 py-1.5 rounded-lg transition"
+                            data-id="{{ $habilidad->id_habilidad }}"
+                            data-nombre="{{ $habilidad->nombre }}"
+                            data-categoria="{{ $habilidad->id_categoria }}"
+                            data-experiencia="{{ $habilidad->anios_experiencia }}"
+                            data-descripcion="{{ $habilidad->descripcion }}">
+                            <i class="fas fa-pencil-alt"></i> Editar
                         </button>
-                    </form>
-                </div>
+                        <form id="delete-hab-{{ $habilidad->id_habilidad }}"
+                              action="{{ route('habilidades.destroy', $habilidad->id_habilidad) }}"
+                              method="POST" class="flex-1">
+                            @csrf
+                            @method('DELETE')
+                            <button type="button"
+                                onclick="confirmarEliminarHabilidad({{ $habilidad->id_habilidad }})"
+                                class="w-full flex items-center justify-center gap-1.5 text-xs bg-[#e11d48] hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        </form>
+                    </div>
 
+                </div>
+                @endforeach
             </div>
-            @endforeach
-        </div>
+
+        </section>
+
+        {{-- Divisor --}}
+        <hr class="border-gray-200">
+
+        {{-- ══════════════════════════════════════════════════════════
+             SECCIÓN 2 — HABILIDADES BLANDAS
+        ══════════════════════════════════════════════════════════ --}}
+        <section id="seccion-habilidades-blandas">
+
+            {{-- Encabezado --}}
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <i class="fas fa-user-friends text-[#1e3a5f]"></i>
+                        <h2 class="text-2xl md:text-3xl font-bold text-[#1e3a5f]">Habilidades Blandas</h2>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1">Selecciona hasta 6 habilidades interpersonales para mostrar en tu perfil</p>
+                    <div class="mt-2 h-1 w-16 rounded-full bg-[#e11d48]"></div>
+                </div>
+                <button
+                    type="button"
+                    id="abrir-modal-habilidades-blandas"
+                    class="inline-flex items-center justify-center gap-2 bg-[#1e3a5f] hover:bg-[#e11d48] text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors duration-200 self-start sm:self-auto">
+                    <i class="fas fa-plus text-xs"></i> Agregar
+                </button>
+            </div>
+
+            {{-- Chips seleccionados --}}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <div id="chips-blandas-display">
+                    @if(count($habilidadesBlandasSeleccionadas) > 0)
+                        <div class="flex flex-wrap gap-2">
+                            @foreach($habilidadesBlandasActivas->whereIn('id_habilidad_blanda', $habilidadesBlandasSeleccionadas) as $hab)
+                                <span class="bg-[#1e3a5f] text-white px-3 py-1.5 rounded-full text-xs font-medium">
+                                    {{ $hab->nombre }}
+                                </span>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="flex flex-col items-center py-6 text-center">
+                            <div class="w-14 h-14 rounded-full bg-[#1e3a5f]/8 flex items-center justify-center mb-3">
+                                <i class="fas fa-user-friends text-2xl text-[#1e3a5f]/40"></i>
+                            </div>
+                            <p class="text-gray-600 font-semibold text-sm">Aún no agregaste habilidades blandas</p>
+                            <p class="text-xs text-gray-400 mt-1">Agrega habilidades interpersonales para completar tu perfil</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+        </section>
 
     </main>
 </div>
 
-{{-- Modal crear / editar --}}
+{{-- Modal crear / editar habilidad técnica --}}
 <div id="modal-habilidades"
     class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4"
     onclick="cerrarModalHabilidadFondo(event)">
@@ -236,9 +246,6 @@
 <script>
 (function () {
 
-    // ============================================================
-    // CONFIGURACIÓN DE CONFIRMACIONES
-    // ============================================================
     const CONFIRM_CONFIG_HAB = {
         guardar: {
             titulo:    '¿Guardar habilidad?',
@@ -269,9 +276,6 @@
         },
     };
 
-    // ============================================================
-    // MODAL DE CONFIRMACIÓN
-    // ============================================================
     function mostrarConfirmacionHabilidad(tipo) {
         const cfg = CONFIRM_CONFIG_HAB[tipo];
         document.getElementById('confirmTituloHabilidad').textContent  = cfg.titulo;
@@ -300,9 +304,6 @@
         if (e.target === this) cerrarConfirmacionHabilidad();
     });
 
-    // ============================================================
-    // RESALTAR ERROR
-    // ============================================================
     function resaltarErrorHabilidad(campoId, mensaje) {
         const el = document.getElementById(campoId);
         if (!el) return;
@@ -320,9 +321,6 @@
         setTimeout(() => msg.remove(), 2500);
     }
 
-    // ============================================================
-    // RECALCULAR ESTADÍSTICAS
-    // ============================================================
     function recalcularStatsHabilidad() {
         const lista = document.getElementById('habilidades-lista');
         if (!lista) return;
@@ -336,7 +334,7 @@
             if (catId) categorias.add(catId);
         });
 
-        const elTotal     = document.getElementById('stat-hab-total');
+        const elTotal      = document.getElementById('stat-hab-total');
         const elCategorias = document.getElementById('stat-hab-categorias');
         if (elTotal)      elTotal.textContent      = total;
         if (elCategorias) elCategorias.textContent = categorias.size;
@@ -346,9 +344,6 @@
         lista.classList.toggle('hidden', total === 0);
     }
 
-    // ============================================================
-    // ABRIR / CERRAR MODAL
-    // ============================================================
     function abrirModalHabilidad() {
         const form        = document.getElementById('formHabilidad');
         const tituloModal = document.getElementById('titulo-modal-habilidad');
@@ -378,9 +373,6 @@
         if (event.target.id === 'modal-habilidades') confirmarCancelarHabilidad();
     };
 
-    // ============================================================
-    // CONFIRMAR GUARDAR (VALIDACIÓN)
-    // ============================================================
     window.confirmarGuardarHabilidad = function () {
         const nombre      = document.getElementById('hab_nombre').value.trim();
         const categoria   = document.getElementById('hab_categoria').value;
@@ -397,9 +389,6 @@
         mostrarConfirmacionHabilidad('guardar');
     };
 
-    // ============================================================
-    // CONFIRMAR CANCELAR (DIRTY CHECK)
-    // ============================================================
     window.confirmarCancelarHabilidad = function () {
         const nombre      = document.getElementById('hab_nombre')?.value.trim();
         const descripcion = document.getElementById('hab_descripcion')?.value.trim();
@@ -410,16 +399,10 @@
         }
     };
 
-    // ============================================================
-    // SUBMIT FORMULARIO
-    // ============================================================
     function submitHabilidad() {
         document.getElementById('formHabilidad').submit();
     }
 
-    // ============================================================
-    // CONFIRMAR ELIMINAR
-    // ============================================================
     window.confirmarEliminarHabilidad = function (id) {
         CONFIRM_CONFIG_HAB.eliminar.accion = () => {
             document.getElementById(`delete-hab-${id}`).submit();
@@ -427,9 +410,6 @@
         mostrarConfirmacionHabilidad('eliminar');
     };
 
-    // ============================================================
-    // EDITAR HABILIDAD
-    // ============================================================
     document.querySelectorAll('.editar-habilidad').forEach(btn => {
         btn.addEventListener('click', () => {
             const id          = btn.getAttribute('data-id');
@@ -466,9 +446,6 @@
         });
     });
 
-    // ============================================================
-    // BOTONES DE APERTURA
-    // ============================================================
     const btnAgregar      = document.getElementById('agregar-habilidad-btn');
     const btnAgregarEmpty = document.getElementById('agregar-habilidad-btn-empty');
 
