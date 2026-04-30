@@ -26,6 +26,45 @@
             </button>
         </div>
 
+        {{-- Habilidades blandas --}}
+        <div id="seccion-habilidades-blandas" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6 md:mb-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <i class="fas fa-user-friends text-[#1e3a5f]"></i>
+                        <h3 class="text-lg font-bold text-[#1e3a5f]">Habilidades Blandas</h3>
+                    </div>
+                    <p class="text-xs text-gray-500">
+                        Selecciona hasta 6 habilidades interpersonales para mostrar en tu perfil
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    id="abrir-modal-habilidades-blandas"
+                    class="inline-flex items-center justify-center gap-2 bg-[#1e3a5f] hover:bg-[#e11d48] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-plus text-xs"></i>
+                    Agregar
+                </button>
+            </div>
+
+            <div class="mt-4">
+                @if(count($habilidadesBlandasSeleccionadas) > 0)
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($habilidadesBlandasActivas->whereIn('id_habilidad_blanda', $habilidadesBlandasSeleccionadas) as $hab)
+                            <span class="bg-[#1e3a5f] text-white px-3 py-1.5 rounded-full text-xs font-medium">
+                                {{ $hab->nombre }}
+                            </span>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-sm text-gray-400">
+                        Aún no agregaste habilidades blandas.
+                    </div>
+                @endif
+            </div>
+        </div>
+
         {{-- Estadísticas --}}
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-5 mb-6 md:mb-8">
 
@@ -167,6 +206,8 @@
 
     </div>
 </div>
+
+@include('gestionHabilidadesBlandas.modal')
 
 {{-- Modal de Confirmación --}}
 <div id="modalConfirmacionHabilidad" class="fixed inset-0 bg-black bg-opacity-60 z-[60] hidden items-center justify-center p-4">
