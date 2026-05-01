@@ -110,3 +110,11 @@ Route::delete('/admin/habilidades-blandas/{id}', [HabilidadBlandaController::cla
 
 Route::post('/habilidades-blandas/guardar', [UsuarioWebController::class, 'guardarHabilidadesBlandas'])
     ->name('habilidades-blandas.guardar');
+
+// =========================
+// CONFIGURACIÓN DE CUENTA
+// =========================
+Route::put('/cuenta/datos',       [UsuarioWebController::class, 'actualizarDatosCuenta'])->name('cuenta.datos');
+Route::put('/cuenta/contrasenia', [UsuarioWebController::class, 'cambiarContrasenia'])->name('cuenta.contrasenia');
+Route::put('/cuenta/visibilidad', [UsuarioWebController::class, 'cambiarVisibilidad'])->name('cuenta.visibilidad');
+Route::delete('/cuenta',          [UsuarioWebController::class, 'eliminarCuenta'])->name('cuenta.eliminar');

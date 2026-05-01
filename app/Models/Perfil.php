@@ -14,7 +14,8 @@ class Perfil extends Model
         'id_usuario',
         'foto_perfil',
         'biografia',
-        'ubicacion'
+        'ubicacion',
+        'visibilidad'
     ];
 
     public function usuario()

@@ -237,7 +237,41 @@
                 </div>
             </div>
 
+            {{-- Botón para desplegar configuración --}}
+            <div class="flex justify-center mb-4">
+                <button id="btn-abrir-configuracion" onclick="toggleConfiguracionCuenta()"
+                    class="inline-flex items-center gap-2 bg-[#e11d48] hover:bg-red-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow">
+                    <i class="fas fa-cog text-xs transition-transform duration-300" id="icono-config"></i>
+                    <span id="texto-btn-config">Configurar cuenta</span>
+                </button>
+            </div>
+
+            {{-- Sección de configuración (oculta por defecto) --}}
+            <div id="seccion-configuracion" class="hidden">
+                @include('gestionarCuenta.index', ['userId' => $userId])
+            </div>
+
         </div>
+
+        <script>
+        function toggleConfiguracionCuenta() {
+            const seccion = document.getElementById('seccion-configuracion');
+            const icono   = document.getElementById('icono-config');
+            const texto   = document.getElementById('texto-btn-config');
+            const abierto = !seccion.classList.contains('hidden');
+
+            if (abierto) {
+                seccion.classList.add('hidden');
+                icono.classList.remove('rotate-90');
+                texto.textContent = 'Configurar cuenta';
+            } else {
+                seccion.classList.remove('hidden');
+                icono.classList.add('rotate-90');
+                texto.textContent = 'Ocultar configuración';
+                seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        </script>
     </main>
 </div>
 

@@ -253,10 +253,11 @@
                         ['from' => '#374151', 'to' => '#1e3a5f'],
                     ];
 
-                    // Portafolios públicos: usuarios con perfil que tengan biografía o algún proyecto/experiencia
+                    // Portafolios públicos: usuarios con perfil PÚBLICO que tengan biografía o algún proyecto/experiencia
                     $portafoliosBase = DB::table('usuario as u')
                         ->join('perfil as p', 'u.id_usuario', '=', 'p.id_usuario')
                         ->select('u.id_usuario', 'u.nombre', 'u.apellido', 'p.id_perfil', 'p.biografia', 'p.ubicacion', 'p.foto_perfil')
+                        ->where('p.visibilidad', 'publico')
                         ->where(function ($q) {
                             $q->whereNotNull('p.biografia')
                               ->orWhereExists(function ($sub) {

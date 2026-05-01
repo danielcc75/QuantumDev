@@ -7,6 +7,7 @@
     <title>Portfolio Digital</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         html {
             scroll-behavior: smooth;
@@ -201,8 +202,8 @@
                         <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                             <i class="fas fa-user mr-2"></i> Mi perfil
                         </a>
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <i class="fas fa-cog mr-2"></i> Configuracion
+                        <a href="#" onclick="cambiarSeccion('perfil'); return false;" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-cog mr-2"></i> Configuración
                         </a>
                         <div class="border-t border-gray-100"></div>
                         <form action="{{ route('logout') }}" method="POST">
@@ -292,6 +293,7 @@
                     <i class="fas fa-folder-open w-5 h-5 mr-3 text-gray-500"></i>
                     <span class="font-medium">Mis Proyectos</span>
                 </a>
+
             </nav>
         </aside>
 
@@ -335,6 +337,7 @@
                     'nombreUsuario' => $nombreUsuario
                 ])
             </section>
+
         </div>
 
         <!-- sidebar derecho -->
