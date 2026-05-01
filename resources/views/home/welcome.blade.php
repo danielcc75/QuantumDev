@@ -81,15 +81,23 @@
                     @php
                         $nombreUsuario = session('usuario_nombre');
                         $iniciales = strtoupper(substr($nombreUsuario, 0, 2));
+                        $fotoPerfilHeader = DB::table('perfil')
+                            ->where('id_usuario', session('usuario_id'))
+                            ->value('foto_perfil');
                     @endphp
 
                     <div class="relative dropdown">
                         <button class="flex items-center space-x-2 focus:outline-none hover:bg-gray-100 px-2 py-1 rounded-lg transition-all-soft">
 
                             <!-- avatar -->
-                            <div class="w-10 h-10 bg-gradient-to-br from-[#1e3a5f] to-indigo-600 rounded-full flex items-center justify-center shadow-md">
-                                <span class="text-white text-sm font-bold">{{ $iniciales }}</span>
-                            </div>
+                            @if(!empty($fotoPerfilHeader))
+                                <img src="{{ $fotoPerfilHeader }}" alt="{{ $nombreUsuario }}"
+                                    class="w-10 h-10 rounded-full object-cover shadow-md">
+                            @else
+                                <div class="w-10 h-10 bg-gradient-to-br from-[#1e3a5f] to-indigo-600 rounded-full flex items-center justify-center shadow-md">
+                                    <span class="text-white text-sm font-bold">{{ $iniciales }}</span>
+                                </div>
+                            @endif
 
                             <!-- nombre -->
                             <span class="text-sm font-medium text-gray-700 hidden md:inline">
@@ -433,9 +441,14 @@
                                      style="background-image: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.3) 0%, transparent 50%);"></div>
 
                                 {{-- Avatar --}}
-                                <div class="absolute -bottom-6 left-5 w-14 h-14 rounded-full bg-[#1e3a5f] text-white flex items-center justify-center font-bold text-base ring-4 ring-white shadow-md">
-                                    {{ $p->iniciales }}
-                                </div>
+                                @if(!empty($p->foto))
+                                    <img src="{{ $p->foto }}" alt="{{ $p->nombre }}"
+                                        class="absolute -bottom-6 left-5 w-14 h-14 rounded-full object-cover ring-4 ring-white shadow-md bg-white">
+                                @else
+                                    <div class="absolute -bottom-6 left-5 w-14 h-14 rounded-full bg-[#1e3a5f] text-white flex items-center justify-center font-bold text-base ring-4 ring-white shadow-md">
+                                        {{ $p->iniciales }}
+                                    </div>
+                                @endif
                             </div>
 
                             {{-- Body --}}
