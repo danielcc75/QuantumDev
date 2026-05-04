@@ -147,6 +147,16 @@
                 <p class="text-xs text-gray-500 leading-relaxed line-clamp-2">{{ $exp->descripcion }}</p>
                 @endif
 
+                {{-- Referencias --}}
+                @if(!empty($exp->referencias))
+                <div class="pt-2 border-t border-gray-100">
+                    <p class="text-xs font-medium text-gray-400 mb-1">
+                        <i class="fas fa-user-check text-[#1e3a5f]/50 mr-1"></i> Referencias
+                    </p>
+                    <p class="text-xs text-gray-500 leading-relaxed whitespace-pre-line line-clamp-3">{{ $exp->referencias }}</p>
+                </div>
+                @endif
+
                 {{-- Proyectos vinculados --}}
                 @php $proyectosExp = $proyectosPorExp->get($exp->id_experiencia, collect()); @endphp
                 @if($proyectosExp->isNotEmpty())

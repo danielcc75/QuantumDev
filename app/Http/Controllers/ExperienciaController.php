@@ -51,6 +51,7 @@ class ExperienciaController extends Controller
             'empresa' => 'required|string|max:150',
             'cargo' => 'required|string|max:100',
             'descripcion' => 'nullable|string',
+            'referencias' => 'nullable|string',
             'fecha_ini' => 'required|date',
             'fecha_fin' => 'nullable|date|after_or_equal:fecha_ini',
             'trabajo_actual' => 'boolean'
@@ -67,6 +68,7 @@ class ExperienciaController extends Controller
             'empresa' => $request->empresa,
             'cargo' => $request->cargo,
             'descripcion' => $request->descripcion,
+            'referencias' => $request->referencias,
             'fecha_ini' => $request->fecha_ini,
             'fecha_fin' => $request->trabajo_actual ? null : $request->fecha_fin,
             'trabajo_actual' => $request->trabajo_actual ?? false
@@ -92,6 +94,7 @@ class ExperienciaController extends Controller
             'empresa' => 'required|string|max:150',
             'cargo' => 'required|string|max:100',
             'descripcion' => 'nullable|string',
+            'referencias' => 'nullable|string',
             'fecha_ini' => 'required|date',
             'fecha_fin' => 'nullable|date|after_or_equal:fecha_ini',
             'trabajo_actual' => 'boolean'
@@ -111,6 +114,7 @@ class ExperienciaController extends Controller
             'empresa' => $request->empresa,
             'cargo' => $request->cargo,
             'descripcion' => $request->descripcion,
+            'referencias' => $request->referencias,
             'fecha_ini' => $request->fecha_ini,
             'fecha_fin' => $request->trabajo_actual ? null : $request->fecha_fin,
             'trabajo_actual' => $request->trabajo_actual ?? false

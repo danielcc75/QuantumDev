@@ -14,6 +14,7 @@ class ExperienciaLaboral extends Model
         'empresa',
         'cargo',
         'descripcion',
+        'referencias',
         'fecha_ini',
         'fecha_fin',
         'trabajo_actual'

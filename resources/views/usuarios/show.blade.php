@@ -84,6 +84,14 @@
                     </div>
                     <p class="text-blue-600 font-medium mb-2">{{ $experiencia->empresa }}</p>
                     <p class="text-gray-600 text-sm leading-relaxed">{{ $experiencia->descripcion }}</p>
+                    @if(!empty($experiencia->referencias))
+                    <div class="mt-3 pt-3 border-t border-gray-100">
+                        <p class="text-xs font-semibold text-gray-700 mb-1">
+                            <i class="fas fa-user-check text-blue-500 mr-1"></i>Referencias
+                        </p>
+                        <p class="text-gray-600 text-sm leading-relaxed whitespace-pre-line">{{ $experiencia->referencias }}</p>
+                    </div>
+                    @endif
                 </div>
                 @empty
                 <div class="bg-gray-50 rounded-lg p-6 text-center text-gray-500">

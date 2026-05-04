@@ -66,6 +66,16 @@
                     placeholder="Describe tus responsabilidades y logros..."></textarea>
             </div>
 
+            <div class="mb-4">
+                <label class="block text-xs font-medium text-gray-700 mb-1">
+                    Referencias
+                    <span class="text-gray-400 font-normal">(opcional)</span>
+                </label>
+                <textarea id="exp_referencias" name="referencias" rows="3"
+                    class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                    placeholder="Ej: Juan Pérez — Jefe directo · juan@empresa.com · +57 300 000 0000"></textarea>
+            </div>
+
             {{-- Sección opcional: vincular proyecto --}}
             <div id="exp_proyecto_wrapper" class="border-t border-gray-100 pt-4 mt-2">
                 <p class="text-sm font-medium text-[#1e3a5f] mb-3">
@@ -434,6 +444,11 @@ function confirmarGuardarExperiencia() {
         if (!projNombre)   { resaltarErrorExperiencia('exp_proj_nombre',   'El nombre del proyecto es obligatorio.');          return; }
         if (!projFechaIni) { resaltarErrorExperiencia('exp_proj_fecha_ini','La fecha de inicio del proyecto es obligatoria.'); return; }
 
+        if (projFechaFin && projFechaFin < projFechaIni) {
+            resaltarErrorExperiencia('exp_proj_fecha_fin', 'La fecha de fin del proyecto no puede ser anterior al inicio.');
+            return;
+        }
+
         if (projFechaFin && projFechaFin < hoy) {
             if (!projUrlLink) {
                 resaltarErrorExperiencia('exp_proj_url_link', 'El proyecto ya finalizó. El enlace es obligatorio.');
@@ -667,6 +682,7 @@ function abrirModalEditarExperiencia(exp, proyectosVinculados = []) {
     document.getElementById('exp_fecha_ini').value      = exp.fecha_ini   ? exp.fecha_ini.substring(0, 10) : '';
     document.getElementById('exp_fecha_fin').value      = exp.fecha_fin   ? exp.fecha_fin.substring(0, 10) : '';
     document.getElementById('exp_descripcion').value    = exp.descripcion ?? '';
+    document.getElementById('exp_referencias').value    = exp.referencias ?? '';
 
     const trabajoActual = (exp.trabajo_actual === 1 || exp.trabajo_actual === true);
     document.getElementById('exp_trabajo_actual').checked = trabajoActual;
@@ -776,9 +792,10 @@ function buildCardHTMLExperiencia(experiencia, proyectos = []) {
     const badgeClass = esActual ? 'bg-[#1e3a5f]/10 text-[#1e3a5f]' : 'bg-gray-100 text-gray-600';
     const badgeLabel = esActual ? 'actual' : 'finalizada';
 
-    const cargo      = escapeHtmlExp(experiencia.cargo      || '');
-    const empresa    = escapeHtmlExp(experiencia.empresa    || '');
+    const cargo       = escapeHtmlExp(experiencia.cargo       || '');
+    const empresa     = escapeHtmlExp(experiencia.empresa     || '');
     const descripcion = escapeHtmlExp(experiencia.descripcion || '');
+    const referencias = escapeHtmlExp(experiencia.referencias || '');
 
     const expJson = JSON.stringify(experiencia).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 
@@ -801,6 +818,14 @@ function buildCardHTMLExperiencia(experiencia, proyectos = []) {
     </div>
 
     ${descripcion ? `<p class="text-xs text-gray-500 leading-relaxed line-clamp-2">${descripcion}</p>` : ''}
+
+    ${referencias ? `
+    <div class="pt-2 border-t border-gray-100">
+        <p class="text-xs font-medium text-gray-400 mb-1">
+            <i class="fas fa-user-check text-[#1e3a5f]/50 mr-1"></i> Referencias
+        </p>
+        <p class="text-xs text-gray-500 leading-relaxed whitespace-pre-line line-clamp-3">${referencias}</p>
+    </div>` : ''}
 
     <div class="pt-2 border-t border-gray-100" id="exp-proyectos-${experiencia.id_experiencia}">
         ${proyectos.length ? `
@@ -1006,6 +1031,7 @@ function submitExperiencia() {
         fecha_ini:      document.getElementById('exp_fecha_ini').value,
         fecha_fin:      trabajoActual ? null : document.getElementById('exp_fecha_fin').value,
         descripcion:    document.getElementById('exp_descripcion').value,
+        referencias:    document.getElementById('exp_referencias').value,
         trabajo_actual: trabajoActual ? 1 : 0,
     };
 
