@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('perfil', function (Blueprint $table) {
-            $table->enum('visibilidad', ['publico', 'privado'])->default('publico')->after('ubicacion');
+            $table->enum('visibilidad', ['publico', 'privado'])->default('privado')->after('ubicacion');
         });
     }
 
