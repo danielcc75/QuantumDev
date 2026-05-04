@@ -519,6 +519,21 @@ class UsuarioWebController extends Controller
 
         try {
             $perfil = Perfil::where('id_usuario', session('usuario_id'))->firstOrFail();
+
+            if ($request->visibilidad === 'publico') {
+                $tieneBiografia  = !empty($perfil->biografia);
+                $tieneProyecto   = DB::table('proyectos')->where('id_perfil', $perfil->id_perfil)->exists();
+                $tieneExperiencia = DB::table('experiencia_laboral')->where('id_perfil', $perfil->id_perfil)->exists();
+
+                if (!$tieneBiografia && !$tieneProyecto && !$tieneExperiencia) {
+                    return response()->json([
+                        'ok' => false,
+                        'code' => 'perfil_incompleto',
+                        'message' => 'Para hacer tu perfil público, primero debes registrar al menos una biografía, un proyecto o una experiencia laboral.',
+                    ], 422);
+                }
+            }
+
             $perfil->visibilidad = $request->visibilidad;
             $perfil->save();
 

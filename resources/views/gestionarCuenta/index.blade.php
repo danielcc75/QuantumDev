@@ -252,6 +252,21 @@
                     }
 
                     Swal.fire({ icon: 'success', title: '¡Listo!', text: `Tu perfil ahora es ${nueva}.`, confirmButtonColor: '#1e3a5f', timer: 2000, showConfirmButton: false });
+                } else if (res.code === 'perfil_incompleto') {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Tu perfil aún está vacío',
+                        html: `
+                            <p class="text-sm text-gray-600 mb-2">Para hacer tu perfil público, primero debes registrar al menos una de estas cosas:</p>
+                            <ul class="text-sm text-gray-600 text-left inline-block mt-1 space-y-1">
+                                <li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> Una <strong>biografía</strong></li>
+                                <li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> Un <strong>proyecto</strong></li>
+                                <li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> Una <strong>experiencia laboral</strong></li>
+                            </ul>
+                        `,
+                        confirmButtonColor: '#1e3a5f',
+                        confirmButtonText: 'Entendido'
+                    });
                 } else {
                     Swal.fire({ icon: 'error', title: 'Error', text: res.message ?? 'No se pudo cambiar la visibilidad.', confirmButtonColor: '#1e3a5f' });
                 }
