@@ -20,16 +20,7 @@ Route::post('/register', [UsuarioWebController::class, 'store'])->name('register
 Route::post('/logout', [UsuarioWebController::class, 'logout'])->name('logout');
 Route::get('/dashboard', [UsuarioWebController::class, 'dashboard'])->name('dashboard');
 
-// =========================
-// USUARIOS CRUD
-// =========================
-Route::get('/usuarios', [UsuarioWebController::class, 'index'])->name('usuarios.index');
-Route::get('/usuarios/create', [UsuarioWebController::class, 'create'])->name('usuarios.create');
-Route::post('/usuarios', [UsuarioWebController::class, 'store'])->name('usuarios.store');
-Route::get('/usuarios/{id}', [UsuarioWebController::class, 'show'])->name('usuarios.show');
-Route::get('/usuarios/{id}/edit', [UsuarioWebController::class, 'edit'])->name('usuarios.edit');
-Route::put('/usuarios/{id}', [UsuarioWebController::class, 'update'])->name('usuarios.update');
-Route::delete('/usuarios/{id}', [UsuarioWebController::class, 'destroy'])->name('usuarios.destroy');
+
 
 // =========================
 // PROYECTOS CRUD
@@ -90,3 +81,71 @@ Route::put('/habilidades/{id}', [HabilidadController::class, 'update'])
 Route::delete('/habilidades/{id}', [HabilidadController::class, 'destroy'])
     ->name('habilidades.destroy');
 
+
+// ============================================================
+// PANEL DE ADMINISTRADOR (todas las funcionalidades)
+// ============================================================
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\UsuarioAdminController;
+use App\Http\Controllers\Admin\CategoriaAdminController;
+use App\Http\Controllers\Admin\TecnologiaAdminController;
+use App\Http\Controllers\Admin\HabilidadAdminController;
+use App\Http\Controllers\Admin\ProyectoAdminController;
+use App\Http\Controllers\Admin\ModeracionController;
+
+Route::prefix('admin')->middleware(['admin'])->group(function () {
+    
+    // Dashboard principal
+    Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
+    
+    // ========================================
+    // 1. GESTIÓN DE USUARIOS
+    // ========================================
+    Route::get('/usuarios', [UsuarioAdminController::class, 'index'])->name('admin.usuarios');
+    Route::get('/usuarios/crear', [UsuarioAdminController::class, 'create'])->name('admin.usuarios.create');
+    Route::post('/usuarios', [UsuarioAdminController::class, 'store'])->name('admin.usuarios.store');
+    Route::get('/usuarios/{id}', [UsuarioAdminController::class, 'show'])->name('admin.usuarios.show');
+    Route::get('/usuarios/{id}/editar', [UsuarioAdminController::class, 'edit'])->name('admin.usuarios.edit');
+    Route::put('/usuarios/{id}', [UsuarioAdminController::class, 'update'])->name('admin.usuarios.update');
+    Route::delete('/usuarios/{id}', [UsuarioAdminController::class, 'destroy'])->name('admin.usuarios.destroy');
+    Route::post('/usuarios/{id}/toggle-estado', [UsuarioAdminController::class, 'toggleEstado'])->name('admin.usuarios.toggle-estado');
+    Route::post('/usuarios/{id}/toggle-rol', [UsuarioAdminController::class, 'toggleRol'])->name('admin.usuarios.toggle-rol');
+    
+    // ========================================
+    // 2. GESTIÓN DE CATEGORÍAS
+    // ========================================
+    Route::get('/categorias', [CategoriaAdminController::class, 'index'])->name('admin.categorias');
+    Route::post('/categorias', [CategoriaAdminController::class, 'store'])->name('admin.categorias.store');
+    Route::put('/categorias/{id}', [CategoriaAdminController::class, 'update'])->name('admin.categorias.update');
+    Route::delete('/categorias/{id}', [CategoriaAdminController::class, 'destroy'])->name('admin.categorias.destroy');
+    
+    // ========================================
+    // 3. GESTIÓN DE TECNOLOGÍAS
+    // ========================================
+    Route::get('/tecnologias', [TecnologiaAdminController::class, 'index'])->name('admin.tecnologias');
+    Route::post('/tecnologias', [TecnologiaAdminController::class, 'store'])->name('admin.tecnologias.store');
+    Route::put('/tecnologias/{id}', [TecnologiaAdminController::class, 'update'])->name('admin.tecnologias.update');
+    Route::delete('/tecnologias/{id}', [TecnologiaAdminController::class, 'destroy'])->name('admin.tecnologias.destroy');
+    
+    // ========================================
+    // 4. MODERACIÓN DE PERFILES
+    // ========================================
+    Route::get('/moderacion/perfiles', [ModeracionController::class, 'perfiles'])->name('admin.perfiles');
+    Route::get('/moderacion/perfiles/{id}', [ModeracionController::class, 'verPerfil'])->name('admin.moderacion.ver-perfil');
+    Route::post('/moderacion/perfiles/{id}/toggle-visibilidad', [ModeracionController::class, 'toggleVisibilidad'])->name('admin.moderacion.toggle-visibilidad');
+    Route::post('/moderacion/perfiles/{id}/nota', [ModeracionController::class, 'agregarNota'])->name('admin.moderacion.agregar-nota');
+
+
+    // Gestión de Habilidades (Catálogo global)
+    Route::get('/habilidades', [HabilidadAdminController::class, 'index'])->name('admin.habilidades');
+    Route::post('/habilidades/{id}/toggle', [HabilidadAdminController::class, 'toggleEstado'])->name('admin.habilidades.toggle');
+    Route::post('/habilidades/fusionar', [HabilidadAdminController::class, 'fusionar'])->name('admin.habilidades.fusionar');
+    Route::delete('/habilidades/{id}', [HabilidadAdminController::class, 'destroy'])->name('admin.habilidades.destroy');
+
+    // Gestión de Proyectos
+Route::get('/proyectos', [ProyectoAdminController::class, 'index'])->name('admin.proyectos');
+Route::get('/proyectos/{id}', [ProyectoAdminController::class, 'show'])->name('admin.proyectos.show');
+Route::post('/proyectos/{id}/toggle-visibilidad', [ProyectoAdminController::class, 'toggleVisibilidad'])->name('admin.proyectos.toggle-visibilidad');
+Route::post('/proyectos/{id}/toggle-destacado', [ProyectoAdminController::class, 'toggleDestacado'])->name('admin.proyectos.toggle-destacado');
+Route::delete('/proyectos/{id}', [ProyectoAdminController::class, 'destroy'])->name('admin.proyectos.destroy');
+});

@@ -25,6 +25,14 @@ class Perfil extends Model
     {
         return $this->hasMany(ExperienciaLaboral::class, 'id_perfil');
     }
+    public function habilidades()
+    {
+        return $this->hasMany(Habilidad::class, 'id_perfil');
+    }
+    public function proyectos()
+    {
+        return $this->hasMany(Proyecto::class, 'id_perfil');
+    }
 
     public function formacionAcademica()
     {

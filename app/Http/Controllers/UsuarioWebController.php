@@ -102,7 +102,6 @@ class UsuarioWebController extends Controller
                     'message' => 'El correo o la contraseña no son correctos.'
                 ], 422);
             }
-
             return redirect('/')->with('error_login', 'El correo o la contraseña no son correctos.');
         }
 
@@ -112,16 +111,18 @@ class UsuarioWebController extends Controller
             'usuario_email' => $usuario->correo_electronico
         ]);
 
+        //Redirigir según el rol
+        $redirectRoute = $usuario->is_admin ? route('admin.dashboard') : route('dashboard');
+
         if ($request->expectsJson()) {
             return response()->json([
                 'ok' => true,
-                'redirect' => route('dashboard')
+                'redirect' => $redirectRoute
             ]);
         }
 
-        return redirect()->route('dashboard');
+        return redirect($redirectRoute);
     }
-
     // =========================
     // DASHBOARD (NUEVO)
     // =========================
@@ -132,13 +133,17 @@ class UsuarioWebController extends Controller
         }
 
         $usuario = Usuario::with('perfil')->find(session('usuario_id'));
+        
+        
+        if ($usuario && $usuario->is_admin) {
+            return redirect()->route('admin.dashboard');
+        }
+        
         $categorias = Categoria::all();
-
-        // 🔥 TRAER habilidades del usuario con su categoría
         $habilidades = Habilidad::with('categoria')  
             ->where('id_perfil', $usuario->perfil->id_perfil)
             ->get();
- 
+    
         return view('dashboard', compact('usuario', 'categorias', 'habilidades'));
     }
 
@@ -161,12 +166,12 @@ class UsuarioWebController extends Controller
     public function index()
     {
         $usuarios = Usuario::with('perfil')->get();
-        return view('usuarios.index', compact('usuarios'));
+        return view('admin.usuarios.index', compact('usuarios'));
     }
 
     public function create()
     {
-        return view('usuarios.create');
+        return view('admin.usuarios.create');
     }
 
     public function show($id)
@@ -185,13 +190,13 @@ class UsuarioWebController extends Controller
             $experiencias = ExperienciaLaboral::where('id_perfil', $usuario->perfil->id_perfil)->get();
         }
 
-        return view('usuarios.show', compact('usuario', 'perfilLinks', 'experiencias'));
+        return view('admin.usuarios.show', compact('usuario', 'perfilLinks', 'experiencias'));
     }
 
     public function edit($id)
     {
         $usuario = Usuario::findOrFail($id);
-        return view('usuarios.edit', compact('usuario'));
+        return view('admin.usuarios.edit', compact('usuario'));
     }
 
     public function update(Request $request, $id)
