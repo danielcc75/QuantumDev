@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Traits\LogsActivity;
 use App\Models\Usuario;
 use App\Models\Perfil;
 use Illuminate\Http\Request;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Hash;
 
 class UsuarioAdminController extends Controller
 {
+    use LogsActivity; 
+
     // Listado de usuarios
     public function index(Request $request)
     {
@@ -71,10 +74,17 @@ class UsuarioAdminController extends Controller
         // Crear perfil automáticamente
         Perfil::create(['id_usuario' => $usuario->id_usuario]);
         
+        // Registrar en bitácora
+        $this->logAdminAction(
+            'crear_usuario',
+            "Usuario creado: {$usuario->nombre} {$usuario->apellido} | Email: {$usuario->correo_electronico}"
+        );
+        
         return redirect()->route('admin.usuarios')
             ->with('success', 'Usuario creado correctamente');
     }
     
+    // Ver detalle de usuario
     public function show($id)
     {
         $usuario = Usuario::with([
@@ -108,6 +118,8 @@ class UsuarioAdminController extends Controller
             'is_admin' => 'boolean'
         ]);
         
+        $datosAntiguos = "Nombre: {$usuario->nombre} {$usuario->apellido} | Rol: " . ($usuario->is_admin ? 'admin' : 'usuario');
+        
         $usuario->nombre = $request->nombre;
         $usuario->apellido = $request->apellido;
         $usuario->correo_electronico = $request->correo_electronico;
@@ -120,12 +132,20 @@ class UsuarioAdminController extends Controller
         
         $usuario->save();
         
+        $datosNuevos = "Nombre: {$usuario->nombre} {$usuario->apellido} | Rol: " . ($usuario->is_admin ? 'admin' : 'usuario');
+        
+        // Registrar en bitácora
+        $this->logAdminAction(
+            'editar_usuario',
+            "Usuario ID {$usuario->id_usuario} | Antes: {$datosAntiguos} | Después: {$datosNuevos}"
+        );
+        
         return redirect()->route('admin.usuarios')
             ->with('success', 'Usuario actualizado correctamente');
     }
     
     // Cambiar estado (activar/suspender)
-    public function toggleEstado($id)
+    public function toggleEstado(Request $request, $id)
     {
         $usuario = Usuario::findOrFail($id);
         
@@ -134,13 +154,32 @@ class UsuarioAdminController extends Controller
             return back()->with('error', 'No puedes cambiar tu propio estado');
         }
         
-        $usuario->estado = $usuario->estado == 'activo' ? 'suspendido' : 'activo';
+        $estadoAnterior = $usuario->estado;
+        
+        if ($usuario->estado == 'activo') {
+            // Motivo opcional (ya no es requerido)
+            $motivo = $request->motivo ?? 'Sin motivo especificado';
+            $usuario->estado = 'suspendido';
+            $usuario->motivo_suspension = $motivo;
+            $mensaje = "Usuario suspendido correctamente";
+        } else {
+            $usuario->estado = 'activo';
+            $usuario->motivo_suspension = null;
+            $mensaje = "Usuario activado correctamente";
+        }
+        
         $usuario->save();
         
-        $mensaje = $usuario->estado == 'activo' ? 'activado' : 'suspendido';
-        return back()->with('success', "Usuario {$mensaje} correctamente");
+        // Registrar en bitácora
+        $this->logAdminAction(
+            'cambio_estado_usuario',
+            "Usuario ID {$usuario->id_usuario} ({$usuario->nombre} {$usuario->apellido}) | Estado: {$estadoAnterior} → {$usuario->estado}" . 
+            ($usuario->estado == 'suspendido' ? " | Motivo: {$usuario->motivo_suspension}" : '')
+        );
+        
+        return back()->with('success', $mensaje);
     }
-    
+        
     // Cambiar rol (usuario ↔ admin)
     public function toggleRol($id)
     {
@@ -151,15 +190,22 @@ class UsuarioAdminController extends Controller
             return back()->with('error', 'No puedes cambiar tu propio rol');
         }
         
+        $rolAnterior = $usuario->is_admin ? 'administrador' : 'usuario';
         $usuario->is_admin = !$usuario->is_admin;
         $usuario->save();
+        $rolNuevo = $usuario->is_admin ? 'administrador' : 'usuario';
         
-        $rol = $usuario->is_admin ? 'administrador' : 'usuario';
-        return back()->with('success', "Rol cambiado a {$rol}");
+        // Registrar en bitácora
+        $this->logAdminAction(
+            'cambio_rol_usuario',
+            "Usuario ID {$usuario->id_usuario} ({$usuario->nombre} {$usuario->apellido}) | Rol: {$rolAnterior} → {$rolNuevo}"
+        );
+        
+        return back()->with('success', "Rol cambiado a {$rolNuevo}");
     }
     
-    // Eliminar usuario
-    public function destroy($id)
+    // Eliminar usuario (soft delete)
+    public function destroy(Request $request, $id)
     {
         $usuario = Usuario::findOrFail($id);
         
@@ -168,9 +214,18 @@ class UsuarioAdminController extends Controller
             return back()->with('error', 'No puedes eliminar tu propia cuenta');
         }
         
-        $usuario->delete();
+        // Guardar quién eliminó y por qué
+        $usuario->deleted_by = session('usuario_id');
+        $usuario->delete_reason = $request->delete_reason ?? 'Eliminado por administrador';
+        $usuario->delete();  // Soft delete
         
-        return redirect()->route('admin.usuarios')
-            ->with('success', 'Usuario eliminado correctamente');
+        // Registrar en bitácora
+        $this->logAdminAction(
+            'eliminar_usuario',
+            "Usuario ID {$usuario->id_usuario} ({$usuario->nombre} {$usuario->apellido}) | Motivo: {$usuario->delete_reason}"
+        );
+        
+        return redirect()->route('admin.usuarios')->with('success', 'Usuario movido a la papelera');
     }
+
 }

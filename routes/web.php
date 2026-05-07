@@ -92,6 +92,9 @@ use App\Http\Controllers\Admin\TecnologiaAdminController;
 use App\Http\Controllers\Admin\HabilidadAdminController;
 use App\Http\Controllers\Admin\ProyectoAdminController;
 use App\Http\Controllers\Admin\ModeracionController;
+use App\Http\Controllers\Admin\LogsController;
+use App\Http\Controllers\Admin\BackupController;
+use App\Http\Controllers\Admin\PapeleraController;
 
 Route::prefix('admin')->middleware(['admin'])->group(function () {
     
@@ -143,9 +146,37 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::delete('/habilidades/{id}', [HabilidadAdminController::class, 'destroy'])->name('admin.habilidades.destroy');
 
     // Gestión de Proyectos
-Route::get('/proyectos', [ProyectoAdminController::class, 'index'])->name('admin.proyectos');
-Route::get('/proyectos/{id}', [ProyectoAdminController::class, 'show'])->name('admin.proyectos.show');
-Route::post('/proyectos/{id}/toggle-visibilidad', [ProyectoAdminController::class, 'toggleVisibilidad'])->name('admin.proyectos.toggle-visibilidad');
-Route::post('/proyectos/{id}/toggle-destacado', [ProyectoAdminController::class, 'toggleDestacado'])->name('admin.proyectos.toggle-destacado');
-Route::delete('/proyectos/{id}', [ProyectoAdminController::class, 'destroy'])->name('admin.proyectos.destroy');
+    Route::get('/proyectos', [ProyectoAdminController::class, 'index'])->name('admin.proyectos');
+    Route::get('/proyectos/{id}', [ProyectoAdminController::class, 'show'])->name('admin.proyectos.show');
+    Route::post('/proyectos/{id}/toggle-visibilidad', [ProyectoAdminController::class, 'toggleVisibilidad'])->name('admin.proyectos.toggle-visibilidad');
+    Route::post('/proyectos/{id}/toggle-destacado', [ProyectoAdminController::class, 'toggleDestacado'])->name('admin.proyectos.toggle-destacado');
+    Route::delete('/proyectos/{id}', [ProyectoAdminController::class, 'destroy'])->name('admin.proyectos.destroy');
+
+
+    // Bitacoras
+    Route::get('/logs', [LogsController::class, 'index'])->name('admin.logs');
+    Route::get('/logs/export', [LogsController::class, 'export'])->name('admin.logs.export');
+
+    // Backups
+    Route::get('/backup', [BackupController::class, 'index'])->name('admin.backup');
+    Route::post('/backup/create', [BackupController::class, 'create'])->name('admin.backup.create');
+    Route::get('/backup/download/{filename}', [BackupController::class, 'download'])->name('admin.backup.download');
+    Route::delete('/backup/{filename}', [BackupController::class, 'destroy'])->name('admin.backup.destroy');
+
+    // Papelera
+    Route::prefix('papelera')->group(function () {
+    Route::get('/', [PapeleraController::class, 'index'])->name('admin.papelera');
+    
+    // Usuarios
+    Route::post('/usuario/{id}/restaurar', [PapeleraController::class, 'restaurarUsuario'])->name('admin.papelera.restaurar.usuario');
+    Route::delete('/usuario/{id}/eliminar', [PapeleraController::class, 'eliminarUsuarioPermanente'])->name('admin.papelera.eliminar.usuario');
+    
+    // Proyectos
+    Route::post('/proyecto/{id}/restaurar', [PapeleraController::class, 'restaurarProyecto'])->name('admin.papelera.restaurar.proyecto');
+    Route::delete('/proyecto/{id}/eliminar', [PapeleraController::class, 'eliminarProyectoPermanente'])->name('admin.papelera.eliminar.proyecto');
+    
+    // Vaciar
+    Route::delete('/vaciar', [PapeleraController::class, 'vaciarPapelera'])->name('admin.papelera.vaciar');
+    Route::delete('/perfil/eliminar-cuenta', [UsuarioWebController::class, 'eliminarCuenta'])->name('perfil.eliminar-cuenta');
+    });
 });

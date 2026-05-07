@@ -15,10 +15,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
+use App\Traits\LogsActivity;
 
 
 class UsuarioWebController extends Controller
 {
+    use LogsActivity;
+    
     // =========================
     // REGISTER (MODIFICADO)
     // =========================
@@ -97,6 +100,10 @@ class UsuarioWebController extends Controller
 
         if (!$usuario || !Hash::check($request->contrasenia, $usuario->contrasenia)) {
             if ($request->expectsJson()) {
+                $this->logSecurity(
+                    'login_fallido',
+                    "Intento de login fallido con email: {$request->correo_electronico}"
+                );
                 return response()->json([
                     'ok' => false,
                     'message' => 'El correo o la contraseña no son correctos.'
@@ -233,7 +240,27 @@ class UsuarioWebController extends Controller
         return redirect()->route('usuarios.index')
             ->with('success', 'Usuario eliminado exitosamente');
     }
-
+    // Eliminar la propia cuenta del usuario
+    public function eliminarCuenta(Request $request)
+    {
+        $usuario = Usuario::find(session('usuario_id'));
+        
+        if (!$usuario) {
+            return redirect('/')->with('error', 'Usuario no encontrado');
+        }
+        
+        // Guardar quién eliminó (él mismo) y por qué
+        $usuario->deleted_by = $usuario->id_usuario;
+        $usuario->delete_reason = $request->motivo ?? 'El usuario eliminó su propia cuenta';
+        $usuario->delete();  // Soft delete
+        
+        // Cerrar sesión
+        $request->session()->forget(['usuario_id', 'usuario_nombre', 'usuario_email']);
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        
+        return redirect('/')->with('success', 'Tu cuenta ha sido eliminada. Puedes restaurarla contactando al administrador.');
+    }
     // PERFIL
     public function verPerfil()
     {

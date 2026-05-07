@@ -94,23 +94,22 @@
                                 <i class="fas fa-edit"></i>
                             </a>
                             
-                            <!-- Suspender/Activar (cambiar estado) -->
                             @if($usuario->estado == 'activo')
                                 <form action="{{ route('admin.usuarios.toggle-estado', $usuario->id_usuario) }}" method="POST" class="inline">
                                     @csrf
-                                    <button type="submit" class="text-orange-600 hover:text-orange-900 bg-orange-100 hover:bg-orange-200 p-2 rounded-lg transition" title="Suspender usuario">
+                                    <button type="submit" class="text-orange-600 bg-orange-100 p-2 rounded-lg hover:bg-orange-200" title="Suspender usuario">
                                         <i class="fas fa-ban"></i>
                                     </button>
+                                    <input type="hidden" name="motivo" value="Sin motivo especificado">
                                 </form>
                             @else
                                 <form action="{{ route('admin.usuarios.toggle-estado', $usuario->id_usuario) }}" method="POST" class="inline">
                                     @csrf
-                                    <button type="submit" class="text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200 p-2 rounded-lg transition" title="Activar usuario">
+                                    <button type="submit" class="text-green-600 bg-green-100 p-2 rounded-lg hover:bg-green-200" title="Activar usuario">
                                         <i class="fas fa-check-circle"></i>
                                     </button>
                                 </form>
                             @endif
-                            
                             <!-- Cambiar rol (Admin/Usuario) -->
                             @if($usuario->id_usuario != session('usuario_id'))
                                 <form action="{{ route('admin.usuarios.toggle-rol', $usuario->id_usuario) }}" method="POST" class="inline">

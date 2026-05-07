@@ -187,6 +187,19 @@
                         <i class="fas fa-id-card w-5 h-5 mr-3 {{ request()->routeIs('admin.perfiles*') ? 'text-white' : 'text-gray-500' }}"></i>
                         <span class="font-medium">Moderar portafolios</span>
                     </a>
+                    <a href="{{ route('admin.backup') }}" class="flex items-center px-6 py-3 text-gray-700 transition-all sidebar-item {{ request()->routeIs('admin.backup*') ? 'bg-[#1e3a5f] text-white' : '' }}">
+                        <i class="fas fa-database w-5 h-5 mr-3 {{ request()->routeIs('admin.backup*') ? 'text-white' : 'text-gray-500' }}"></i>
+                        <span class="font-medium">Respaldos</span>
+                    </a>
+
+                    <a href="{{ route('admin.logs') }}" class="flex items-center px-6 py-3 text-gray-700 transition-all sidebar-item {{ request()->routeIs('admin.logs*') ? 'bg-[#1e3a5f] text-white' : '' }}">
+                        <i class="fas fa-history w-5 h-5 mr-3 {{ request()->routeIs('admin.logs*') ? 'text-white' : 'text-gray-500' }}"></i>
+                        <span class="font-medium">Bitácora</span>
+                    </a>
+                    <a href="{{ route('admin.papelera') }}" class="flex items-center px-6 py-3 text-gray-700 transition-all sidebar-item {{ request()->routeIs('admin.papelera*') ? 'bg-[#1e3a5f] text-white' : '' }}">
+                        <i class="fas fa-trash-alt w-5 h-5 mr-3 {{ request()->routeIs('admin.papelera*') ? 'text-white' : 'text-gray-500' }}"></i>
+                        <span class="font-medium">Papelera</span>
+                    </a>
 
                     <hr class="my-4 mx-4 border-gray-200">
 
