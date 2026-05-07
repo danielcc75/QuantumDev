@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Habilidad;
+use App\Models\HabilidadBlanda;
 use App\Models\Categoria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -26,7 +27,7 @@ class HabilidadAdminController extends Controller
         }
         
         $habilidades = $query->orderBy('nombre')->paginate(20);
-        $categorias = Categoria::all();
+        $categorias = Categoria::withCount('habilidades')->orderBy('nombre')->get();
         
         // Habilidad más popular - versión corregida
         $habilidadPopular = Habilidad::select('nombre')
@@ -42,7 +43,9 @@ class HabilidadAdminController extends Controller
             ->havingRaw('count(*) > 1')
             ->get();
         
-        return view('admin.habilidades.index', compact('habilidades', 'categorias', 'habilidadPopular', 'habilidadesDuplicadas'));
+        $habilidadesBlandas = HabilidadBlanda::orderBy('nombre')->get();
+
+        return view('admin.habilidades.index', compact('habilidades', 'categorias', 'habilidadPopular', 'habilidadesDuplicadas', 'habilidadesBlandas'));
     }
         
     // Desactivar/Activar habilidad globalmente

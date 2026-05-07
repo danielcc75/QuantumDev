@@ -169,7 +169,7 @@
                     </a>
                     <a href="{{ route('admin.habilidades') }}" class="flex items-center px-6 py-3 text-gray-700 transition-all sidebar-item {{ request()->routeIs('admin.habilidades*') ? 'bg-[#1e3a5f] text-white' : '' }}">
                         <i class="fas fa-code w-5 h-5 mr-3 {{ request()->routeIs('admin.habilidades*') ? 'text-white' : 'text-gray-500' }}"></i>
-                        <span class="font-medium">Habilidades Globales</span>
+                        <span class="font-medium">Habilidades</span>
                     </a>
                     <a href="{{ route('admin.categorias') }}" class="flex items-center px-6 py-3 text-gray-700 transition-all sidebar-item {{ request()->routeIs('admin.categorias*') ? 'bg-[#1e3a5f] text-white' : '' }}">
                         <i class="fas fa-tags w-5 h-5 mr-3 {{ request()->routeIs('admin.categorias*') ? 'text-white' : 'text-gray-500' }}"></i>

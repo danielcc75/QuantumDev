@@ -23,23 +23,23 @@ class CategoriaAdminController extends Controller
         Categoria::create([
             'nombre' => $request->nombre
         ]);
-        
-        return redirect()->route('admin.categorias')->with('success', 'Categoría creada correctamente');
+
+        return back()->with('success', 'Categoría creada correctamente');
     }
-    
+
     public function update(Request $request, $id)
     {
         $categoria = Categoria::findOrFail($id);
-        
+
         $request->validate([
             'nombre' => 'required|string|max:100|unique:categoria,nombre,' . $id . ',id_categoria',
         ]);
-        
+
         $categoria->update([
             'nombre' => $request->nombre
         ]);
-        
-        return redirect()->route('admin.categorias')->with('success', 'Categoría actualizada correctamente');
+
+        return back()->with('success', 'Categoría actualizada correctamente');
     }
     
     public function destroy($id)

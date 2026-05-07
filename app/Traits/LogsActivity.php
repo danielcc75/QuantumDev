@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\AdminLog;
+use App\Models\SystemLog;
 
 trait LogsActivity
 {
@@ -13,6 +14,15 @@ trait LogsActivity
             'accion' => $accion,
             'detalles' => $detalles,
             'ip_address' => request()->ip()
+        ]);
+    }
+
+    protected function logSecurity($accion, $detalles = null)
+    {
+        SystemLog::registrar([
+            'tipo' => 'seguridad',
+            'accion' => $accion,
+            'detalles' => $detalles,
         ]);
     }
 }

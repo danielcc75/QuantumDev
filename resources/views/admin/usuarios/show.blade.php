@@ -12,7 +12,16 @@
     </div>
     
     <!-- Título con nombre del usuario -->
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">{{ $usuario->nombre }} {{ $usuario->apellido }}</h1>
+    <div class="flex items-center gap-4 mb-6">
+        @if($usuario->perfil && $usuario->perfil->foto_perfil)
+            <img src="{{ $usuario->perfil->foto_perfil }}" alt="Foto de {{ $usuario->nombre }}" class="h-16 w-16 rounded-full object-cover shadow-md">
+        @else
+            <div class="h-16 w-16 rounded-full bg-gradient-to-r from-[#1e3a5f] to-indigo-600 flex items-center justify-center shadow-md">
+                <span class="text-white text-xl font-bold">{{ substr($usuario->nombre, 0, 1) }}{{ substr($usuario->apellido, 0, 1) }}</span>
+            </div>
+        @endif
+        <h1 class="text-2xl font-bold text-gray-800">{{ $usuario->nombre }} {{ $usuario->apellido }}</h1>
+    </div>
     
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
