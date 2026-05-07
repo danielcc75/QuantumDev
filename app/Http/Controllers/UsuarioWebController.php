@@ -17,10 +17,13 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use App\Models\HabilidadBlanda;
 use App\Models\PerfilHabilidadBlanda;
+use App\Traits\LogsActivity;
 
 
 class UsuarioWebController extends Controller
 {
+    use LogsActivity;
+    
     // =========================
     // REGISTER (MODIFICADO)
     // =========================
@@ -99,12 +102,15 @@ class UsuarioWebController extends Controller
 
         if (!$usuario || !Hash::check($request->contrasenia, $usuario->contrasenia)) {
             if ($request->expectsJson()) {
+                $this->logSecurity(
+                    'login_fallido',
+                    "Intento de login fallido con email: {$request->correo_electronico}"
+                );
                 return response()->json([
                     'ok' => false,
                     'message' => 'El correo o la contraseña no son correctos.'
                 ], 422);
             }
-
             return redirect('/')->with('error_login', 'El correo o la contraseña no son correctos.');
         }
 
@@ -114,48 +120,55 @@ class UsuarioWebController extends Controller
             'usuario_email' => $usuario->correo_electronico
         ]);
 
+        //Redirigir según el rol
+        $redirectRoute = $usuario->is_admin ? route('admin.dashboard') : route('dashboard');
+
         if ($request->expectsJson()) {
             return response()->json([
                 'ok' => true,
-                'redirect' => route('dashboard')
+                'redirect' => $redirectRoute
             ]);
         }
 
-        return redirect()->route('dashboard');
+        return redirect($redirectRoute);
     }
-
     // =========================
     // DASHBOARD (NUEVO)
     // =========================
- public function dashboard()
-{
-    if (!session('usuario_id')) {
-        return redirect('/');
+    public function dashboard()
+    {
+        if (!session('usuario_id')) {
+            return redirect('/');
+        }
+
+        $usuario = Usuario::with('perfil')->find(session('usuario_id'));
+
+        if ($usuario && $usuario->is_admin) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        $categorias = Categoria::all();
+
+        $habilidades = Habilidad::with('categoria')
+            ->where('id_perfil', $usuario->perfil->id_perfil)
+            ->get();
+
+        $habilidadesBlandasActivas = HabilidadBlanda::where('estado', 'activo')
+            ->orderBy('nombre', 'asc')
+            ->get();
+
+        $habilidadesBlandasSeleccionadas = PerfilHabilidadBlanda::where('id_perfil', $usuario->perfil->id_perfil)
+            ->pluck('id_habilidad_blanda')
+            ->toArray();
+
+        return view('dashboard', compact(
+            'usuario',
+            'categorias',
+            'habilidades',
+            'habilidadesBlandasActivas',
+            'habilidadesBlandasSeleccionadas'
+        ));
     }
-
-    $usuario = Usuario::with('perfil')->find(session('usuario_id'));
-    $categorias = Categoria::all();
-
-    $habilidades = Habilidad::with('categoria')
-        ->where('id_perfil', $usuario->perfil->id_perfil)
-        ->get();
-
-    $habilidadesBlandasActivas = HabilidadBlanda::where('estado', 'activo')
-        ->orderBy('nombre', 'asc')
-        ->get();
-
-    $habilidadesBlandasSeleccionadas = PerfilHabilidadBlanda::where('id_perfil', $usuario->perfil->id_perfil)
-        ->pluck('id_habilidad_blanda')
-        ->toArray();
-
-    return view('dashboard', compact(
-        'usuario',
-        'categorias',
-        'habilidades',
-        'habilidadesBlandasActivas',
-        'habilidadesBlandasSeleccionadas'
-    ));
-}
 
     // =========================
     // LOGOUT (NUEVO)
@@ -176,12 +189,12 @@ class UsuarioWebController extends Controller
     public function index()
     {
         $usuarios = Usuario::with('perfil')->get();
-        return view('usuarios.index', compact('usuarios'));
+        return view('admin.usuarios.index', compact('usuarios'));
     }
 
     public function create()
     {
-        return view('usuarios.create');
+        return view('admin.usuarios.create');
     }
 
     public function show($id)
@@ -206,13 +219,13 @@ class UsuarioWebController extends Controller
             $experiencias = ExperienciaLaboral::where('id_perfil', $usuario->perfil->id_perfil)->get();
         }
 
-        return view('usuarios.show', compact('usuario', 'perfilLinks', 'experiencias'));
+        return view('admin.usuarios.show', compact('usuario', 'perfilLinks', 'experiencias'));
     }
 
     public function edit($id)
     {
         $usuario = Usuario::findOrFail($id);
-        return view('usuarios.edit', compact('usuario'));
+        return view('admin.usuarios.edit', compact('usuario'));
     }
 
     public function update(Request $request, $id)
@@ -249,7 +262,6 @@ class UsuarioWebController extends Controller
         return redirect()->route('usuarios.index')
             ->with('success', 'Usuario eliminado exitosamente');
     }
-
     // PERFIL
     public function verPerfil()
     {
@@ -568,6 +580,8 @@ class UsuarioWebController extends Controller
                     ->update(['id_experiencia' => null]);
             }
 
+            $usuario->deleted_by = $usuario->id_usuario;
+            $usuario->delete_reason = $request->motivo ?? 'El usuario eliminó su propia cuenta';
             $usuario->delete();
         } catch (\Exception $e) {
             return response()->json(['ok' => false, 'message' => 'No se pudo eliminar la cuenta: ' . $e->getMessage()], 500);

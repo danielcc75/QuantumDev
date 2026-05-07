@@ -86,7 +86,19 @@ class ProyectoController extends Controller
 
     public function destroy($id)
     {
-        Proyecto::destroy($id);
-        return response()->json(['success' => true]);
+        $proyecto = Proyecto::findOrFail($id);
+        
+        // Verificar que el proyecto pertenece al usuario
+        $perfil = Perfil::where('id_usuario', session('usuario_id'))->first();
+        
+        if (!$perfil || $proyecto->id_perfil != $perfil->id_perfil) {
+            return response()->json(['error' => 'No autorizado'], 403);
+        }
+        
+        $proyecto->deleted_by = session('usuario_id');
+        $proyecto->delete_reason = 'Eliminado por el usuario';
+        $proyecto->delete(); // Soft delete
+        
+        return response()->json(['success' => true, 'message' => 'Proyecto eliminado']);
     }
 }
