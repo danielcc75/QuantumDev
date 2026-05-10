@@ -284,19 +284,21 @@
 
                         $cargo = DB::table('experiencia_laboral')
                             ->where('id_perfil', $p->id_perfil)
+                            ->where('publicado', true)
                             ->orderByDesc('fecha_ini')
                             ->value('cargo') ?? 'Desarrollador';
 
                         $tags = DB::table('habilidades')
                             ->where('id_perfil', $p->id_perfil)
+                            ->where('publicado', true)
                             ->orderByDesc('id_habilidad')
                             ->limit(3)
                             ->pluck('nombre')
                             ->all();
-                        $totalHabs = DB::table('habilidades')->where('id_perfil', $p->id_perfil)->count();
+                        $totalHabs = DB::table('habilidades')->where('id_perfil', $p->id_perfil)->where('publicado', true)->count();
                         $extraTags = max(0, $totalHabs - count($tags));
 
-                        $exps  = DB::table('experiencia_laboral')->where('id_perfil', $p->id_perfil)->get();
+                        $exps  = DB::table('experiencia_laboral')->where('id_perfil', $p->id_perfil)->where('publicado', true)->get();
                         $meses = 0;
                         foreach ($exps as $e) {
                             $ini = \Carbon\Carbon::parse($e->fecha_ini);
@@ -307,7 +309,7 @@
                         $anioStr = $anios > 0 ? ($anios . ' año' . ($anios === 1 ? '' : 's'))
                                               : ($meses > 0 ? 'Menos de 1 año' : 'Sin experiencia registrada');
 
-                        $cntProy = DB::table('proyectos')->where('id_perfil', $p->id_perfil)->count();
+                        $cntProy = DB::table('proyectos')->where('id_perfil', $p->id_perfil)->where('visible', true)->count();
 
                         // Links sociales (tipo => url)
                         $linksRows = DB::table('perfil_links')->where('id_perfil', $p->id_perfil)->get();
@@ -318,6 +320,7 @@
                         $habGrupos = DB::table('habilidades as h')
                             ->leftJoin('categoria as c', 'h.id_categoria', '=', 'c.id_categoria')
                             ->where('h.id_perfil', $p->id_perfil)
+                            ->where('h.publicado', true)
                             ->select('h.nombre', 'c.nombre as categoria')
                             ->get()
                             ->groupBy(fn($r) => $r->categoria ?? 'Otras')
@@ -326,6 +329,7 @@
                         // Proyectos vinculados a experiencias (id_experiencia => [proyectos])
                         $proyectosPorExp = DB::table('proyectos')
                             ->where('id_perfil', $p->id_perfil)
+                            ->where('visible', true)
                             ->whereNotNull('id_experiencia')
                             ->get()
                             ->groupBy('id_experiencia');
@@ -333,6 +337,7 @@
                         // Experiencias (todas) con sus proyectos vinculados
                         $experiencias = DB::table('experiencia_laboral')
                             ->where('id_perfil', $p->id_perfil)
+                            ->where('publicado', true)
                             ->orderByDesc('fecha_ini')
                             ->get()
                             ->map(function ($e) use ($proyectosPorExp) {
@@ -374,12 +379,14 @@
                         $habBlandas = DB::table('perfil_habilidad_blanda as phb')
                             ->join('habilidades_blandas as hb', 'phb.id_habilidad_blanda', '=', 'hb.id_habilidad_blanda')
                             ->where('phb.id_perfil', $p->id_perfil)
+                            ->where('phb.publicado', true)
                             ->pluck('hb.nombre')
                             ->all();
 
                         // Formación académica
                         $formacion = DB::table('formacion_academica')
                             ->where('id_perfil', $p->id_perfil)
+                            ->where('publicado', true)
                             ->orderByDesc('fecha_ini')
                             ->get()
                             ->map(fn($f) => [

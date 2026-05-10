@@ -555,6 +555,199 @@ class UsuarioWebController extends Controller
         }
     }
 
+    // =========================
+    // PUBLICACIÓN DE PORTAFOLIO
+    // =========================
+    public function datosPortafolio()
+    {
+        if (!session('usuario_id')) {
+            return response()->json(['ok' => false, 'message' => 'No autenticado'], 401);
+        }
+
+        $perfil = Perfil::where('id_usuario', session('usuario_id'))->first();
+        if (!$perfil) {
+            return response()->json(['ok' => false, 'message' => 'Perfil no encontrado'], 404);
+        }
+
+        $tecnicas = DB::table('habilidades')
+            ->where('id_perfil', $perfil->id_perfil)
+            ->get(['id_habilidad', 'nombre', 'anios_experiencia', 'publicado'])
+            ->map(function ($h) {
+                return [
+                    'id'         => $h->id_habilidad,
+                    'nombre'     => $h->nombre,
+                    'nivel'      => $this->nivelDesdeAnios($h->anios_experiencia),
+                    'publicado'  => (bool) $h->publicado,
+                ];
+            });
+
+        $blandas = DB::table('perfil_habilidad_blanda as phb')
+            ->join('habilidades_blandas as hb', 'hb.id_habilidad_blanda', '=', 'phb.id_habilidad_blanda')
+            ->where('phb.id_perfil', $perfil->id_perfil)
+            ->get(['phb.id_perfil_habilidad_blanda', 'hb.nombre', 'phb.publicado'])
+            ->map(function ($b) {
+                return [
+                    'id'        => $b->id_perfil_habilidad_blanda,
+                    'nombre'    => $b->nombre,
+                    'publicado' => (bool) $b->publicado,
+                ];
+            });
+
+        $experiencia = DB::table('experiencia_laboral')
+            ->where('id_perfil', $perfil->id_perfil)
+            ->orderByDesc('fecha_ini')
+            ->get(['id_experiencia', 'empresa', 'cargo', 'fecha_ini', 'fecha_fin', 'trabajo_actual', 'publicado'])
+            ->map(function ($e) {
+                $ini = $e->fecha_ini ? \Carbon\Carbon::parse($e->fecha_ini)->format('M Y') : '';
+                $fin = $e->trabajo_actual ? 'Actualidad' : ($e->fecha_fin ? \Carbon\Carbon::parse($e->fecha_fin)->format('M Y') : '');
+                return [
+                    'id'        => $e->id_experiencia,
+                    'nombre'    => $e->cargo,
+                    'detalle'   => trim($e->empresa . ($ini ? ' · ' . $ini . ($fin ? ' - ' . $fin : '') : '')),
+                    'publicado' => (bool) $e->publicado,
+                ];
+            });
+
+        $educacion = DB::table('formacion_academica')
+            ->where('id_perfil', $perfil->id_perfil)
+            ->orderByDesc('fecha_ini')
+            ->get(['id_formacion', 'titulo', 'institucion', 'nivel', 'publicado'])
+            ->map(function ($f) {
+                return [
+                    'id'        => $f->id_formacion,
+                    'nombre'    => $f->titulo,
+                    'detalle'   => trim($f->institucion . ($f->nivel ? ' · ' . $f->nivel : '')),
+                    'publicado' => (bool) $f->publicado,
+                ];
+            });
+
+        $proyectos = DB::table('proyectos')
+            ->where('id_perfil', $perfil->id_perfil)
+            ->whereNull('deleted_at')
+            ->get(['id_proyecto', 'nombre', 'descripcion', 'visible'])
+            ->map(function ($p) {
+                return [
+                    'id'        => $p->id_proyecto,
+                    'nombre'    => $p->nombre,
+                    'detalle'   => \Illuminate\Support\Str::limit($p->descripcion ?? '', 80),
+                    'publicado' => (bool) $p->visible,
+                ];
+            });
+
+        return response()->json([
+            'ok'           => true,
+            'visibilidad'  => $perfil->visibilidad ?? 'privado',
+            'slug'         => 'mi-perfil',
+            'tecnicas'     => $tecnicas,
+            'blandas'      => $blandas,
+            'experiencia'  => $experiencia,
+            'educacion'    => $educacion,
+            'proyectos'    => $proyectos,
+        ]);
+    }
+
+    public function publicarPortafolio(Request $request)
+    {
+        if (!session('usuario_id')) {
+            return response()->json(['ok' => false, 'message' => 'No autenticado'], 401);
+        }
+
+        $request->validate([
+            'tecnicas'    => 'array',
+            'tecnicas.*'  => 'integer',
+            'blandas'     => 'array',
+            'blandas.*'   => 'integer',
+            'experiencia' => 'array',
+            'experiencia.*' => 'integer',
+            'educacion'   => 'array',
+            'educacion.*' => 'integer',
+            'proyectos'   => 'array',
+            'proyectos.*' => 'integer',
+        ]);
+
+        $perfil = Perfil::where('id_usuario', session('usuario_id'))->firstOrFail();
+
+        $tieneBiografia  = !empty($perfil->biografia);
+        $tieneProyecto   = DB::table('proyectos')->where('id_perfil', $perfil->id_perfil)->exists();
+        $tieneExperiencia = DB::table('experiencia_laboral')->where('id_perfil', $perfil->id_perfil)->exists();
+
+        if (!$tieneBiografia && !$tieneProyecto && !$tieneExperiencia) {
+            return response()->json([
+                'ok' => false,
+                'code' => 'perfil_incompleto',
+                'message' => 'Para publicar tu portafolio necesitas al menos una biografía, un proyecto o una experiencia laboral.',
+            ], 422);
+        }
+
+        try {
+            DB::transaction(function () use ($request, $perfil) {
+                $tecnicas    = $request->input('tecnicas', []);
+                $blandas     = $request->input('blandas', []);
+                $experiencia = $request->input('experiencia', []);
+                $educacion   = $request->input('educacion', []);
+                $proyectos   = $request->input('proyectos', []);
+
+                DB::table('habilidades')->where('id_perfil', $perfil->id_perfil)
+                    ->update(['publicado' => DB::raw('false')]);
+                if (!empty($tecnicas)) {
+                    DB::table('habilidades')->where('id_perfil', $perfil->id_perfil)
+                        ->whereIn('id_habilidad', $tecnicas)
+                        ->update(['publicado' => DB::raw('true')]);
+                }
+
+                DB::table('perfil_habilidad_blanda')->where('id_perfil', $perfil->id_perfil)
+                    ->update(['publicado' => DB::raw('false')]);
+                if (!empty($blandas)) {
+                    DB::table('perfil_habilidad_blanda')->where('id_perfil', $perfil->id_perfil)
+                        ->whereIn('id_perfil_habilidad_blanda', $blandas)
+                        ->update(['publicado' => DB::raw('true')]);
+                }
+
+                DB::table('experiencia_laboral')->where('id_perfil', $perfil->id_perfil)
+                    ->update(['publicado' => DB::raw('false')]);
+                if (!empty($experiencia)) {
+                    DB::table('experiencia_laboral')->where('id_perfil', $perfil->id_perfil)
+                        ->whereIn('id_experiencia', $experiencia)
+                        ->update(['publicado' => DB::raw('true')]);
+                }
+
+                DB::table('formacion_academica')->where('id_perfil', $perfil->id_perfil)
+                    ->update(['publicado' => DB::raw('false')]);
+                if (!empty($educacion)) {
+                    DB::table('formacion_academica')->where('id_perfil', $perfil->id_perfil)
+                        ->whereIn('id_formacion', $educacion)
+                        ->update(['publicado' => DB::raw('true')]);
+                }
+
+                DB::table('proyectos')->where('id_perfil', $perfil->id_perfil)
+                    ->whereNull('deleted_at')
+                    ->update(['visible' => DB::raw('false')]);
+                if (!empty($proyectos)) {
+                    DB::table('proyectos')->where('id_perfil', $perfil->id_perfil)
+                        ->whereNull('deleted_at')
+                        ->whereIn('id_proyecto', $proyectos)
+                        ->update(['visible' => DB::raw('true')]);
+                }
+
+                $perfil->visibilidad = 'publico';
+                $perfil->save();
+            });
+
+            return response()->json(['ok' => true, 'visibilidad' => 'publico']);
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'message' => 'No se pudo publicar: ' . $e->getMessage()], 500);
+        }
+    }
+
+    private function nivelDesdeAnios(?int $anios): string
+    {
+        $a = (int) $anios;
+        if ($a >= 8) return 'Experto';
+        if ($a >= 5) return 'Avanzado';
+        if ($a >= 3) return 'Intermedio';
+        return 'Básico';
+    }
+
     public function eliminarCuenta(Request $request)
     {
         if (!session('usuario_id')) {

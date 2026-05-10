@@ -108,6 +108,8 @@ Route::post('/habilidades-blandas/guardar', [UsuarioWebController::class, 'guard
 Route::put('/cuenta/datos',       [UsuarioWebController::class, 'actualizarDatosCuenta'])->name('cuenta.datos');
 Route::put('/cuenta/contrasenia', [UsuarioWebController::class, 'cambiarContrasenia'])->name('cuenta.contrasenia');
 Route::put('/cuenta/visibilidad', [UsuarioWebController::class, 'cambiarVisibilidad'])->name('cuenta.visibilidad');
+Route::get('/cuenta/portafolio/datos', [UsuarioWebController::class, 'datosPortafolio'])->name('cuenta.portafolio.datos');
+Route::put('/cuenta/portafolio/publicar', [UsuarioWebController::class, 'publicarPortafolio'])->name('cuenta.portafolio.publicar');
 Route::delete('/cuenta',          [UsuarioWebController::class, 'eliminarCuenta'])->name('cuenta.eliminar');
 
 // ============================================================

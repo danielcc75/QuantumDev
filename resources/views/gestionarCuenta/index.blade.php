@@ -201,22 +201,45 @@
         });
     };
 
+    // ── Aplicar UI público ─────────────────────────────────────────────────
+    window.aplicarVisibilidadPublica = function () {
+        const btn   = document.getElementById('btn-visibilidad');
+        const dot   = document.getElementById('toggle-dot');
+        const label = document.getElementById('label-visibilidad');
+        const desc  = document.getElementById('desc-visibilidad');
+        const badge = document.getElementById('badge-visibilidad');
+        btn.dataset.actual = 'publico';
+        btn.classList.replace('bg-gray-300', 'bg-[#1e3a5f]');
+        dot.classList.replace('translate-x-1', 'translate-x-8');
+        label.textContent = 'Perfil público';
+        desc.textContent  = 'Cualquier persona puede ver tu portafolio';
+        badge.className   = 'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-[#1e3a5f]/10 text-[#1e3a5f]';
+        badge.innerHTML   = '<i class="fas fa-globe text-[10px]"></i> Público';
+    };
+
     // ── Visibilidad ────────────────────────────────────────────────────────
     window.confirmarCambiarVisibilidad = function () {
         const btn    = document.getElementById('btn-visibilidad');
         const actual = btn.dataset.actual;
         const nueva  = actual === 'publico' ? 'privado' : 'publico';
 
+        // Activando público: abrir modal de selección
+        if (nueva === 'publico') {
+            if (typeof window.abrirModalPublicar === 'function') {
+                window.abrirModalPublicar();
+            }
+            return;
+        }
+
+        // Pasando a privado: confirmación rápida
         Swal.fire({
-            title: nueva === 'privado' ? '¿Hacer perfil privado?' : '¿Hacer perfil público?',
-            text: nueva === 'privado'
-                ? 'Solo tú podrás ver tu portafolio.'
-                : 'Cualquier persona podrá ver tu portafolio.',
+            title: '¿Hacer perfil privado?',
+            text: 'Solo tú podrás ver tu portafolio.',
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#1e3a5f',
             cancelButtonColor: '#6b7280',
-            confirmButtonText: nueva === 'privado' ? 'Sí, hacer privado' : 'Sí, hacer público',
+            confirmButtonText: 'Sí, hacer privado',
             cancelButtonText: 'Cancelar'
         }).then(result => {
             if (!result.isConfirmed) return;
@@ -224,49 +247,24 @@
             fetch('{{ route("cuenta.visibilidad") }}', {
                 method: 'PUT',
                 headers: { 'X-CSRF-TOKEN': csrf, 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({ visibilidad: nueva })
+                body: JSON.stringify({ visibilidad: 'privado' })
             })
             .then(r => r.json())
             .then(res => {
                 if (res.ok) {
-                    btn.dataset.actual = nueva;
                     const dot   = document.getElementById('toggle-dot');
                     const label = document.getElementById('label-visibilidad');
                     const desc  = document.getElementById('desc-visibilidad');
                     const badge = document.getElementById('badge-visibilidad');
+                    btn.dataset.actual = 'privado';
+                    btn.classList.replace('bg-[#1e3a5f]', 'bg-gray-300');
+                    dot.classList.replace('translate-x-8', 'translate-x-1');
+                    label.textContent = 'Perfil privado';
+                    desc.textContent  = 'Solo tú puedes ver tu portafolio';
+                    badge.className   = 'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 text-gray-500';
+                    badge.innerHTML   = '<i class="fas fa-lock text-[10px]"></i> Privado';
 
-                    if (nueva === 'publico') {
-                        btn.classList.replace('bg-gray-300', 'bg-[#1e3a5f]');
-                        dot.classList.replace('translate-x-1', 'translate-x-8');
-                        label.textContent = 'Perfil público';
-                        desc.textContent  = 'Cualquier persona puede ver tu portafolio';
-                        badge.className   = 'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-[#1e3a5f]/10 text-[#1e3a5f]';
-                        badge.innerHTML   = '<i class="fas fa-globe text-[10px]"></i> Público';
-                    } else {
-                        btn.classList.replace('bg-[#1e3a5f]', 'bg-gray-300');
-                        dot.classList.replace('translate-x-8', 'translate-x-1');
-                        label.textContent = 'Perfil privado';
-                        desc.textContent  = 'Solo tú puedes ver tu portafolio';
-                        badge.className   = 'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 text-gray-500';
-                        badge.innerHTML   = '<i class="fas fa-lock text-[10px]"></i> Privado';
-                    }
-
-                    Swal.fire({ icon: 'success', title: '¡Listo!', text: `Tu perfil ahora es ${nueva}.`, confirmButtonColor: '#1e3a5f', timer: 2000, showConfirmButton: false });
-                } else if (res.code === 'perfil_incompleto') {
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Tu perfil aún está vacío',
-                        html: `
-                            <p class="text-sm text-gray-600 mb-2">Para hacer tu perfil público, primero debes registrar al menos una de estas cosas:</p>
-                            <ul class="text-sm text-gray-600 text-left inline-block mt-1 space-y-1">
-                                <li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> Una <strong>biografía</strong></li>
-                                <li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> Un <strong>proyecto</strong></li>
-                                <li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> Una <strong>experiencia laboral</strong></li>
-                            </ul>
-                        `,
-                        confirmButtonColor: '#1e3a5f',
-                        confirmButtonText: 'Entendido'
-                    });
+                    Swal.fire({ icon: 'success', title: '¡Listo!', text: 'Tu perfil ahora es privado.', confirmButtonColor: '#1e3a5f', timer: 2000, showConfirmButton: false });
                 } else {
                     Swal.fire({ icon: 'error', title: 'Error', text: res.message ?? 'No se pudo cambiar la visibilidad.', confirmButtonColor: '#1e3a5f' });
                 }
@@ -326,3 +324,5 @@
     };
 })();
 </script>
+
+@include('gestionarCuenta._modal_publicar')
