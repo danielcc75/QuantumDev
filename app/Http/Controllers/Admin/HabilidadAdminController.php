@@ -96,20 +96,12 @@ class HabilidadAdminController extends Controller
         return back()->with('success', "Habilidades fusionadas exitosamente en '{$request->nombre_fusion}'");
     }
     
-    // Eliminar habilidad (solo si no está en uso)
+    // Eliminar habilidad
     public function destroy($id)
     {
         $habilidad = Habilidad::findOrFail($id);
-        
-        // Verificar si está en uso por algún perfil
-        $enUso = DB::table('perfil_habilidad')->where('id_habilidad', $id)->exists();
-        
-        if ($enUso) {
-            return back()->with('error', 'No se puede eliminar: hay perfiles usando esta habilidad');
-        }
-        
         $habilidad->delete();
-        
+
         return back()->with('success', 'Habilidad eliminada correctamente');
     }
 }
