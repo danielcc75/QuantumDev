@@ -24,11 +24,16 @@
                     <h3 class="font-bold text-gray-800 mb-2">Descripción</h3>
                     <p class="text-gray-600">{{ $proyecto->descripcion ?: 'Sin descripción' }}</p>
                     
-                    @if($proyecto->tecnologias->count() > 0)
+                    @php
+                        $tags = $proyecto->tecnologias
+                            ? array_filter(array_map('trim', explode(',', $proyecto->tecnologias)))
+                            : [];
+                    @endphp
+                    @if(count($tags) > 0)
                     <h3 class="font-bold text-gray-800 mt-4 mb-2">Tecnologías</h3>
                     <div class="flex flex-wrap gap-2">
-                        @foreach($proyecto->tecnologias as $tec)
-                            <span class="px-2 py-1 bg-gray-100 rounded-full text-xs">{{ $tec->nombre }}</span>
+                        @foreach($tags as $tec)
+                            <span class="px-2 py-1 bg-gray-100 rounded-full text-xs">{{ $tec }}</span>
                         @endforeach
                     </div>
                     @endif

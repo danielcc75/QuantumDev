@@ -13,7 +13,7 @@ class ProyectoAdminController extends Controller
     // Listar todos los proyectos del sistema
     public function index(Request $request)
     {
-        $query = Proyecto::with('perfil.usuario', 'tecnologias');
+        $query = Proyecto::with('perfil.usuario');
         
         // Búsqueda por nombre o descripción
         if ($request->search) {
@@ -62,7 +62,7 @@ class ProyectoAdminController extends Controller
     // Ver detalle de un proyecto
     public function show($id)
     {
-        $proyecto = Proyecto::with('perfil.usuario', 'tecnologias', 'experienciaLaboral')->findOrFail($id);
+        $proyecto = Proyecto::with('perfil.usuario', 'experienciaLaboral')->findOrFail($id);
         return view('admin.proyectos.show', compact('proyecto'));
     }
     
