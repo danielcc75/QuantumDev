@@ -18,6 +18,15 @@
     @if(session('error'))
         <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-lg">{{ session('error') }}</div>
     @endif
+    @if($errors->any())
+        <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-lg">
+            <ul class="list-disc list-inside">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <!-- Tabs -->
     <div class="bg-white rounded-xl shadow-md">
@@ -302,22 +311,27 @@
 </div>
 
 <script>
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const target = btn.dataset.tab;
-
-            document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.remove('border-[#1e3a5f]', 'text-[#1e3a5f]');
-                b.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700');
-            });
-            btn.classList.add('border-[#1e3a5f]', 'text-[#1e3a5f]');
-            btn.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700');
-
-            document.querySelectorAll('[data-tab-panel]').forEach(p => {
-                p.classList.toggle('hidden', p.dataset.tabPanel !== target);
-            });
+    function activarTab(target) {
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            const activo = b.dataset.tab === target;
+            b.classList.toggle('border-[#1e3a5f]', activo);
+            b.classList.toggle('text-[#1e3a5f]', activo);
+            b.classList.toggle('border-transparent', !activo);
+            b.classList.toggle('text-gray-500', !activo);
+            b.classList.toggle('hover:text-gray-700', !activo);
         });
+        document.querySelectorAll('[data-tab-panel]').forEach(p => {
+            p.classList.toggle('hidden', p.dataset.tabPanel !== target);
+        });
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => activarTab(btn.dataset.tab));
     });
+
+    @if(session('active_tab'))
+        activarTab(@json(session('active_tab')));
+    @endif
 
     function abrirModalFusion(nombre) {
         document.getElementById('nombre_original').value = nombre;
