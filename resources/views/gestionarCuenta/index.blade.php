@@ -124,17 +124,17 @@
                 </div>
                 <div>
                     <h3 class="font-semibold text-[#e11d48] text-sm">Zona de peligro</h3>
-                    <p class="text-xs text-gray-400">Acciones irreversibles sobre tu cuenta</p>
+                    <p class="text-xs text-gray-400">Acción sensible sobre tu cuenta</p>
                 </div>
             </div>
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                    <p class="text-sm font-medium text-gray-800">Eliminar cuenta</p>
-                    <p class="text-xs text-gray-500 mt-0.5">Se eliminarán permanentemente todos tus datos, proyectos y portafolio</p>
+                    <p class="text-sm font-medium text-gray-800">Desactivar cuenta</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Perderás el acceso a tu cuenta y tu portafolio dejará de ser visible. Tus datos se conservan, pero no podrás volver a iniciar sesión.</p>
                 </div>
-                <button type="button" onclick="confirmarEliminarCuenta()"
+                <button type="button" onclick="confirmarDesactivarCuenta()"
                     class="inline-flex items-center gap-2 bg-[#e11d48] hover:bg-red-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors duration-200 flex-shrink-0">
-                    <i class="fas fa-trash text-xs"></i> Eliminar cuenta
+                    <i class="fas fa-user-slash text-xs"></i> Desactivar cuenta
                 </button>
             </div>
         </div>
@@ -273,23 +273,23 @@
         });
     };
 
-    // ── Eliminar cuenta ────────────────────────────────────────────────────
-    window.confirmarEliminarCuenta = function () {
+    // ── Desactivar cuenta ──────────────────────────────────────────────────
+    window.confirmarDesactivarCuenta = function () {
         Swal.fire({
-            title: '¿Eliminar tu cuenta?',
+            title: '¿Desactivar tu cuenta?',
             html: `
-                <p class="text-sm text-gray-600 mb-3">Esta acción es <strong>irreversible</strong>. Se eliminarán todos tus datos, proyectos, habilidades y portafolio.</p>
+                <p class="text-sm text-gray-600 mb-3">Tu cuenta quedará <strong>inactiva</strong> y <strong>no podrás volver a iniciar sesión</strong>. Tus datos se conservan, pero el acceso queda bloqueado.</p>
                 <p class="text-sm text-gray-600 mb-2">Ingresa tu <strong>contraseña actual</strong> para confirmar:</p>
-                <input id="swal-confirmar-eliminar" type="password" class="swal2-input" placeholder="••••••••" autocomplete="current-password">
+                <input id="swal-confirmar-desactivar" type="password" class="swal2-input" placeholder="••••••••" autocomplete="current-password">
             `,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#e11d48',
             cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Eliminar cuenta',
+            confirmButtonText: 'Desactivar cuenta',
             cancelButtonText: 'Cancelar',
             preConfirm: () => {
-                const val = document.getElementById('swal-confirmar-eliminar').value;
+                const val = document.getElementById('swal-confirmar-desactivar').value;
                 if (!val) {
                     Swal.showValidationMessage('Debes ingresar tu contraseña para confirmar');
                     return false;
@@ -299,8 +299,8 @@
         }).then(result => {
             if (!result.isConfirmed) return;
 
-            fetch('{{ route("cuenta.eliminar") }}', {
-                method: 'DELETE',
+            fetch('{{ route("cuenta.desactivar") }}', {
+                method: 'PUT',
                 headers: { 'X-CSRF-TOKEN': csrf, 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify({ contrasenia: result.value })
             })
@@ -309,14 +309,14 @@
                 if (res.ok) {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Cuenta eliminada',
-                        text: 'Tu cuenta ha sido eliminada. Serás redirigido.',
+                        title: 'Cuenta desactivada',
+                        text: 'Tu cuenta ha sido desactivada. Serás redirigido.',
                         confirmButtonColor: '#1e3a5f',
                         timer: 2500,
                         showConfirmButton: false
                     }).then(() => { window.location.href = res.redirect ?? '/'; });
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Error', text: res.message ?? 'No se pudo eliminar la cuenta.', confirmButtonColor: '#1e3a5f' });
+                    Swal.fire({ icon: 'error', title: 'Error', text: res.message ?? 'No se pudo desactivar la cuenta.', confirmButtonColor: '#1e3a5f' });
                 }
             })
             .catch(() => Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'No se pudo conectar al servidor.', confirmButtonColor: '#1e3a5f' }));

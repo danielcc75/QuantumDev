@@ -91,10 +91,11 @@ class UsuarioAdminController extends Controller
             'perfil.experienciasLaborales',
             'perfil.formacionAcademica',
             'perfil.links',
-            'perfil.habilidades', 
-            'perfil.proyectos'   
+            'perfil.habilidades.categoria',
+            'perfil.habilidadesBlandas',
+            'perfil.proyectos',
         ])->findOrFail($id);
-        
+
         return view('admin.usuarios.show', compact('usuario'));
     }
     
@@ -204,28 +205,10 @@ class UsuarioAdminController extends Controller
         return back()->with('success', "Rol cambiado a {$rolNuevo}");
     }
     
-    // Eliminar usuario (soft delete)
+    // Eliminar usuario (deshabilitado)
     public function destroy(Request $request, $id)
     {
-        $usuario = Usuario::findOrFail($id);
-        
-        // No permitir eliminarse a sí mismo
-        if ($usuario->id_usuario == session('usuario_id')) {
-            return back()->with('error', 'No puedes eliminar tu propia cuenta');
-        }
-        
-        // Guardar quién eliminó y por qué
-        $usuario->deleted_by = session('usuario_id');
-        $usuario->delete_reason = $request->delete_reason ?? 'Eliminado por administrador';
-        $usuario->delete();  // Soft delete
-        
-        // Registrar en bitácora
-        $this->logAdminAction(
-            'eliminar_usuario',
-            "Usuario ID {$usuario->id_usuario} ({$usuario->nombre} {$usuario->apellido}) | Motivo: {$usuario->delete_reason}"
-        );
-        
-        return redirect()->route('admin.usuarios')->with('success', 'Usuario movido a la papelera');
+        return back()->with('error', 'La eliminación de cuentas está deshabilitada. Usa "Suspender" para bloquear el acceso del usuario.');
     }
 
 }

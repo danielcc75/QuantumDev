@@ -145,14 +145,6 @@
                                     </button>
                                 </form>
                                 
-                                <form action="{{ route('admin.proyectos.destroy', $proyecto->id_proyecto) }}" method="POST" class="inline" 
-                                      onsubmit="return confirm('¿Eliminar este proyecto?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200" title="Eliminar">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
                             </div>
                         </td>
                     </tr>

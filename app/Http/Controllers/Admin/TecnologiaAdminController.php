@@ -11,32 +11,45 @@ class TecnologiaAdminController extends Controller
     public function index()
     {
         $tecnologias = Tecnologia::paginate(15);
-        return view('admin.tecnologias.index', compact('tecnologias'));
+        $categorias = Tecnologia::query()
+            ->whereNotNull('categoria')
+            ->where('categoria', '!=', '')
+            ->distinct()
+            ->orderBy('categoria')
+            ->pluck('categoria');
+
+        return view('admin.tecnologias.index', compact('tecnologias', 'categorias'));
     }
-    
+
     public function store(Request $request)
     {
         $request->validate([
             'nombre' => 'required|string|max:100',
-            'categoria' => 'required|string|max:100'
+            'categoria' => 'required|string|max:100',
         ]);
-        
-        Tecnologia::create($request->only(['nombre', 'categoria']));
-        
+
+        Tecnologia::create([
+            'nombre' => $request->nombre,
+            'categoria' => trim($request->categoria),
+        ]);
+
         return back()->with('success', 'Tecnología creada correctamente');
     }
-    
+
     public function update(Request $request, $id)
     {
         $tecnologia = Tecnologia::findOrFail($id);
-        
+
         $request->validate([
             'nombre' => 'required|string|max:100',
-            'categoria' => 'required|string|max:100'
+            'categoria' => 'required|string|max:100',
         ]);
-        
-        $tecnologia->update($request->only(['nombre', 'categoria']));
-        
+
+        $tecnologia->update([
+            'nombre' => $request->nombre,
+            'categoria' => trim($request->categoria),
+        ]);
+
         return back()->with('success', 'Tecnología actualizada correctamente');
     }
     

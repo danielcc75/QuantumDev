@@ -72,24 +72,19 @@ function toInputDate(str) {
 function buildCardHTML(p) {
     const badge    = ESTADO_BADGE[p.estado] ?? { label: p.estado, cls: 'bg-gray-100 text-gray-600' };
     const tags     = p.tecnologias ? p.tecnologias.split(',').map(t => t.trim()).filter(Boolean) : [];
-    const esPublico = !!p.visible;
-    const fechaFin  = p.fecha_fin ? formatFecha(p.fecha_fin) : 'Presente';
+    const fechaFin = p.fecha_fin ? formatFecha(p.fecha_fin) : 'Presente';
 
     const tagsHTML = tags.map(t =>
         `<span class="text-xs bg-[#1e3a5f]/5 text-[#1e3a5f] border border-[#1e3a5f]/15 px-2 py-0.5 rounded-md font-medium">${t}</span>`
     ).join('');
 
-    const demoBtn = (p.url_link && esPublico)
+    const demoBtn = p.url_link
         ? `<a href="${p.url_link}" target="_blank"
               class="flex items-center gap-2 text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg w-fit transition">
               <i class="fas fa-globe text-xs"></i> Ver Demo
               <i class="fas fa-external-link-alt text-xs"></i>
            </a>`
         : '';
-
-    const toggleColor = esPublico ? 'bg-[#1e3a5f]' : 'bg-gray-300';
-    const thumbPos    = esPublico ? 'translate-x-4' : 'translate-x-1';
-    const visLabelCls = esPublico ? 'text-[#1e3a5f]' : 'text-gray-400';
 
     return `
 <div class="bg-white rounded-2xl border border-gray-200 shadow-md p-5 flex flex-col gap-3 border-t-4 border-t-[#1e3a5f] hover:-translate-y-1 hover:shadow-xl transition-all duration-200"
@@ -115,16 +110,6 @@ function buildCardHTML(p) {
     ${tags.length ? `<div class="flex flex-wrap gap-1.5">${tagsHTML}</div>` : ''}
 
     ${demoBtn}
-
-    <div class="flex items-center gap-2 text-xs text-gray-500">
-        <span>Visibilidad:</span>
-        <span class="font-medium ${visLabelCls}">${esPublico ? 'Público' : 'Privado'}</span>
-        <button onclick="toggleVisibilidad(${p.id_proyecto}, this)"
-            data-visible="${esPublico ? '1' : '0'}"
-            class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${toggleColor}">
-            <span class="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${thumbPos}"></span>
-        </button>
-    </div>
 
     <div class="flex gap-2 pt-1 border-t border-gray-100 mt-auto">
         <button onclick="confirmarEditar(${p.id_proyecto})"
@@ -453,27 +438,6 @@ document.getElementById('proj_url_link').addEventListener('input', function() {
     }
 });
 
-// ── Toggle visible (modal) ────────────────────────────────────────────────────
-
-function toggleVisibleModal() {
-    const btn = document.getElementById('toggleVisible');
-    resetToggle(btn.dataset.on !== '1');
-}
-
-function resetToggle(on) {
-    const btn   = document.getElementById('toggleVisible');
-    const thumb = document.getElementById('toggleThumb');
-    btn.dataset.on = on ? '1' : '0';
-    if (on) {
-        btn.classList.add('bg-[#1e3a5f]');    btn.classList.remove('bg-gray-300');
-        thumb.classList.add('translate-x-6'); thumb.classList.remove('translate-x-1');
-    } else {
-        btn.classList.add('bg-gray-300');     btn.classList.remove('bg-[#1e3a5f]');
-        thumb.classList.add('translate-x-1'); thumb.classList.remove('translate-x-6');
-    }
-    document.getElementById('proj_visible').value = on ? '1' : '0';
-}
-
 function resetUrlStatus() {
     const input  = document.getElementById('proj_url_link');
     const status = document.getElementById('url_status');
@@ -496,7 +460,7 @@ function abrirModalProyecto() {
     document.getElementById('proj_chips').innerHTML = '';
     document.getElementById('proj_chips_container').classList.add('hidden');
     document.getElementById('modalProyectoTitulo').textContent = 'Crear Nuevo Proyecto';
-    resetToggle(true);
+    document.getElementById('proj_visible').value = '1';
     resetUrlStatus();
     actualizarFechaFinSegunEstado();
     setModalVisible('modalProyecto', true);
@@ -532,7 +496,7 @@ function ejecutarAbrirEditar(id) {
             urlInput.dispatchEvent(new Event('input')); // activa el indicador visual
 
             setTags(p.tecnologias ? p.tecnologias.split(',').map(t => t.trim()).filter(Boolean) : []);
-            resetToggle(!!p.visible);
+            document.getElementById('proj_visible').value = p.visible ? '1' : '0';
             actualizarFechaFinSegunEstado();
             document.getElementById('modalProyectoTitulo').textContent = 'Editar Proyecto';
             setModalVisible('modalProyecto', true);
@@ -705,20 +669,4 @@ function actualizarResumenProyectos(proyecto, accion) {
     if (empty) empty.classList.toggle('hidden', !vacio);
 }
 
-// ── Toggle visibilidad (tarjeta) ──────────────────────────────────────────────
-
-function toggleVisibilidad(id, btn) {
-    const visible = btn.dataset.visible === '1' ? 0 : 1;
-    apiFetch(`/proyectos/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ visible })
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (!data.success) return;
-        const card = document.querySelector(`[data-proyecto-id="${id}"]`);
-        if (card) card.outerHTML = buildCardHTML(data.proyecto);
-    });
-}
 </script>

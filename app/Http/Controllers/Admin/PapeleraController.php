@@ -50,11 +50,7 @@ class PapeleraController extends Controller
     
     public function eliminarUsuarioPermanente($id)
     {
-        $usuario = Usuario::onlyTrashed()->findOrFail($id);
-        $nombre = $usuario->nombre . ' ' . $usuario->apellido;
-        $usuario->forceDelete();
-        
-        return back()->with('success', "Usuario '{$nombre}' eliminado permanentemente");
+        return back()->with('error', 'La eliminación permanente de cuentas está deshabilitada. Solo se pueden restaurar.');
     }
     
     // ========== PROYECTOS ==========
@@ -72,23 +68,13 @@ class PapeleraController extends Controller
     
     public function eliminarProyectoPermanente($id)
     {
-        $proyecto = Proyecto::onlyTrashed()->findOrFail($id);
-        $nombre = $proyecto->nombre;
-        $proyecto->forceDelete();
-        
-        return back()->with('success', "Proyecto '{$nombre}' eliminado permanentemente");
+        return back()->with('error', 'La eliminación permanente de proyectos está deshabilitada. Solo se pueden restaurar.');
     }
     
     // ========== VACIAR TODO ==========
     
     public function vaciarPapelera()
     {
-        $totalUsuarios = Usuario::onlyTrashed()->count();
-        $totalProyectos = Proyecto::onlyTrashed()->count();
-        
-        Usuario::onlyTrashed()->forceDelete();
-        Proyecto::onlyTrashed()->forceDelete();
-        
-        return back()->with('success', "Papelera vaciada: {$totalUsuarios} usuarios y {$totalProyectos} proyectos eliminados permanentemente");
+        return back()->with('error', 'La eliminación permanente está deshabilitada. Los elementos de la papelera solo pueden restaurarse.');
     }
 }

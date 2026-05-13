@@ -748,7 +748,7 @@ class UsuarioWebController extends Controller
         return 'Básico';
     }
 
-    public function eliminarCuenta(Request $request)
+    public function desactivarCuenta(Request $request)
     {
         if (!session('usuario_id')) {
             return response()->json(['ok' => false, 'message' => 'No autenticado'], 401);
@@ -758,26 +758,17 @@ class UsuarioWebController extends Controller
             'contrasenia' => 'required|string',
         ]);
 
-        $usuario = Usuario::with('perfil')->findOrFail(session('usuario_id'));
+        $usuario = Usuario::findOrFail(session('usuario_id'));
 
         if (!Hash::check($request->contrasenia, $usuario->contrasenia)) {
             return response()->json(['ok' => false, 'message' => 'La contraseña es incorrecta.'], 422);
         }
 
         try {
-            // Desvincula proyectos de sus experiencias antes de borrar
-            // para evitar el conflicto de múltiples cascadas en PostgreSQL
-            if ($usuario->perfil) {
-                DB::table('proyectos')
-                    ->where('id_perfil', $usuario->perfil->id_perfil)
-                    ->update(['id_experiencia' => null]);
-            }
-
-            $usuario->deleted_by = $usuario->id_usuario;
-            $usuario->delete_reason = $request->motivo ?? 'El usuario eliminó su propia cuenta';
-            $usuario->delete();
+            $usuario->estado = 'inactivo';
+            $usuario->save();
         } catch (\Exception $e) {
-            return response()->json(['ok' => false, 'message' => 'No se pudo eliminar la cuenta: ' . $e->getMessage()], 500);
+            return response()->json(['ok' => false, 'message' => 'No se pudo desactivar la cuenta: ' . $e->getMessage()], 500);
         }
 
         $request->session()->flush();

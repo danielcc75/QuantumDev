@@ -92,16 +92,18 @@
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Categoría *</label>
-                <select name="categoria" id="tecnologiaCategoria" required
+                <select id="tecnologiaCategoriaSelect" onchange="onCategoriaChange()"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">Seleccionar categoría</option>
-                    <option value="Frontend">Frontend</option>
-                    <option value="Backend">Backend</option>
-                    <option value="Base de Datos">Base de Datos</option>
-                    <option value="DevOps">DevOps</option>
-                    <option value="Mobile">Mobile</option>
-                    <option value="Otros">Otros</option>
+                    @foreach($categorias as $cat)
+                        <option value="{{ $cat }}">{{ $cat }}</option>
+                    @endforeach
+                    <option value="__nueva__">+ Crear nueva categoría</option>
                 </select>
+                <input type="text" id="tecnologiaCategoriaNueva" maxlength="100"
+                    class="mt-2 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 hidden"
+                    placeholder="Nombre de la nueva categoría">
+                <input type="hidden" name="categoria" id="tecnologiaCategoria" required>
             </div>
             <div class="flex justify-end space-x-3">
                 <button type="button" onclick="cerrarModal()" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Cancelar</button>
@@ -112,30 +114,85 @@
 </div>
 
 <script>
+    function setCategoriaUI(valor) {
+        const select = document.getElementById('tecnologiaCategoriaSelect');
+        const nueva  = document.getElementById('tecnologiaCategoriaNueva');
+        const hidden = document.getElementById('tecnologiaCategoria');
+
+        nueva.classList.add('hidden');
+        nueva.value = '';
+
+        if (!valor) {
+            select.value = '';
+            hidden.value = '';
+            return;
+        }
+
+        const existe = Array.from(select.options).some(o => o.value === valor && o.value !== '__nueva__');
+        if (existe) {
+            select.value = valor;
+            hidden.value = valor;
+        } else {
+            select.value = '__nueva__';
+            nueva.classList.remove('hidden');
+            nueva.value = valor;
+            hidden.value = valor;
+        }
+    }
+
+    function onCategoriaChange() {
+        const select = document.getElementById('tecnologiaCategoriaSelect');
+        const nueva  = document.getElementById('tecnologiaCategoriaNueva');
+        const hidden = document.getElementById('tecnologiaCategoria');
+
+        if (select.value === '__nueva__') {
+            nueva.classList.remove('hidden');
+            nueva.value = '';
+            hidden.value = '';
+            nueva.focus();
+        } else {
+            nueva.classList.add('hidden');
+            nueva.value = '';
+            hidden.value = select.value;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const nueva  = document.getElementById('tecnologiaCategoriaNueva');
+        const hidden = document.getElementById('tecnologiaCategoria');
+        nueva.addEventListener('input', () => { hidden.value = nueva.value.trim(); });
+
+        document.getElementById('formTecnologia').addEventListener('submit', function (e) {
+            if (!hidden.value || !hidden.value.trim()) {
+                e.preventDefault();
+                alert('Selecciona una categoría existente o escribe el nombre de la nueva.');
+            }
+        });
+    });
+
     function abrirModalCrear() {
         document.getElementById('modalTitulo').innerText = 'Nueva Tecnología';
         document.getElementById('formTecnologia').action = "{{ route('admin.tecnologias.store') }}";
         document.getElementById('methodField').value = 'POST';
         document.getElementById('tecnologiaNombre').value = '';
-        document.getElementById('tecnologiaCategoria').value = '';
+        setCategoriaUI('');
         document.getElementById('modalTecnologia').classList.remove('hidden');
     }
-    
+
     function editarTecnologia(id, nombre, categoria) {
         document.getElementById('modalTitulo').innerText = 'Editar Tecnología';
         document.getElementById('formTecnologia').action = `/admin/tecnologias/${id}`;
         document.getElementById('methodField').value = 'PUT';
         document.getElementById('tecnologiaNombre').value = nombre;
-        document.getElementById('tecnologiaCategoria').value = categoria;
+        setCategoriaUI(categoria);
         document.getElementById('modalTecnologia').classList.remove('hidden');
     }
-    
+
     function cerrarModal() {
         document.getElementById('modalTecnologia').classList.add('hidden');
     }
-    
-    // Cerrar modal con ESC
-    document.addEventListener('keydown', function(event) {
+
+    document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
             cerrarModal();
         }

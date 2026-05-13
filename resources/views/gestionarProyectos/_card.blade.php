@@ -13,7 +13,6 @@
     $tags     = $proyecto->tecnologias
         ? array_filter(array_map('trim', explode(',', $proyecto->tecnologias)))
         : [];
-    $esPublico = (bool) $proyecto->visible;
     $fechaIni  = \Carbon\Carbon::parse($proyecto->fecha_ini)->format('d M Y');
     $fechaFin  = $proyecto->fecha_fin
         ? \Carbon\Carbon::parse($proyecto->fecha_fin)->format('d M Y')
@@ -54,30 +53,13 @@
     @endif
 
     {{-- Botón demo --}}
-    @if($proyecto->url_link && $esPublico)
+    @if($proyecto->url_link)
     <a href="{{ $proyecto->url_link }}" target="_blank"
         class="flex items-center gap-2 text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg w-fit transition">
         <i class="fas fa-globe text-xs"></i> Ver Demo
         <i class="fas fa-external-link-alt text-xs"></i>
     </a>
     @endif
-
-    {{-- Toggle visibilidad --}}
-    <div class="flex items-center gap-2 text-xs text-gray-500">
-        <span>Visibilidad:</span>
-        <span @class(['font-medium', 'text-[#1e3a5f]' => $esPublico, 'text-gray-400' => !$esPublico])>
-            {{ $esPublico ? 'Público' : 'Privado' }}
-        </span>
-        <button onclick="toggleVisibilidad({{ $proyecto->id_proyecto }}, this)"
-            data-visible="{{ $esPublico ? '1' : '0' }}"
-            @class(['relative inline-flex h-5 w-9 items-center rounded-full transition-colors',
-                    'bg-[#1e3a5f]' => $esPublico,
-                    'bg-gray-300'  => !$esPublico])>
-            <span @class(['inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform',
-                          'translate-x-4' => $esPublico,
-                          'translate-x-1' => !$esPublico])></span>
-        </button>
-    </div>
 
     {{-- Acciones editar / eliminar --}}
     <div class="flex gap-2 pt-1 border-t border-gray-100 mt-auto">

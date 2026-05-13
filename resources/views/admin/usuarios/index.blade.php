@@ -120,14 +120,6 @@
                                 </form>
                             @endif
                             
-                            <!-- Eliminar -->
-                            <form action="{{ route('admin.usuarios.destroy', $usuario->id_usuario) }}" method="POST" class="inline" onsubmit="return confirm('¿Estás seguro de eliminar este usuario?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 p-2 rounded-lg transition" title="Eliminar usuario">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
                         </div>
                     </td>
                 </tr>

@@ -110,7 +110,7 @@ Route::put('/cuenta/contrasenia', [UsuarioWebController::class, 'cambiarContrase
 Route::put('/cuenta/visibilidad', [UsuarioWebController::class, 'cambiarVisibilidad'])->name('cuenta.visibilidad');
 Route::get('/cuenta/portafolio/datos', [UsuarioWebController::class, 'datosPortafolio'])->name('cuenta.portafolio.datos');
 Route::put('/cuenta/portafolio/publicar', [UsuarioWebController::class, 'publicarPortafolio'])->name('cuenta.portafolio.publicar');
-Route::delete('/cuenta',          [UsuarioWebController::class, 'eliminarCuenta'])->name('cuenta.eliminar');
+Route::put('/cuenta/desactivar',  [UsuarioWebController::class, 'desactivarCuenta'])->name('cuenta.desactivar');
 
 // ============================================================
 // PANEL DE ADMINISTRADOR (todas las funcionalidades)
@@ -207,6 +207,6 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     
     // Vaciar
     Route::delete('/vaciar', [PapeleraController::class, 'vaciarPapelera'])->name('admin.papelera.vaciar');
-    Route::delete('/perfil/eliminar-cuenta', [UsuarioWebController::class, 'eliminarCuenta'])->name('perfil.eliminar-cuenta');
+    Route::put('/perfil/desactivar-cuenta', [UsuarioWebController::class, 'desactivarCuenta'])->name('admin.perfil.desactivar-cuenta');
     });
 });

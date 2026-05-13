@@ -12,14 +12,6 @@
                 </h1>
                 <p class="text-gray-500 mt-1">Elementos eliminados recientemente</p>
             </div>
-            <form action="{{ route('admin.papelera.vaciar') }}" method="POST" 
-                  onsubmit="return confirm('¿Vaciar toda la papelera? Esta acción no se puede deshacer.')">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-                    <i class="fas fa-trash-alt mr-2"></i>Vaciar Papelera
-                </button>
-            </form>
         </div>
     </div>
 
@@ -76,14 +68,6 @@
                                     <i class="fas fa-trash-restore"></i>
                                 </button>
                             </form>
-                            <form action="{{ route('admin.papelera.eliminar.usuario', $usuario->id_usuario) }}" method="POST" 
-                                  onsubmit="return confirm('¿Eliminar permanentemente?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 bg-red-100 p-2 rounded-lg" title="Eliminar permanentemente">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </form>
                         </div>
                     </td>
                 </tr>
@@ -126,14 +110,6 @@
                                 @csrf
                                 <button type="submit" class="text-green-600 bg-green-100 p-2 rounded-lg" title="Restaurar">
                                     <i class="fas fa-trash-restore"></i>
-                                </button>
-                            </form>
-                            <form action="{{ route('admin.papelera.eliminar.proyecto', $proyecto->id_proyecto) }}" method="POST"
-                                  onsubmit="return confirm('¿Eliminar permanentemente?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 bg-red-100 p-2 rounded-lg" title="Eliminar permanentemente">
-                                    <i class="fas fa-trash-alt"></i>
                                 </button>
                             </form>
                         </div>

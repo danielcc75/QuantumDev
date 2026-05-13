@@ -88,16 +88,9 @@ class ProyectoAdminController extends Controller
         return back()->with('success', "Proyecto marcado como {$estado}");
     }
     
-    // Eliminar proyecto
+    // Eliminar proyecto (deshabilitado)
     public function destroy($id)
     {
-        $proyecto = Proyecto::findOrFail($id);
-        $nombre = $proyecto->nombre;
-        
-        $proyecto->deleted_by = session('usuario_id');
-        $proyecto->delete_reason = 'Eliminado por administrador';
-        $proyecto->delete();
-        
-        return redirect()->route('admin.proyectos')->with('success', "Proyecto '{$nombre}' movido a la papelera");
+        return back()->with('error', 'La eliminación de proyectos está deshabilitada. Usa "Ocultar" para retirarlo del portafolio público.');
     }
 }

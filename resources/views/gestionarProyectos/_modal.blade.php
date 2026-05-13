@@ -151,21 +151,7 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between bg-[#1e3a5f]/5 rounded-xl px-4 py-3">
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-eye text-[#1e3a5f] text-sm"></i>
-                            <div>
-                                <p class="text-sm font-medium text-[#1e3a5f]">Proyecto Público</p>
-                                <p class="text-xs text-gray-400">Visible en tu portafolio público</p>
-                            </div>
-                        </div>
-                        <button type="button" id="toggleVisible" onclick="toggleVisibleModal()"
-                            data-on="1"
-                            class="relative inline-flex h-6 w-11 items-center rounded-full bg-[#1e3a5f] transition-colors">
-                            <span id="toggleThumb" class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform translate-x-6"></span>
-                        </button>
-                        <input type="hidden" id="proj_visible" value="1">
-                    </div>
+                    <input type="hidden" id="proj_visible" value="1">
                 </div>
 
             </div>

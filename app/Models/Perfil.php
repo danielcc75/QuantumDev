@@ -43,4 +43,14 @@ class Perfil extends Model
     {
         return $this->hasMany(PerfilLink::class, 'id_perfil');
     }
+
+    public function habilidadesBlandas()
+    {
+        return $this->belongsToMany(
+            HabilidadBlanda::class,
+            'perfil_habilidad_blanda',
+            'id_perfil',
+            'id_habilidad_blanda'
+        );
+    }
 }
