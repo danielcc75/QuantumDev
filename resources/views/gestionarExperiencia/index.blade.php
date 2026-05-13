@@ -10,6 +10,7 @@
     $experiencias = $perfilIdExp
         ? DB::table('experiencia_laboral')
               ->where('id_perfil', $perfilIdExp)
+              ->whereNull('deleted_at')
               ->orderBy('fecha_ini', 'desc')
               ->get()
         : collect();
@@ -19,6 +20,7 @@
         ? DB::table('proyectos')
               ->where('id_perfil', $perfilIdExp)
               ->whereNotNull('id_experiencia')
+              ->whereNull('deleted_at')
               ->get()
               ->groupBy('id_experiencia')
         : collect();
@@ -27,6 +29,7 @@
     $proyectosUsuario = $perfilIdExp
         ? DB::table('proyectos')
               ->where('id_perfil', $perfilIdExp)
+              ->whereNull('deleted_at')
               ->orderBy('nombre')
               ->get(['id_proyecto', 'nombre', 'id_experiencia'])
         : collect();

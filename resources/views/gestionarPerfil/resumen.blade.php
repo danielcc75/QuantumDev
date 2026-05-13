@@ -14,11 +14,11 @@
         @php
             $perfilResumen = isset($userId) ? DB::table('perfil')->where('id_usuario', $userId)->first() : null;
             $perfilId = $perfilResumen->id_perfil ?? null;
-            $totalProyectos = $perfilId ? DB::table('proyectos')->where('id_perfil', $perfilId)->count() : 0;
+            $totalProyectos = $perfilId ? DB::table('proyectos')->where('id_perfil', $perfilId)->whereNull('deleted_at')->count() : 0;
             $stats = [
                 'repos' => $totalProyectos,
                 'commits' => $totalProyectos * 45,
-                'estudios' => $perfilId ? DB::table('formacion_academica')->where('id_perfil', $perfilId)->count() : 0,
+                'estudios' => $perfilId ? DB::table('formacion_academica')->where('id_perfil', $perfilId)->whereNull('deleted_at')->count() : 0,
                 'codigo_limpio' => 95
             ];
         @endphp
@@ -46,6 +46,7 @@
         @php
             $proyectosRecientes = $perfilId ? DB::table('proyectos')
                 ->where('id_perfil', $perfilId)
+                ->whereNull('deleted_at')
                 ->orderBy('created_at', 'desc')
                 ->limit(3)
                 ->get() : collect();
@@ -153,6 +154,7 @@
             $habilidadesResumen = $perfilId ? DB::table('habilidades')
                 ->join('categoria', 'habilidades.id_categoria', '=', 'categoria.id_categoria')
                 ->where('habilidades.id_perfil', $perfilId)
+                ->whereNull('habilidades.deleted_at')
                 ->select('habilidades.*', 'categoria.nombre as nombre_categoria')
                 ->orderBy('habilidades.anios_experiencia', 'desc')
                 ->get() : collect();

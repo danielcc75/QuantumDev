@@ -534,8 +534,8 @@ class UsuarioWebController extends Controller
 
             if ($request->visibilidad === 'publico') {
                 $tieneBiografia  = !empty($perfil->biografia);
-                $tieneProyecto   = DB::table('proyectos')->where('id_perfil', $perfil->id_perfil)->exists();
-                $tieneExperiencia = DB::table('experiencia_laboral')->where('id_perfil', $perfil->id_perfil)->exists();
+                $tieneProyecto   = DB::table('proyectos')->where('id_perfil', $perfil->id_perfil)->whereNull('deleted_at')->exists();
+                $tieneExperiencia = DB::table('experiencia_laboral')->where('id_perfil', $perfil->id_perfil)->whereNull('deleted_at')->exists();
 
                 if (!$tieneBiografia && !$tieneProyecto && !$tieneExperiencia) {
                     return response()->json([
@@ -571,6 +571,7 @@ class UsuarioWebController extends Controller
 
         $tecnicas = DB::table('habilidades')
             ->where('id_perfil', $perfil->id_perfil)
+            ->whereNull('deleted_at')
             ->get(['id_habilidad', 'nombre', 'anios_experiencia', 'publicado'])
             ->map(function ($h) {
                 return [
@@ -595,6 +596,7 @@ class UsuarioWebController extends Controller
 
         $experiencia = DB::table('experiencia_laboral')
             ->where('id_perfil', $perfil->id_perfil)
+            ->whereNull('deleted_at')
             ->orderByDesc('fecha_ini')
             ->get(['id_experiencia', 'empresa', 'cargo', 'fecha_ini', 'fecha_fin', 'trabajo_actual', 'publicado'])
             ->map(function ($e) {
@@ -610,6 +612,7 @@ class UsuarioWebController extends Controller
 
         $educacion = DB::table('formacion_academica')
             ->where('id_perfil', $perfil->id_perfil)
+            ->whereNull('deleted_at')
             ->orderByDesc('fecha_ini')
             ->get(['id_formacion', 'titulo', 'institucion', 'nivel', 'publicado'])
             ->map(function ($f) {
@@ -668,8 +671,8 @@ class UsuarioWebController extends Controller
         $perfil = Perfil::where('id_usuario', session('usuario_id'))->firstOrFail();
 
         $tieneBiografia  = !empty($perfil->biografia);
-        $tieneProyecto   = DB::table('proyectos')->where('id_perfil', $perfil->id_perfil)->exists();
-        $tieneExperiencia = DB::table('experiencia_laboral')->where('id_perfil', $perfil->id_perfil)->exists();
+        $tieneProyecto   = DB::table('proyectos')->where('id_perfil', $perfil->id_perfil)->whereNull('deleted_at')->exists();
+        $tieneExperiencia = DB::table('experiencia_laboral')->where('id_perfil', $perfil->id_perfil)->whereNull('deleted_at')->exists();
 
         if (!$tieneBiografia && !$tieneProyecto && !$tieneExperiencia) {
             return response()->json([
@@ -688,9 +691,11 @@ class UsuarioWebController extends Controller
                 $proyectos   = $request->input('proyectos', []);
 
                 DB::table('habilidades')->where('id_perfil', $perfil->id_perfil)
+                    ->whereNull('deleted_at')
                     ->update(['publicado' => DB::raw('false')]);
                 if (!empty($tecnicas)) {
                     DB::table('habilidades')->where('id_perfil', $perfil->id_perfil)
+                        ->whereNull('deleted_at')
                         ->whereIn('id_habilidad', $tecnicas)
                         ->update(['publicado' => DB::raw('true')]);
                 }
@@ -704,17 +709,21 @@ class UsuarioWebController extends Controller
                 }
 
                 DB::table('experiencia_laboral')->where('id_perfil', $perfil->id_perfil)
+                    ->whereNull('deleted_at')
                     ->update(['publicado' => DB::raw('false')]);
                 if (!empty($experiencia)) {
                     DB::table('experiencia_laboral')->where('id_perfil', $perfil->id_perfil)
+                        ->whereNull('deleted_at')
                         ->whereIn('id_experiencia', $experiencia)
                         ->update(['publicado' => DB::raw('true')]);
                 }
 
                 DB::table('formacion_academica')->where('id_perfil', $perfil->id_perfil)
+                    ->whereNull('deleted_at')
                     ->update(['publicado' => DB::raw('false')]);
                 if (!empty($educacion)) {
                     DB::table('formacion_academica')->where('id_perfil', $perfil->id_perfil)
+                        ->whereNull('deleted_at')
                         ->whereIn('id_formacion', $educacion)
                         ->update(['publicado' => DB::raw('true')]);
                 }

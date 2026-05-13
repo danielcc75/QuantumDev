@@ -146,6 +146,8 @@ class ExperienciaController extends Controller
             return response()->json(['error' => 'No autorizado'], 403);
         }
 
+        $experiencia->deleted_by = Session::get('usuario_id');
+        $experiencia->delete_reason = 'Eliminada por el usuario';
         $experiencia->delete();
 
         return response()->json([

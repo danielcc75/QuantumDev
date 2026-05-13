@@ -269,10 +269,14 @@
                         ->where(function ($q) {
                             $q->whereNotNull('p.biografia')
                               ->orWhereExists(function ($sub) {
-                                  $sub->select(DB::raw(1))->from('proyectos')->whereColumn('proyectos.id_perfil', 'p.id_perfil');
+                                  $sub->select(DB::raw(1))->from('proyectos')
+                                      ->whereColumn('proyectos.id_perfil', 'p.id_perfil')
+                                      ->whereNull('proyectos.deleted_at');
                               })
                               ->orWhereExists(function ($sub) {
-                                  $sub->select(DB::raw(1))->from('experiencia_laboral')->whereColumn('experiencia_laboral.id_perfil', 'p.id_perfil');
+                                  $sub->select(DB::raw(1))->from('experiencia_laboral')
+                                      ->whereColumn('experiencia_laboral.id_perfil', 'p.id_perfil')
+                                      ->whereNull('experiencia_laboral.deleted_at');
                               });
                         })
                         ->orderByDesc('p.id_perfil')
@@ -285,20 +289,22 @@
                         $cargo = DB::table('experiencia_laboral')
                             ->where('id_perfil', $p->id_perfil)
                             ->where('publicado', true)
+                            ->whereNull('deleted_at')
                             ->orderByDesc('fecha_ini')
                             ->value('cargo') ?? 'Desarrollador';
 
                         $tags = DB::table('habilidades')
                             ->where('id_perfil', $p->id_perfil)
                             ->where('publicado', true)
+                            ->whereNull('deleted_at')
                             ->orderByDesc('id_habilidad')
                             ->limit(3)
                             ->pluck('nombre')
                             ->all();
-                        $totalHabs = DB::table('habilidades')->where('id_perfil', $p->id_perfil)->where('publicado', true)->count();
+                        $totalHabs = DB::table('habilidades')->where('id_perfil', $p->id_perfil)->where('publicado', true)->whereNull('deleted_at')->count();
                         $extraTags = max(0, $totalHabs - count($tags));
 
-                        $exps  = DB::table('experiencia_laboral')->where('id_perfil', $p->id_perfil)->where('publicado', true)->get();
+                        $exps  = DB::table('experiencia_laboral')->where('id_perfil', $p->id_perfil)->where('publicado', true)->whereNull('deleted_at')->get();
                         $meses = 0;
                         foreach ($exps as $e) {
                             $ini = \Carbon\Carbon::parse($e->fecha_ini);
@@ -309,7 +315,7 @@
                         $anioStr = $anios > 0 ? ($anios . ' año' . ($anios === 1 ? '' : 's'))
                                               : ($meses > 0 ? 'Menos de 1 año' : 'Sin experiencia registrada');
 
-                        $cntProy = DB::table('proyectos')->where('id_perfil', $p->id_perfil)->where('visible', true)->count();
+                        $cntProy = DB::table('proyectos')->where('id_perfil', $p->id_perfil)->where('visible', true)->whereNull('deleted_at')->count();
 
                         // Links sociales (tipo => url)
                         $linksRows = DB::table('perfil_links')->where('id_perfil', $p->id_perfil)->get();
@@ -321,6 +327,7 @@
                             ->leftJoin('categoria as c', 'h.id_categoria', '=', 'c.id_categoria')
                             ->where('h.id_perfil', $p->id_perfil)
                             ->where('h.publicado', true)
+                            ->whereNull('h.deleted_at')
                             ->select('h.nombre', 'c.nombre as categoria')
                             ->get()
                             ->groupBy(fn($r) => $r->categoria ?? 'Otras')
@@ -331,6 +338,7 @@
                             ->where('id_perfil', $p->id_perfil)
                             ->where('visible', true)
                             ->whereNotNull('id_experiencia')
+                            ->whereNull('deleted_at')
                             ->get()
                             ->groupBy('id_experiencia');
 
@@ -338,6 +346,7 @@
                         $experiencias = DB::table('experiencia_laboral')
                             ->where('id_perfil', $p->id_perfil)
                             ->where('publicado', true)
+                            ->whereNull('deleted_at')
                             ->orderByDesc('fecha_ini')
                             ->get()
                             ->map(function ($e) use ($proyectosPorExp) {
@@ -362,6 +371,7 @@
                         $proyectosLista = DB::table('proyectos')
                             ->where('id_perfil', $p->id_perfil)
                             ->where('visible', 1)
+                            ->whereNull('deleted_at')
                             ->orderByDesc('fecha_ini')
                             ->get()
                             ->map(fn($pr) => [
@@ -387,6 +397,7 @@
                         $formacion = DB::table('formacion_academica')
                             ->where('id_perfil', $p->id_perfil)
                             ->where('publicado', true)
+                            ->whereNull('deleted_at')
                             ->orderByDesc('fecha_ini')
                             ->get()
                             ->map(fn($f) => [

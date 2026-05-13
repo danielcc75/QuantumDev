@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Habilidad extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'habilidades';
     protected $primaryKey = 'id_habilidad';
 
@@ -15,6 +18,12 @@ class Habilidad extends Model
         'nombre',
         'anios_experiencia',
         'descripcion',
+        'deleted_by',
+        'delete_reason',
+    ];
+
+    protected $casts = [
+        'deleted_at' => 'datetime',
     ];
 
     public function perfil()
@@ -25,5 +34,10 @@ class Habilidad extends Model
     public function categoria()
     {
         return $this->belongsTo(Categoria::class, 'id_categoria', 'id_categoria');
+    }
+
+    public function deletedBy()
+    {
+        return $this->belongsTo(Usuario::class, 'deleted_by');
     }
 }

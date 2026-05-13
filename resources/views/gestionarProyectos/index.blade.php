@@ -4,12 +4,13 @@
 
 @php
     use Illuminate\Support\Facades\DB;
+    use App\Models\Proyecto;
 
     $perfil   = DB::table('perfil')->where('id_usuario', $userId)->first();
     $perfilId = $perfil->id_perfil ?? null;
 
     $proyectos = $perfilId
-        ? DB::table('proyectos')->where('id_perfil', $perfilId)->orderBy('created_at', 'desc')->get()
+        ? Proyecto::where('id_perfil', $perfilId)->orderBy('created_at', 'desc')->get()
         : collect();
 
     $totalProyectos = $proyectos->count();

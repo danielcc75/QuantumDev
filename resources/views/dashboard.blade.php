@@ -92,8 +92,8 @@
         if (!empty($perfilDash?->foto_perfil))                                        $progreso += 20; // foto
         if (!empty($perfilDash?->biografia))                                          $progreso += 20; // bio
         if (!empty($perfilDash?->ubicacion))                                          $progreso += 15; // ubicación
-        if ($perfilIdDash && DB::table('proyectos')->where('id_perfil', $perfilIdDash)->exists())   $progreso += 15; // proyectos
-        if ($perfilIdDash && DB::table('habilidades')->where('id_perfil', $perfilIdDash)->exists()) $progreso += 10; // habilidades
+        if ($perfilIdDash && DB::table('proyectos')->where('id_perfil', $perfilIdDash)->whereNull('deleted_at')->exists())   $progreso += 15; // proyectos
+        if ($perfilIdDash && DB::table('habilidades')->where('id_perfil', $perfilIdDash)->whereNull('deleted_at')->exists()) $progreso += 10; // habilidades
 
         $progresoColor = $progreso < 40 ? '#e11d48' : ($progreso < 75 ? '#f59e0b' : '#1e3a5f');
         $progresoLabel = $progreso < 40 ? 'Perfil incompleto' : ($progreso < 75 ? 'Perfil en progreso' : 'Perfil casi completo');

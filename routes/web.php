@@ -204,7 +204,16 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     // Proyectos
     Route::post('/proyecto/{id}/restaurar', [PapeleraController::class, 'restaurarProyecto'])->name('admin.papelera.restaurar.proyecto');
     Route::delete('/proyecto/{id}/eliminar', [PapeleraController::class, 'eliminarProyectoPermanente'])->name('admin.papelera.eliminar.proyecto');
-    
+
+    // Habilidades técnicas
+    Route::post('/habilidad/{id}/restaurar', [PapeleraController::class, 'restaurarHabilidad'])->name('admin.papelera.restaurar.habilidad');
+
+    // Experiencia laboral
+    Route::post('/experiencia/{id}/restaurar', [PapeleraController::class, 'restaurarExperiencia'])->name('admin.papelera.restaurar.experiencia');
+
+    // Formación académica
+    Route::post('/educacion/{id}/restaurar', [PapeleraController::class, 'restaurarEducacion'])->name('admin.papelera.restaurar.educacion');
+
     // Vaciar
     Route::delete('/vaciar', [PapeleraController::class, 'vaciarPapelera'])->name('admin.papelera.vaciar');
     Route::put('/perfil/desactivar-cuenta', [UsuarioWebController::class, 'desactivarCuenta'])->name('admin.perfil.desactivar-cuenta');

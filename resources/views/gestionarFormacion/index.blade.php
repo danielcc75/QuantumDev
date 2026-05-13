@@ -10,6 +10,7 @@
     $educaciones = $perfilIdEdu
         ? DB::table('formacion_academica')
               ->where('id_perfil', $perfilIdEdu)
+              ->whereNull('deleted_at')
               ->orderBy('fecha_ini', 'desc')
               ->get()
         : collect();

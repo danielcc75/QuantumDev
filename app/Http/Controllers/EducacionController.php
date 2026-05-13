@@ -144,6 +144,8 @@ class EducacionController extends Controller
             return response()->json(['error' => 'No autorizado'], 403);
         }
 
+        $educacion->deleted_by = Session::get('usuario_id');
+        $educacion->delete_reason = 'Eliminada por el usuario';
         $educacion->delete();
 
         return response()->json([

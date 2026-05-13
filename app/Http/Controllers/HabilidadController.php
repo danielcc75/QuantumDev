@@ -88,7 +88,10 @@ class HabilidadController extends Controller
     // =========================
     public function destroy($id)
     {
-        Habilidad::findOrFail($id)->delete();
+        $habilidad = Habilidad::findOrFail($id);
+        $habilidad->deleted_by = session('usuario_id');
+        $habilidad->delete_reason = 'Eliminada por el usuario';
+        $habilidad->delete();
 
         return redirect(route('dashboard') . '?seccion=habilidades')->with('success', 'Habilidad eliminada correctamente');
     }
