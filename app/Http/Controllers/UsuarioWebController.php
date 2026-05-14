@@ -63,7 +63,8 @@ class UsuarioWebController extends Controller
             'correo_electronico' => $request->correo_electronico,
             'telefono'           => $request->telefono,
             'contrasenia'        => Hash::make($request->contrasenia),
-            'estado'             => 'activo'
+            'estado'             => 'activo',
+            'ultimo_acceso'      => now(),
         ]);
 
         Perfil::create([
@@ -126,6 +127,9 @@ class UsuarioWebController extends Controller
             }
             return redirect('/')->with('error_login', $mensaje);
         }
+
+        $usuario->ultimo_acceso = now();
+        $usuario->save();
 
         session([
             'usuario_id' => $usuario->id_usuario,

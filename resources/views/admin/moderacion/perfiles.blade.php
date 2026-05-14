@@ -64,14 +64,25 @@
                     <td class="px-6 py-4 text-sm max-w-xs truncate">{{ $perfil->moderation_note ?? 'Sin nota' }}</td>
                     <td class="px-6 py-4">
                         <div class="flex space-x-2">
-                            <a href="{{ route('admin.moderacion.ver-perfil', $perfil->id_perfil) }}" 
-                               class="text-blue-600 bg-blue-100 p-2 rounded-lg">Ver</a>
-                            <form action="{{ route('admin.moderacion.toggle-visibilidad', $perfil->id_perfil) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="text-orange-600 bg-orange-100 p-2 rounded-lg">
-                                    {{ $perfil->visible ? 'Ocultar' : 'Mostrar' }}
+                            <button type="button"
+                                onclick="abrirVistaPortafolio({{ $perfil->id_perfil }})"
+                                class="text-blue-600 bg-blue-100 hover:bg-blue-200 p-2 rounded-lg">Ver</button>
+
+                            @if($perfil->visible)
+                                {{-- Abrir modal para pedir el motivo --}}
+                                <button type="button"
+                                    onclick="abrirModalOcultar({{ $perfil->id_perfil }}, '{{ addslashes(trim($perfil->usuario->nombre . ' ' . $perfil->usuario->apellido)) }}')"
+                                    class="text-orange-600 bg-orange-100 hover:bg-orange-200 p-2 rounded-lg">
+                                    Ocultar
                                 </button>
-                            </form>
+                            @else
+                                <form action="{{ route('admin.moderacion.toggle-visibilidad', $perfil->id_perfil) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="text-green-700 bg-green-100 hover:bg-green-200 p-2 rounded-lg">
+                                        Mostrar
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     </td>
                 </tr>
@@ -84,4 +95,117 @@
         </table>
     </div>
 </div>
+
+{{-- Modal del portafolio público (reutilizado del home) --}}
+@include('home._modal_portafolio_publico')
+
+<script>
+    async function abrirVistaPortafolio(idPerfil) {
+        try {
+            const resp = await fetch(`/admin/moderacion/perfiles/${idPerfil}/portafolio-json`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            });
+            if (!resp.ok) throw new Error('No se pudo cargar el portafolio');
+            const data = await resp.json();
+            if (data.ok && typeof window.abrirModalPortafolio === 'function') {
+                window.abrirModalPortafolio({ data: data.portafolio });
+            }
+        } catch (err) {
+            alert('No se pudo abrir la vista del portafolio: ' + err.message);
+        }
+    }
+</script>
+
+{{-- Modal: motivo para ocultar portafolio --}}
+<div id="modalOcultar" class="fixed inset-0 z-[80] hidden bg-black/50 backdrop-blur-sm" onclick="cerrarModalOcultarFondo(event)">
+    <div class="min-h-full flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden" onclick="event.stopPropagation()">
+            <div class="bg-gradient-to-r from-[#1e3a5f] to-[#e11d48] px-6 py-4 flex items-center justify-between">
+                <h3 class="text-white font-bold text-lg">
+                    <i class="fas fa-eye-slash mr-2"></i> Ocultar portafolio
+                </h3>
+                <button type="button" onclick="cerrarModalOcultar()" class="text-white/90 hover:text-white text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="formOcultar" method="POST">
+                @csrf
+                <div class="p-6 space-y-4">
+                    <p class="text-sm text-gray-700">
+                        Vas a ocultar el portafolio de
+                        <span id="modalOcultarUsuario" class="font-semibold text-gray-900"></span>.
+                        Indica el motivo (se guardará como nota de moderación y será visible para el equipo administrador).
+                    </p>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Motivo <span class="text-red-500">*</span>
+                        </label>
+                        <textarea name="motivo" id="modalOcultarMotivo" rows="4" maxlength="500" required
+                            class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:border-[#1e3a5f] focus:ring-2 focus:ring-[#1e3a5f]/20 outline-none"
+                            placeholder="Ej. Contenido inapropiado, datos personales expuestos, denuncia recibida..."></textarea>
+                        <p id="modalOcultarError" class="hidden mt-1 text-xs text-red-600"></p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 px-6 py-3 flex justify-end gap-2">
+                    <button type="button" onclick="cerrarModalOcultar()"
+                        class="px-4 py-2 rounded-lg text-sm text-gray-700 bg-gray-200 hover:bg-gray-300">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="px-4 py-2 rounded-lg text-sm text-white bg-[#e11d48] hover:bg-[#be123c]">
+                        <i class="fas fa-eye-slash mr-1"></i> Confirmar ocultar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const __modalOcultar = document.getElementById('modalOcultar');
+    const __formOcultar  = document.getElementById('formOcultar');
+    const __motivoInput  = document.getElementById('modalOcultarMotivo');
+    const __motivoError  = document.getElementById('modalOcultarError');
+
+    function abrirModalOcultar(idPerfil, nombre) {
+        __formOcultar.action = `/admin/moderacion/perfiles/${idPerfil}/toggle-visibilidad`;
+        document.getElementById('modalOcultarUsuario').textContent = nombre || '';
+        __motivoInput.value = '';
+        __motivoError.classList.add('hidden');
+        __motivoError.textContent = '';
+        __modalOcultar.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => __motivoInput.focus(), 50);
+    }
+
+    function cerrarModalOcultar() {
+        __modalOcultar.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    function cerrarModalOcultarFondo(event) {
+        if (event.target === __modalOcultar) cerrarModalOcultar();
+    }
+
+    __formOcultar.addEventListener('submit', function (e) {
+        if (!__motivoInput.value.trim()) {
+            e.preventDefault();
+            __motivoError.textContent = 'Debes indicar el motivo para ocultar el portafolio.';
+            __motivoError.classList.remove('hidden');
+            __motivoInput.focus();
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !__modalOcultar.classList.contains('hidden')) {
+            cerrarModalOcultar();
+        }
+    });
+</script>
 @endsection

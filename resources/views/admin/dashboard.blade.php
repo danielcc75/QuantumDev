@@ -131,21 +131,7 @@
     </div>
 
     <!-- TERCERA FILA: Indicadores de salud -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <!-- Usuarios que nunca accedieron -->
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-gray-500 text-sm">Nunca han accedido</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $usuariosNuncaAccedieron }}</p>
-                    <p class="text-xs text-gray-400 mt-1">{{ $porcentajeNuncaAccedieron }}% del total</p>
-                </div>
-                <div class="bg-yellow-100 p-3 rounded-lg">
-                    <i class="fas fa-user-clock text-yellow-600 text-2xl"></i>
-                </div>
-            </div>
-        </div>
-
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <!-- Usuarios inactivos 30+ días -->
         <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
             <div class="flex justify-between items-start">

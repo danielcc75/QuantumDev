@@ -9,174 +9,179 @@
         </div>
     @endif
 
-    {{-- Encabezado --}}
+    {{-- Barra de moderación --}}
     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-200 flex items-center justify-between">
+        <div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-200 flex flex-wrap items-center justify-between gap-3">
             <div>
                 <h3 class="text-xl font-bold text-gray-800">
-                    <i class="fas fa-user-shield text-orange-600 mr-2"></i>
-                    Detalle de perfil — Moderación
+                    <i class="fas fa-eye text-orange-600 mr-2"></i>
+                    Portafolio publicado — {{ $perfil->usuario->nombre }} {{ $perfil->usuario->apellido }}
                 </h3>
-                <p class="text-sm text-gray-600 mt-1">Información completa del portafolio del usuario</p>
+                <p class="text-sm text-gray-600 mt-1">
+                    Vista del portafolio tal como lo ven los visitantes públicos.
+                </p>
             </div>
             <a href="{{ route('admin.perfiles') }}" class="text-sm text-gray-600 hover:text-gray-800">
                 <i class="fas fa-arrow-left mr-1"></i> Volver al listado
             </a>
         </div>
 
-        <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {{-- Datos básicos --}}
-            <div class="md:col-span-1 flex flex-col items-center text-center">
-                @if($perfil->foto_perfil)
-                    <img src="{{ $perfil->foto_perfil }}" alt="" class="h-28 w-28 rounded-full object-cover ring-4 ring-gray-100">
-                @else
-                    <div class="h-28 w-28 rounded-full bg-gradient-to-r from-[#1e3a5f] to-indigo-600 flex items-center justify-center ring-4 ring-gray-100">
-                        <span class="text-2xl font-bold text-white">
-                            {{ substr($perfil->usuario->nombre, 0, 1) }}{{ substr($perfil->usuario->apellido, 0, 1) }}
-                        </span>
-                    </div>
-                @endif
+        <div class="px-6 py-4 flex flex-wrap items-center gap-3">
+            @if($perfil->visible)
+                <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Visible (admin)</span>
+            @else
+                <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">Oculto (admin)</span>
+            @endif
 
-                <h4 class="mt-3 text-lg font-bold text-gray-800">
-                    {{ $perfil->usuario->nombre }} {{ $perfil->usuario->apellido }}
-                </h4>
-                <p class="text-sm text-gray-500">{{ $perfil->usuario->correo_electronico }}</p>
-                @if($perfil->ubicacion)
-                    <p class="text-sm text-gray-600 mt-1"><i class="fas fa-map-marker-alt mr-1"></i>{{ $perfil->ubicacion }}</p>
-                @endif
+            @php $vis = $perfil->visibilidad ?? 'publico'; @endphp
+            @if($vis === 'publico')
+                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">Perfil público</span>
+            @else
+                <span class="px-2 py-1 bg-gray-200 text-gray-700 rounded-full text-xs">Perfil privado</span>
+            @endif
 
-                <div class="mt-3 flex flex-wrap justify-center gap-2">
-                    @if($perfil->visible)
-                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Visible (admin)</span>
-                    @else
-                        <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">Oculto (admin)</span>
-                    @endif
+            @if($perfil->visible)
+                <button type="button"
+                    onclick="abrirModalOcultar({{ $perfil->id_perfil }}, '{{ addslashes(trim($perfil->usuario->nombre . ' ' . $perfil->usuario->apellido)) }}')"
+                    class="ml-auto text-orange-700 bg-orange-100 hover:bg-orange-200 px-3 py-2 rounded-lg text-sm">
+                    <i class="fas fa-eye-slash mr-1"></i> Ocultar portafolio
+                </button>
+            @else
+                <form action="{{ route('admin.moderacion.toggle-visibilidad', $perfil->id_perfil) }}" method="POST" class="ml-auto">
+                    @csrf
+                    <button type="submit" class="text-green-700 bg-green-100 hover:bg-green-200 px-3 py-2 rounded-lg text-sm">
+                        <i class="fas fa-eye mr-1"></i> Mostrar portafolio
+                    </button>
+                </form>
+            @endif
 
-                    @php $vis = $perfil->visibilidad ?? 'publico'; @endphp
-                    @if($vis === 'publico')
-                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">Perfil público</span>
-                    @else
-                        <span class="px-2 py-1 bg-gray-200 text-gray-700 rounded-full text-xs">Perfil privado</span>
-                    @endif
-                </div>
-
-                <div class="mt-4 w-full flex flex-col gap-2">
-                    <form action="{{ route('admin.moderacion.toggle-visibilidad', $perfil->id_perfil) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="w-full text-orange-700 bg-orange-100 hover:bg-orange-200 px-3 py-2 rounded-lg text-sm">
-                            {{ $perfil->visible ? 'Ocultar portafolio' : 'Mostrar portafolio' }}
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            {{-- Biografía + Nota --}}
-            <div class="md:col-span-2 space-y-4">
-                <div>
-                    <h5 class="text-sm font-semibold text-gray-700 mb-1">Biografía</h5>
-                    <p class="text-sm text-gray-700 bg-gray-50 rounded-lg p-3 whitespace-pre-line">
-                        {{ $perfil->biografia ?: 'Sin biografía' }}
-                    </p>
-                </div>
-
-                <div>
-                    <h5 class="text-sm font-semibold text-gray-700 mb-1">Nota de moderación</h5>
-                    <form action="{{ route('admin.moderacion.agregar-nota', $perfil->id_perfil) }}" method="POST" class="space-y-2">
-                        @csrf
-                        <textarea name="moderation_note" rows="3" maxlength="500"
-                            class="w-full border rounded-lg p-2 text-sm"
-                            placeholder="Anota el motivo de la decisión de moderación...">{{ old('moderation_note', $perfil->moderation_note) }}</textarea>
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-1.5 rounded-lg">
-                            Guardar nota
-                        </button>
-                    </form>
-                </div>
-
-                @if($perfil->links && $perfil->links->count())
-                    <div>
-                        <h5 class="text-sm font-semibold text-gray-700 mb-1">Enlaces</h5>
-                        <ul class="text-sm space-y-1">
-                            @foreach($perfil->links as $link)
-                                <li>
-                                    <span class="font-medium capitalize">{{ $link->tipo }}:</span>
-                                    <a href="{{ $link->url }}" target="_blank" rel="noopener" class="text-blue-600 hover:underline break-all">
-                                        {{ $link->url }}
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-            </div>
+            <button type="button" onclick="abrirModalPortafolio({ data: window.__portafolioAdmin })"
+                class="text-blue-700 bg-blue-100 hover:bg-blue-200 px-3 py-2 rounded-lg text-sm">
+                <i class="fas fa-eye mr-1"></i> Reabrir vista pública
+            </button>
         </div>
     </div>
 
-    {{-- Experiencia laboral --}}
+    {{-- Nota de moderación --}}
     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
         <div class="px-6 py-3 border-b border-gray-200 bg-gray-50">
-            <h4 class="font-semibold text-gray-800"><i class="fas fa-briefcase text-[#1e3a5f] mr-2"></i>Experiencia laboral</h4>
+            <h4 class="font-semibold text-gray-800">
+                <i class="fas fa-sticky-note text-yellow-600 mr-2"></i>Nota de moderación
+            </h4>
         </div>
-        <div class="p-6">
-            @forelse($perfil->experienciasLaborales as $exp)
-                <div class="border-l-4 border-[#1e3a5f] pl-4 mb-4">
-                    <div class="flex items-center justify-between">
-                        <p class="font-semibold text-gray-800">{{ $exp->cargo }} — {{ $exp->empresa }}</p>
-                        @if($exp->publicado)
-                            <span class="px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-xs">Publicado</span>
-                        @else
-                            <span class="px-2 py-0.5 bg-gray-200 text-gray-700 rounded-full text-xs">No publicado</span>
-                        @endif
-                    </div>
-                    <p class="text-xs text-gray-500">
-                        {{ optional($exp->fecha_ini)->format('Y-m') }} —
-                        {{ $exp->trabajo_actual ? 'Actualidad' : optional($exp->fecha_fin)->format('Y-m') }}
-                    </p>
-                    @if($exp->descripcion)
-                        <p class="text-sm text-gray-700 mt-1 whitespace-pre-line">{{ $exp->descripcion }}</p>
-                    @endif
-                </div>
-            @empty
-                <p class="text-sm text-gray-500">Sin experiencia laboral registrada.</p>
-            @endforelse
-        </div>
-    </div>
-
-    {{-- Formación académica --}}
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div class="px-6 py-3 border-b border-gray-200 bg-gray-50">
-            <h4 class="font-semibold text-gray-800"><i class="fas fa-graduation-cap text-[#1e3a5f] mr-2"></i>Formación académica</h4>
-        </div>
-        <div class="p-6">
-            @forelse($perfil->formacionAcademica as $form)
-                <div class="border-l-4 border-indigo-500 pl-4 mb-4">
-                    <div class="flex items-center justify-between">
-                        <p class="font-semibold text-gray-800">{{ $form->titulo }}</p>
-                        @if($form->publicado)
-                            <span class="px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-xs">Publicado</span>
-                        @else
-                            <span class="px-2 py-0.5 bg-gray-200 text-gray-700 rounded-full text-xs">No publicado</span>
-                        @endif
-                    </div>
-                    <p class="text-sm text-gray-600">{{ $form->institucion }} @if($form->nivel) — {{ $form->nivel }} @endif</p>
-                    <p class="text-xs text-gray-500">
-                        {{ optional($form->fecha_ini)->format('Y-m') }} —
-                        {{ optional($form->fecha_fin)->format('Y-m') ?: 'Sin fecha fin' }}
-                    </p>
-                    @if($form->descripcion)
-                        <p class="text-sm text-gray-700 mt-1 whitespace-pre-line">{{ $form->descripcion }}</p>
-                    @endif
-                </div>
-            @empty
-                <p class="text-sm text-gray-500">Sin formación académica registrada.</p>
-            @endforelse
-        </div>
-    </div>
-
-    <div class="flex justify-end">
-        <a href="{{ route('admin.usuarios.show', $perfil->usuario->id_usuario) }}"
-           class="text-sm text-blue-700 hover:underline">
-            <i class="fas fa-external-link-alt mr-1"></i> Ver ficha de usuario
-        </a>
+        <form action="{{ route('admin.moderacion.agregar-nota', $perfil->id_perfil) }}" method="POST" class="p-6 space-y-2">
+            @csrf
+            <textarea name="moderation_note" rows="3" maxlength="500"
+                class="w-full border rounded-lg p-2 text-sm"
+                placeholder="Anota el motivo de la decisión de moderación...">{{ old('moderation_note', $perfil->moderation_note) }}</textarea>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-1.5 rounded-lg">
+                Guardar nota
+            </button>
+        </form>
     </div>
 </div>
+
+{{-- Modal del portafolio público --}}
+@include('home._modal_portafolio_publico')
+
+{{-- Modal: motivo para ocultar portafolio --}}
+@if($perfil->visible)
+<div id="modalOcultar" class="fixed inset-0 z-[80] hidden bg-black/50 backdrop-blur-sm" onclick="cerrarModalOcultarFondo(event)">
+    <div class="min-h-full flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden" onclick="event.stopPropagation()">
+            <div class="bg-gradient-to-r from-[#1e3a5f] to-[#e11d48] px-6 py-4 flex items-center justify-between">
+                <h3 class="text-white font-bold text-lg">
+                    <i class="fas fa-eye-slash mr-2"></i> Ocultar portafolio
+                </h3>
+                <button type="button" onclick="cerrarModalOcultar()" class="text-white/90 hover:text-white text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="formOcultar" method="POST">
+                @csrf
+                <div class="p-6 space-y-4">
+                    <p class="text-sm text-gray-700">
+                        Vas a ocultar el portafolio de
+                        <span id="modalOcultarUsuario" class="font-semibold text-gray-900"></span>.
+                        Indica el motivo (se guardará como nota de moderación).
+                    </p>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Motivo <span class="text-red-500">*</span>
+                        </label>
+                        <textarea name="motivo" id="modalOcultarMotivo" rows="4" maxlength="500" required
+                            class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:border-[#1e3a5f] focus:ring-2 focus:ring-[#1e3a5f]/20 outline-none"
+                            placeholder="Ej. Contenido inapropiado, datos personales expuestos, denuncia recibida..."></textarea>
+                        <p id="modalOcultarError" class="hidden mt-1 text-xs text-red-600"></p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 px-6 py-3 flex justify-end gap-2">
+                    <button type="button" onclick="cerrarModalOcultar()"
+                        class="px-4 py-2 rounded-lg text-sm text-gray-700 bg-gray-200 hover:bg-gray-300">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="px-4 py-2 rounded-lg text-sm text-white bg-[#e11d48] hover:bg-[#be123c]">
+                        <i class="fas fa-eye-slash mr-1"></i> Confirmar ocultar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+
+<script>
+    window.__portafolioAdmin = @json($portafolio);
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof window.abrirModalPortafolio === 'function') {
+            window.abrirModalPortafolio({ data: window.__portafolioAdmin });
+        }
+    });
+
+    @if($perfil->visible)
+    const __modalOcultar = document.getElementById('modalOcultar');
+    const __formOcultar  = document.getElementById('formOcultar');
+    const __motivoInput  = document.getElementById('modalOcultarMotivo');
+    const __motivoError  = document.getElementById('modalOcultarError');
+
+    function abrirModalOcultar(idPerfil, nombre) {
+        __formOcultar.action = `/admin/moderacion/perfiles/${idPerfil}/toggle-visibilidad`;
+        document.getElementById('modalOcultarUsuario').textContent = nombre || '';
+        __motivoInput.value = '';
+        __motivoError.classList.add('hidden');
+        __motivoError.textContent = '';
+        __modalOcultar.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => __motivoInput.focus(), 50);
+    }
+
+    function cerrarModalOcultar() {
+        __modalOcultar.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    function cerrarModalOcultarFondo(event) {
+        if (event.target === __modalOcultar) cerrarModalOcultar();
+    }
+
+    __formOcultar.addEventListener('submit', function (e) {
+        if (!__motivoInput.value.trim()) {
+            e.preventDefault();
+            __motivoError.textContent = 'Debes indicar el motivo para ocultar el portafolio.';
+            __motivoError.classList.remove('hidden');
+            __motivoInput.focus();
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !__modalOcultar.classList.contains('hidden')) {
+            cerrarModalOcultar();
+        }
+    });
+    @endif
+</script>
 @endsection

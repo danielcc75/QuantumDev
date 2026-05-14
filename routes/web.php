@@ -166,6 +166,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     // ========================================
     Route::get('/moderacion/perfiles', [ModeracionController::class, 'perfiles'])->name('admin.perfiles');
     Route::get('/moderacion/perfiles/{id}', [ModeracionController::class, 'verPerfil'])->name('admin.moderacion.ver-perfil');
+    Route::get('/moderacion/perfiles/{id}/portafolio-json', [ModeracionController::class, 'portafolioJson'])->name('admin.moderacion.portafolio-json');
     Route::post('/moderacion/perfiles/{id}/toggle-visibilidad', [ModeracionController::class, 'toggleVisibilidad'])->name('admin.moderacion.toggle-visibilidad');
     Route::post('/moderacion/perfiles/{id}/nota', [ModeracionController::class, 'agregarNota'])->name('admin.moderacion.agregar-nota');
 
