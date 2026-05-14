@@ -14,8 +14,9 @@ class ModeracionController extends Controller
     // Listado de perfiles para moderar
     public function perfiles(Request $request)
     {
-        $query = Perfil::with('usuario');
-        
+        // Solo perfiles cuyo usuario sigue activo (no desactivados / soft-deleted)
+        $query = Perfil::with('usuario')->whereHas('usuario');
+
         // Búsqueda
         if ($request->search) {
             $query->whereHas('usuario', function($q) use ($request) {
@@ -24,14 +25,14 @@ class ModeracionController extends Controller
                   ->orWhere('correo_electronico', 'like', "%{$request->search}%");
             });
         }
-        
+
         // Filtro por visibilidad
         if ($request->visible && $request->visible != 'todos') {
             $query->where('visible', $request->visible == 'visible');
         }
-        
+
         $perfiles = $query->orderBy('created_at', 'desc')->paginate(15);
-        
+
         return view('admin.moderacion.perfiles', compact('perfiles'));
     }
     
@@ -39,6 +40,9 @@ class ModeracionController extends Controller
     public function verPerfil($id)
     {
         $perfil = Perfil::with(['usuario'])->findOrFail($id);
+        if (!$perfil->usuario) {
+            abort(404, 'El usuario de este perfil está desactivado.');
+        }
         $portafolio = $this->construirPortafolioPublicado($perfil);
 
         return view('admin.moderacion.ver-perfil', compact('perfil', 'portafolio'));
@@ -48,6 +52,9 @@ class ModeracionController extends Controller
     public function portafolioJson($id)
     {
         $perfil = Perfil::with(['usuario'])->findOrFail($id);
+        if (!$perfil->usuario) {
+            return response()->json(['ok' => false, 'message' => 'Usuario desactivado'], 404);
+        }
         $portafolio = $this->construirPortafolioPublicado($perfil);
 
         return response()->json(['ok' => true, 'portafolio' => $portafolio]);

@@ -77,7 +77,7 @@
                             <i class="fas fa-pen text-xs"></i>
                         </button>
                         <form action="{{ route('admin.categorias.destroy', $categoria->id_categoria) }}" method="POST"
-                            class="inline ml-1" onsubmit="return confirm('¿Eliminar la categoría {{ $categoria->nombre }}?')">
+                            class="inline ml-1" data-confirm="¿Eliminar la categoría «{{ $categoria->nombre }}»?">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="text-red-600 hover:text-red-800" title="Eliminar">
@@ -138,7 +138,7 @@
                                             <i class="fas {{ $habilidad->activa ? 'fa-ban' : 'fa-check' }}"></i>
                                         </button>
                                     </form>
-                                    <form action="{{ route('admin.habilidades.destroy', $habilidad->id_habilidad) }}" method="POST" onsubmit="return confirm('¿Eliminar esta habilidad?')">
+                                    <form action="{{ route('admin.habilidades.destroy', $habilidad->id_habilidad) }}" method="POST" data-confirm="¿Eliminar la habilidad «{{ $habilidad->nombre }}»?">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="p-2 rounded-lg bg-red-100 text-red-600">
