@@ -7,9 +7,11 @@ use Illuminate\Validation\Rule;
 use App\Models\HabilidadBlanda;
 use App\Models\PerfilHabilidadBlanda;
 use App\Models\Usuario;
+use App\Traits\LogsActivity;
 
 class HabilidadBlandaController extends Controller
 {
+    use LogsActivity;
     public function store(Request $request)
     {
         $nombre = trim($request->nombre ?? '');
@@ -43,6 +45,7 @@ class HabilidadBlandaController extends Controller
             'estado' => 'activo',
         ]);
 
+        $this->logAdminAction('habilidad_blanda_creada', "Habilidad blanda: «{$nombre}»");
         return redirect()
             ->back()
             ->with('active_tab', 'blandas')
@@ -63,6 +66,7 @@ class HabilidadBlandaController extends Controller
 
         $habilidad->save();
 
+        $this->logAdminAction('habilidad_blanda_estado_cambiado', "Habilidad blanda «{$habilidad->nombre}»: {$habilidad->estado}");
         return redirect()
             ->back()
             ->with('active_tab', 'blandas')
@@ -103,6 +107,7 @@ class HabilidadBlandaController extends Controller
             'descripcion' => $request->descripcion,
         ]);
 
+        $this->logAdminAction('habilidad_blanda_actualizada', "Habilidad blanda ID {$habilidad->id_habilidad_blanda}: «{$habilidad->nombre}»");
         return redirect()
             ->back()
             ->with('active_tab', 'blandas')
@@ -122,8 +127,10 @@ class HabilidadBlandaController extends Controller
                 ->with('error', 'no se puede eliminar porque esta habilidad ya fue seleccionada por usuarios. puedes desactivarla.');
         }
 
+        $nombreBlanda = $habilidad->nombre;
         $habilidad->delete();
 
+        $this->logAdminAction('habilidad_blanda_eliminada', "Habilidad blanda: «{$nombreBlanda}»");
         return redirect()
             ->back()
             ->with('active_tab', 'blandas')

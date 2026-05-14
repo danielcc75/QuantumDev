@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Traits\LogsActivity;
 use App\Models\Proyecto;
 use App\Models\Usuario;
 use App\Models\Perfil;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 
 class ProyectoAdminController extends Controller
 {
+    use LogsActivity;
     // Listar todos los proyectos del sistema
     public function index(Request $request)
     {
@@ -67,8 +69,9 @@ class ProyectoAdminController extends Controller
         $proyecto->visible = !$proyecto->visible;
         $proyecto->save();
         
-        $estado = $proyecto->visible ? 'visible al público' : 'oculto';
-        return back()->with('success', "Proyecto ahora está {$estado}");
+        $estado = $proyecto->visible ? 'visible' : 'oculto';
+        $this->logAdminAction('proyecto_visibilidad_cambiada', "Proyecto «{$proyecto->nombre}» (ID {$proyecto->id_proyecto}) marcado como {$estado}");
+        return back()->with('success', "Proyecto ahora está {$estado} al público");
     }
     
     // Eliminar proyecto (deshabilitado)

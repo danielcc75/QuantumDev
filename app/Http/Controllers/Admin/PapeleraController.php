@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Traits\LogsActivity;
 use App\Models\Usuario;
 use App\Models\Proyecto;
 use App\Models\Habilidad;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 
 class PapeleraController extends Controller
 {
+    use LogsActivity;
     // Panel principal de papelera
     public function index()
     {
@@ -71,6 +73,7 @@ class PapeleraController extends Controller
         $usuario->delete_reason = null;
         $usuario->save();
 
+        $this->logAdminAction('usuario_restaurado', "Usuario ID {$usuario->id_usuario}: {$usuario->nombre} {$usuario->apellido} | Email: {$usuario->correo_electronico}");
         return back()->with('success', "Usuario '{$usuario->nombre} {$usuario->apellido}' restaurado");
     }
     
@@ -89,6 +92,7 @@ class PapeleraController extends Controller
         $proyecto->delete_reason = null;
         $proyecto->save();
         
+        $this->logAdminAction('proyecto_restaurado', "Proyecto ID {$proyecto->id_proyecto}: «{$proyecto->nombre}»");
         return back()->with('success', "Proyecto '{$proyecto->nombre}' restaurado");
     }
     
@@ -107,6 +111,7 @@ class PapeleraController extends Controller
         $habilidad->delete_reason = null;
         $habilidad->save();
 
+        $this->logAdminAction('habilidad_restaurada', "Habilidad ID {$habilidad->id_habilidad}: «{$habilidad->nombre}»");
         return back()->with('success', "Habilidad '{$habilidad->nombre}' restaurada");
     }
 
@@ -120,6 +125,7 @@ class PapeleraController extends Controller
         $experiencia->delete_reason = null;
         $experiencia->save();
 
+        $this->logAdminAction('experiencia_restaurada', "Experiencia ID {$experiencia->id_experiencia}: cargo «{$experiencia->cargo}» en {$experiencia->empresa}");
         return back()->with('success', "Experiencia en '{$experiencia->empresa}' restaurada");
     }
 
@@ -133,6 +139,7 @@ class PapeleraController extends Controller
         $educacion->delete_reason = null;
         $educacion->save();
 
+        $this->logAdminAction('educacion_restaurada', "Formación ID {$educacion->id_educacion}: «{$educacion->titulo}» en {$educacion->institucion}");
         return back()->with('success', "Formación '{$educacion->titulo}' restaurada");
     }
 

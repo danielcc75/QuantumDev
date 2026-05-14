@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Traits\LogsActivity;
 use App\Models\Habilidad;
 use App\Models\HabilidadBlanda;
 use App\Models\Categoria;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class HabilidadAdminController extends Controller
 {
+    use LogsActivity;
     // Listar todas las habilidades del sistema
     public function index(Request $request)
     {
@@ -56,6 +58,7 @@ class HabilidadAdminController extends Controller
         $habilidad->save();
         
         $estado = $habilidad->activa ? 'activada' : 'desactivada';
+        $this->logAdminAction('habilidad_estado_cambiado', "Habilidad «{$habilidad->nombre}» {$estado}");
         return back()->with('success', "Habilidad {$estado} correctamente");
     }
     
@@ -93,6 +96,7 @@ class HabilidadAdminController extends Controller
             }
         }
         
+        $this->logAdminAction('habilidades_fusionadas', "«{$request->nombre_original}» fusionada en «{$request->nombre_fusion}»");
         return back()->with('success', "Habilidades fusionadas exitosamente en '{$request->nombre_fusion}'");
     }
     
@@ -100,8 +104,10 @@ class HabilidadAdminController extends Controller
     public function destroy($id)
     {
         $habilidad = Habilidad::findOrFail($id);
+        $nombre = $habilidad->nombre;
         $habilidad->delete();
 
+        $this->logAdminAction('habilidad_eliminada', "Habilidad técnica: «{$nombre}»");
         return back()->with('success', 'Habilidad eliminada correctamente');
     }
 }

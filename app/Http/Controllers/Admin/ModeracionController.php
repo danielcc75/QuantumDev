@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Traits\LogsActivity;
 use App\Models\Perfil;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Carbon\Carbon;
 
 class ModeracionController extends Controller
 {
+    use LogsActivity;
     // Listado de perfiles para moderar
     public function perfiles(Request $request)
     {
@@ -248,6 +250,9 @@ class ModeracionController extends Controller
         $perfil->save();
 
         $estado = $perfil->visible ? 'visible' : 'oculto';
+        $usuario = $perfil->usuario;
+        $nombre  = $usuario ? "{$usuario->nombre} {$usuario->apellido}" : "Perfil ID {$perfil->id_perfil}";
+        $this->logAdminAction('perfil_visibilidad_cambiada', "Portafolio de {$nombre} marcado como {$estado}" . (!$perfil->visible && $perfil->moderation_note ? " | Motivo: {$perfil->moderation_note}" : ''));
         return back()->with('success', "Perfil marcado como {$estado}");
     }
     
@@ -262,7 +267,10 @@ class ModeracionController extends Controller
         
         $perfil->moderation_note = $request->moderation_note;
         $perfil->save();
-        
+
+        $usuario = $perfil->usuario;
+        $nombre  = $usuario ? "{$usuario->nombre} {$usuario->apellido}" : "Perfil ID {$perfil->id_perfil}";
+        $this->logAdminAction('nota_moderacion_guardada', "Portafolio de {$nombre} | Nota: " . ($perfil->moderation_note ?? '(borrada)'));
         return back()->with('success', 'Nota de moderación guardada');
     }
 }

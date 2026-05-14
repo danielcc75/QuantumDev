@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Traits\LogsActivity;
 use App\Models\Tecnologia;
 use Illuminate\Http\Request;
 
 class TecnologiaAdminController extends Controller
 {
+    use LogsActivity;
     public function index(Request $request)
     {
         $search    = trim((string) $request->input('search', ''));
@@ -58,11 +60,12 @@ class TecnologiaAdminController extends Controller
             'categoria' => 'required|string|max:100',
         ]);
 
-        Tecnologia::create([
+        $tecnologia = Tecnologia::create([
             'nombre' => $request->nombre,
             'categoria' => trim($request->categoria),
         ]);
 
+        $this->logAdminAction('tecnologia_creada', "Tecnología: «{$tecnologia->nombre}» | Categoría: {$tecnologia->categoria}");
         return back()->with('success', 'Tecnología creada correctamente');
     }
 
@@ -80,6 +83,7 @@ class TecnologiaAdminController extends Controller
             'categoria' => trim($request->categoria),
         ]);
 
+        $this->logAdminAction('tecnologia_actualizada', "Tecnología ID {$tecnologia->id_tecnologia}: «{$tecnologia->nombre}» | Categoría: {$tecnologia->categoria}");
         return back()->with('success', 'Tecnología actualizada correctamente');
     }
     
@@ -92,8 +96,10 @@ class TecnologiaAdminController extends Controller
             return back()->with('error', 'No se puede eliminar: hay proyectos usando esta tecnología');
         }
         
+        $nombre = $tecnologia->nombre;
         $tecnologia->delete();
-        
+
+        $this->logAdminAction('tecnologia_eliminada', "Tecnología: «{$nombre}»");
         return back()->with('success', 'Tecnología eliminada correctamente');
     }
 }

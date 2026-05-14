@@ -183,6 +183,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     // Backups
     Route::get('/backup', [BackupController::class, 'index'])->name('admin.backup');
     Route::post('/backup/create', [BackupController::class, 'create'])->name('admin.backup.create');
+    Route::post('/backup/create-por-fechas', [BackupController::class, 'createByDates'])->name('admin.backup.createByDates');
     Route::get('/backup/download/{filename}', [BackupController::class, 'download'])->name('admin.backup.download');
     Route::delete('/backup/{filename}', [BackupController::class, 'destroy'])->name('admin.backup.destroy');
 
