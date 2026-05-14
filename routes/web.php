@@ -1,9 +1,12 @@
 <?php
 
-use App\Http\Controllers\UsuarioWebController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\HabilidadController;
 use App\Http\Controllers\HabilidadBlandaController;
+use App\Http\Controllers\PortafolioController;
+use App\Http\Controllers\CuentaController;
+use App\Http\Controllers\PerfilWebController;
+use App\Http\Controllers\AuthWebController;
 use Illuminate\Support\Facades\Route;
 
 // =========================
@@ -16,24 +19,16 @@ Route::get('/', function () {
 // =========================
 // AUTH
 // =========================
-Route::post('/login', [UsuarioWebController::class, 'login'])->name('login.store');
-Route::post('/register', [UsuarioWebController::class, 'store'])->name('register.store');
-Route::post('/logout', [UsuarioWebController::class, 'logout'])->name('logout');
-Route::get('/dashboard', [UsuarioWebController::class, 'dashboard'])->name('dashboard');
+Route::post('/login', [AuthWebController::class, 'login'])->name('login.store');
+Route::post('/register', [AuthWebController::class, 'register'])->name('register.store');
+Route::post('/logout', [AuthWebController::class, 'logout'])->name('logout');
+Route::get('/dashboard', [AuthWebController::class, 'dashboard'])->name('dashboard');
 
 
 
 // =========================
-// PROYECTOS CRUD
+// PROYECTOS CRUD (usado por AJAX desde el dashboard)
 // =========================
-Route::get('/proyectos', [ProyectoController::class, 'index'])->name('proyectos.index');
-Route::get('/proyectos/{id}', [ProyectoController::class, 'show'])->name('proyectos.show');
-Route::post('/proyectos', [ProyectoController::class, 'store'])->name('proyectos.store');
-Route::put('/proyectos/{id}', [ProyectoController::class, 'update'])->name('proyectos.update');
-Route::delete('/proyectos/{id}', [ProyectoController::class, 'destroy'])->name('proyectos.destroy');
-
-
-// CRUD Proyectos (usado por AJAX desde el dashboard)
 Route::get('/proyectos',         [ProyectoController::class, 'index'])->name('proyectos.index');
 Route::get('/proyectos/{id}',    [ProyectoController::class, 'show'])->name('proyectos.show');
 Route::post('/proyectos',        [ProyectoController::class, 'store'])->name('proyectos.store');
@@ -41,9 +36,9 @@ Route::put('/proyectos/{id}',    [ProyectoController::class, 'update'])->name('p
 Route::delete('/proyectos/{id}', [ProyectoController::class, 'destroy'])->name('proyectos.destroy');
 
 // Perfil 2
-Route::get('/mi-perfil', [UsuarioWebController::class, 'verPerfil'])->name('perfil.ver');
-Route::get('/mi-perfil/editar', [UsuarioWebController::class, 'editarPerfil'])->name('perfil.editar');
-Route::put('/mi-perfil', [UsuarioWebController::class, 'actualizarPerfil'])->name('perfil.actualizar');
+Route::get('/mi-perfil', [PerfilWebController::class, 'ver'])->name('perfil.ver');
+Route::get('/mi-perfil/editar', [PerfilWebController::class, 'editar'])->name('perfil.editar');
+Route::put('/mi-perfil', [PerfilWebController::class, 'actualizar'])->name('perfil.actualizar');
 
 // Experiencia Laboral
 Route::get('/perfil/experiencia/{id}', [App\Http\Controllers\ExperienciaController::class, 'show'])->name('perfil.experiencia.mostrar');
@@ -84,9 +79,6 @@ Route::delete('/habilidades/{id}', [HabilidadController::class, 'destroy'])
 
 
 //Rutas Habilidades blandas
-Route::get('/admin/habilidades-blandas', [HabilidadBlandaController::class, 'index'])
-    ->name('habilidades-blandas.index');
-
 Route::post('/admin/habilidades-blandas', [HabilidadBlandaController::class, 'store'])
     ->name('habilidades-blandas.store');
 
@@ -99,19 +91,19 @@ Route::put('/admin/habilidades-blandas/{id}', [HabilidadBlandaController::class,
 Route::delete('/admin/habilidades-blandas/{id}', [HabilidadBlandaController::class, 'destroy'])
     ->name('habilidades-blandas.destroy');
 
-Route::post('/habilidades-blandas/guardar', [UsuarioWebController::class, 'guardarHabilidadesBlandas'])
+Route::post('/habilidades-blandas/guardar', [HabilidadBlandaController::class, 'guardarSeleccionUsuario'])
     ->name('habilidades-blandas.guardar');
 
 // =========================
 // CONFIGURACIÓN DE CUENTA
 // =========================
-Route::put('/cuenta/datos',       [UsuarioWebController::class, 'actualizarDatosCuenta'])->name('cuenta.datos');
-Route::put('/cuenta/contrasenia', [UsuarioWebController::class, 'cambiarContrasenia'])->name('cuenta.contrasenia');
-Route::put('/cuenta/visibilidad', [UsuarioWebController::class, 'cambiarVisibilidad'])->name('cuenta.visibilidad');
-Route::get('/cuenta/portafolio/datos', [UsuarioWebController::class, 'datosPortafolio'])->name('cuenta.portafolio.datos');
-Route::put('/cuenta/portafolio/publicar', [UsuarioWebController::class, 'publicarPortafolio'])->name('cuenta.portafolio.publicar');
-Route::post('/cuenta/portafolio/preview', [UsuarioWebController::class, 'previewPortafolio'])->name('cuenta.portafolio.preview');
-Route::put('/cuenta/desactivar',  [UsuarioWebController::class, 'desactivarCuenta'])->name('cuenta.desactivar');
+Route::put('/cuenta/datos',       [CuentaController::class, 'actualizarDatos'])->name('cuenta.datos');
+Route::put('/cuenta/contrasenia', [CuentaController::class, 'cambiarContrasenia'])->name('cuenta.contrasenia');
+Route::put('/cuenta/visibilidad', [CuentaController::class, 'cambiarVisibilidad'])->name('cuenta.visibilidad');
+Route::get('/cuenta/portafolio/datos', [PortafolioController::class, 'datos'])->name('cuenta.portafolio.datos');
+Route::put('/cuenta/portafolio/publicar', [PortafolioController::class, 'publicar'])->name('cuenta.portafolio.publicar');
+Route::post('/cuenta/portafolio/preview', [PortafolioController::class, 'preview'])->name('cuenta.portafolio.preview');
+Route::put('/cuenta/desactivar',  [CuentaController::class, 'desactivar'])->name('cuenta.desactivar');
 
 // ============================================================
 // PANEL DE ADMINISTRADOR (todas las funcionalidades)
@@ -218,6 +210,6 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
     // Vaciar
     Route::delete('/vaciar', [PapeleraController::class, 'vaciarPapelera'])->name('admin.papelera.vaciar');
-    Route::put('/perfil/desactivar-cuenta', [UsuarioWebController::class, 'desactivarCuenta'])->name('admin.perfil.desactivar-cuenta');
+    Route::put('/perfil/desactivar-cuenta', [CuentaController::class, 'desactivar'])->name('admin.perfil.desactivar-cuenta');
     });
 });

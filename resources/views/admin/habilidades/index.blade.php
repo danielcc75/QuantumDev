@@ -103,7 +103,7 @@
                     <div class="inline-flex items-center bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-sm">
                         <span class="font-medium text-gray-700">{{ $categoria->nombre }}</span>
                         <span class="ml-2 text-xs text-gray-500">({{ $categoria->habilidades_count ?? 0 }})</span>
-                        <button type="button" onclick="abrirModalEditarCategoria({{ $categoria->id_categoria }}, '{{ addslashes($categoria->nombre) }}')"
+                        <button type="button" onclick="abrirModalEditarCategoria({{ $categoria->id_categoria }}, {!! Js::from($categoria->nombre) !!})"
                             class="ml-2 text-blue-600 hover:text-blue-800" title="Editar">
                             <i class="fas fa-pen text-xs"></i>
                         </button>
@@ -233,6 +233,11 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex space-x-2">
+                                    <button type="button"
+                                        onclick="abrirModalEditarBlanda({{ $blanda->id_habilidad_blanda }}, {!! Js::from($blanda->nombre) !!}, {!! Js::from($blanda->descripcion ?? '') !!})"
+                                        class="p-2 rounded-lg bg-blue-100 text-blue-600" title="Editar">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
                                     <form action="{{ route('habilidades-blandas.toggle', $blanda->id_habilidad_blanda) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="p-2 rounded-lg {{ $blanda->estado === 'activo' ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-600' }}">
@@ -274,6 +279,29 @@
             </div>
             <div class="flex justify-end gap-3">
                 <button type="button" onclick="cerrarModalEditarCategoria()" class="px-4 py-2 bg-gray-300 rounded-lg">Cancelar</button>
+                <button type="submit" class="px-4 py-2 bg-[#1e3a5f] text-white rounded-lg">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Editar Habilidad Blanda -->
+<div id="modalEditarBlanda" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6">
+        <h3 class="text-xl font-bold mb-4">Editar habilidad blanda</h3>
+        <form id="formEditarBlanda" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Nombre</label>
+                <input type="text" id="blanda_nombre" name="nombre" required maxlength="100" class="w-full px-3 py-2 border rounded-lg">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Descripción</label>
+                <input type="text" id="blanda_descripcion" name="descripcion" maxlength="500" class="w-full px-3 py-2 border rounded-lg">
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="cerrarModalEditarBlanda()" class="px-4 py-2 bg-gray-300 rounded-lg">Cancelar</button>
                 <button type="submit" class="px-4 py-2 bg-[#1e3a5f] text-white rounded-lg">Guardar</button>
             </div>
         </form>
@@ -356,6 +384,23 @@
 
     function cerrarModalEditarCategoria() {
         const modal = document.getElementById('modalEditarCategoria');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    function abrirModalEditarBlanda(id, nombre, descripcion) {
+        const form = document.getElementById('formEditarBlanda');
+        form.action = "{{ url('admin/habilidades-blandas') }}/" + id;
+        document.getElementById('blanda_nombre').value = nombre;
+        document.getElementById('blanda_descripcion').value = descripcion;
+        const modal = document.getElementById('modalEditarBlanda');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        activarTab('blandas');
+    }
+
+    function cerrarModalEditarBlanda() {
+        const modal = document.getElementById('modalEditarBlanda');
         modal.classList.add('hidden');
         modal.classList.remove('flex');
     }

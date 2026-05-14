@@ -42,7 +42,7 @@
 
             @if($perfil->visible)
                 <button type="button"
-                    onclick="abrirModalOcultar({{ $perfil->id_perfil }}, '{{ addslashes(trim($perfil->usuario->nombre . ' ' . $perfil->usuario->apellido)) }}')"
+                    onclick="abrirModalOcultar({{ $perfil->id_perfil }}, {!! Js::from(trim($perfil->usuario->nombre . ' ' . $perfil->usuario->apellido)) !!})"
                     class="ml-auto text-orange-700 bg-orange-100 hover:bg-orange-200 px-3 py-2 rounded-lg text-sm">
                     <i class="fas fa-eye-slash mr-1"></i> Ocultar portafolio
                 </button>

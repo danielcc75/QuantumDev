@@ -8,6 +8,6 @@ use App\Http\Controllers\PerfilController;
 
 
 
-Route::apiResource('proyectos', ProyectoController::class);
-Route::apiResource('usuarios', UsuarioController::class);
-Route::apiResource('perfiles', PerfilController::class);
+Route::apiResource('proyectos', ProyectoController::class)->names('api.proyectos');
+Route::apiResource('usuarios', UsuarioController::class)->names('api.usuarios');
+Route::apiResource('perfiles', PerfilController::class)->names('api.perfiles');

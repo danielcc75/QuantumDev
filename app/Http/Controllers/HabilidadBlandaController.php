@@ -6,15 +6,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Models\HabilidadBlanda;
 use App\Models\PerfilHabilidadBlanda;
+use App\Models\Usuario;
 
 class HabilidadBlandaController extends Controller
 {
-    public function index()
-    {
-        $habilidadesBlandas = HabilidadBlanda::orderBy('id_habilidad_blanda', 'desc')->get();
-
-        return view('gestionHabilidadesBlandas.admin', compact('habilidadesBlandas'));
-    }
     public function store(Request $request)
     {
         $nombre = trim($request->nombre ?? '');
@@ -133,5 +128,32 @@ class HabilidadBlandaController extends Controller
             ->back()
             ->with('active_tab', 'blandas')
             ->with('success', 'habilidad blanda eliminada correctamente');
+    }
+
+    public function guardarSeleccionUsuario(Request $request)
+    {
+        $request->validate([
+            'habilidades' => 'nullable|array|max:6'
+        ]);
+
+        $usuario = Usuario::with('perfil')->find(session('usuario_id'));
+
+        if (!$usuario || !$usuario->perfil) {
+            return response()->json(['ok' => false], 400);
+        }
+
+        $perfilId = $usuario->perfil->id_perfil;
+
+        PerfilHabilidadBlanda::where('id_perfil', $perfilId)->delete();
+
+        foreach ($request->habilidades ?? [] as $idHabilidad) {
+            PerfilHabilidadBlanda::create([
+                'id_perfil' => $perfilId,
+                'id_habilidad_blanda' => $idHabilidad,
+                'publicado' => false,
+            ]);
+        }
+
+        return response()->json(['ok' => true]);
     }
 }

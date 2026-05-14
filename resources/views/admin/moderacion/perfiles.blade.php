@@ -71,7 +71,7 @@
                             @if($perfil->visible)
                                 {{-- Abrir modal para pedir el motivo --}}
                                 <button type="button"
-                                    onclick="abrirModalOcultar({{ $perfil->id_perfil }}, '{{ addslashes(trim($perfil->usuario->nombre . ' ' . $perfil->usuario->apellido)) }}')"
+                                    onclick="abrirModalOcultar({{ $perfil->id_perfil }}, {!! Js::from(trim($perfil->usuario->nombre . ' ' . $perfil->usuario->apellido)) !!})"
                                     class="text-orange-600 bg-orange-100 hover:bg-orange-200 p-2 rounded-lg">
                                     Ocultar
                                 </button>

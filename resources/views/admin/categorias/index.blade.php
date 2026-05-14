@@ -40,7 +40,7 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div class="flex space-x-2">
-                            <button onclick='editarCategoria({{ $categoria->id_categoria }}, "{{ addslashes($categoria->nombre) }}")' 
+                            <button onclick="editarCategoria({{ $categoria->id_categoria }}, {!! Js::from($categoria->nombre) !!})"
                                     class="text-yellow-600 hover:text-yellow-900 bg-yellow-100 hover:bg-yellow-200 p-2 rounded-lg transition">
                                 <i class="fas fa-edit"></i>
                             </button>

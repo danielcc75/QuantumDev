@@ -16,6 +16,10 @@ class ProyectoController extends Controller
 
     public function store(Request $request)
     {
+        if (!session('usuario_id')) {
+            return response()->json(['success' => false, 'message' => 'No autenticado'], 401);
+        }
+
         $request->validate([
             'nombre'    => 'required|string|max:100',
             'fecha_ini' => 'required|date',
@@ -23,8 +27,7 @@ class ProyectoController extends Controller
             'estado'    => 'in:pendiente,en_progreso,completado,cancelado',
         ]);
 
-        // Resolver id_perfil a partir de user_id
-        $perfil = Perfil::where('id_usuario', $request->user_id)->first();
+        $perfil = Perfil::where('id_usuario', session('usuario_id'))->first();
         if (!$perfil) {
             return response()->json(['success' => false, 'message' => 'Perfil no encontrado'], 404);
         }
@@ -48,12 +51,22 @@ class ProyectoController extends Controller
 
     public function show($id)
     {
-        return Proyecto::findOrFail($id);
+        $proyecto = Proyecto::findOrFail($id);
+
+        if (!$this->usuarioPuedeAcceder($proyecto)) {
+            return response()->json(['error' => 'No autorizado'], 403);
+        }
+
+        return $proyecto;
     }
 
     public function update(Request $request, $id)
     {
         $proyecto = Proyecto::findOrFail($id);
+
+        if (!$this->usuarioPuedeAcceder($proyecto)) {
+            return response()->json(['error' => 'No autorizado'], 403);
+        }
 
         $request->validate([
             'nombre'         => 'sometimes|string|max:100',
@@ -74,7 +87,6 @@ class ProyectoController extends Controller
             'id_experiencia'
         ]);
 
-        // Limpiar fecha_fin vacía
         if (array_key_exists('fecha_fin', $data) && empty($data['fecha_fin'])) {
             $data['fecha_fin'] = null;
         }
@@ -87,18 +99,26 @@ class ProyectoController extends Controller
     public function destroy($id)
     {
         $proyecto = Proyecto::findOrFail($id);
-        
-        // Verificar que el proyecto pertenece al usuario
-        $perfil = Perfil::where('id_usuario', session('usuario_id'))->first();
-        
-        if (!$perfil || $proyecto->id_perfil != $perfil->id_perfil) {
+
+        if (!$this->usuarioPuedeAcceder($proyecto)) {
             return response()->json(['error' => 'No autorizado'], 403);
         }
-        
+
         $proyecto->deleted_by = session('usuario_id');
         $proyecto->delete_reason = 'Eliminado por el usuario';
-        $proyecto->delete(); // Soft delete
-        
+        $proyecto->delete();
+
         return response()->json(['success' => true, 'message' => 'Proyecto eliminado']);
+    }
+
+    private function usuarioPuedeAcceder(Proyecto $proyecto): bool
+    {
+        if (!session('usuario_id')) {
+            return false;
+        }
+
+        $perfil = Perfil::where('id_usuario', session('usuario_id'))->first();
+
+        return $perfil && $proyecto->id_perfil == $perfil->id_perfil;
     }
 }
