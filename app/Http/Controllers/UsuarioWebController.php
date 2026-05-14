@@ -96,9 +96,7 @@ class UsuarioWebController extends Controller
             'contrasenia' => 'required'
         ]);
 
-        $usuario = Usuario::where('correo_electronico', $request->correo_electronico)
-            ->where('estado', 'activo')
-            ->first();
+        $usuario = Usuario::where('correo_electronico', $request->correo_electronico)->first();
 
         if (!$usuario || !Hash::check($request->contrasenia, $usuario->contrasenia)) {
             if ($request->expectsJson()) {
@@ -112,6 +110,21 @@ class UsuarioWebController extends Controller
                 ], 422);
             }
             return redirect('/')->with('error_login', 'El correo o la contraseña no son correctos.');
+        }
+
+        if ($usuario->estado !== 'activo') {
+            $mensaje = 'Tu cuenta ha sido suspendida. Ponte en contacto con el administrador para más información.';
+            $this->logSecurity(
+                'login_suspendido',
+                "Intento de login de cuenta suspendida: {$usuario->correo_electronico}"
+            );
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => $mensaje
+                ], 403);
+            }
+            return redirect('/')->with('error_login', $mensaje);
         }
 
         session([
@@ -203,7 +216,13 @@ class UsuarioWebController extends Controller
 
         // Bloquea la vista pública si el perfil es privado y el visitante no es el dueño
         $esDueno = session('usuario_id') == $usuario->id_usuario;
-        if ($usuario->perfil && ($usuario->perfil->visibilidad ?? 'publico') === 'privado' && !$esDueno) {
+        $visitante = session('usuario_id') ? Usuario::find(session('usuario_id')) : null;
+        $esAdmin = $visitante && $visitante->is_admin;
+        if ($usuario->perfil && ($usuario->perfil->visibilidad ?? 'publico') === 'privado' && !$esDueno && !$esAdmin) {
+            abort(404);
+        }
+        // Bloquea la vista pública si un admin ocultó el perfil (moderación)
+        if ($usuario->perfil && !($usuario->perfil->visible ?? true) && !$esDueno && !$esAdmin) {
             abort(404);
         }
 

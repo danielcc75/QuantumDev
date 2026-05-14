@@ -261,6 +261,7 @@
                         ->join('perfil as p', 'u.id_usuario', '=', 'p.id_usuario')
                         ->select('u.id_usuario', 'u.nombre', 'u.apellido', 'p.id_perfil', 'p.biografia', 'p.ubicacion', 'p.foto_perfil')
                         ->where('p.visibilidad', 'publico')
+                        ->where('p.visible', true)
                         ->where(function ($q) {
                             $q->whereNotNull('p.biografia')
                               ->orWhereExists(function ($sub) {
