@@ -26,10 +26,6 @@
             <p class="text-2xl font-bold">{{ $estadisticas['privados'] }}</p>
             <p class="text-xs text-gray-500">Privados</p>
         </div>
-        <div class="bg-white rounded-xl shadow-md p-4 text-center border-l-4 border-yellow-500">
-            <p class="text-2xl font-bold">{{ $estadisticas['destacados'] }}</p>
-            <p class="text-xs text-gray-500">Destacados</p>
-        </div>
     </div>
     
     <!-- Filtros -->
@@ -52,15 +48,9 @@
                 <option value="privado" {{ request('visibilidad') == 'privado' ? 'selected' : '' }}>Privados</option>
             </select>
             
-            <select name="destacado" class="px-3 py-2 border rounded-lg text-sm">
-                <option value="todos">Todos</option>
-                <option value="si" {{ request('destacado') == 'si' ? 'selected' : '' }}>Destacados</option>
-                <option value="no" {{ request('destacado') == 'no' ? 'selected' : '' }}>No destacados</option>
-            </select>
-            
             <button type="submit" class="bg-[#1e3a5f] text-white px-4 py-2 rounded-lg text-sm">Filtrar</button>
-            
-            @if(request()->anyFilled(['search', 'estado', 'visibilidad', 'destacado']))
+
+            @if(request()->anyFilled(['search', 'estado', 'visibilidad']))
                 <a href="{{ route('admin.proyectos') }}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm">Limpiar</a>
             @endif
         </form>
@@ -115,9 +105,6 @@
                             @else
                                 <span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">Oculto</span>
                             @endif
-                            @if($proyecto->destacado)
-                                <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs ml-1">⭐ Destacado</span>
-                            @endif
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-500">
                             {{ $proyecto->created_at->format('d/m/Y') }}
@@ -134,14 +121,6 @@
                                     <button type="submit" class="p-2 rounded-lg bg-orange-100 text-orange-600 hover:bg-orange-200" 
                                             title="{{ $proyecto->visible ? 'Ocultar' : 'Mostrar' }}">
                                         <i class="fas {{ $proyecto->visible ? 'fa-eye-slash' : 'fa-eye' }}"></i>
-                                    </button>
-                                </form>
-                                
-                                <form action="{{ route('admin.proyectos.toggle-destacado', $proyecto->id_proyecto) }}" method="POST" class="inline">
-                                    @csrf
-                                    <button type="submit" class="p-2 rounded-lg bg-yellow-100 text-yellow-600 hover:bg-yellow-200" 
-                                            title="{{ $proyecto->destacado ? 'Quitar destacado' : 'Destacar' }}">
-                                        <i class="fas {{ $proyecto->destacado ? 'fa-star' : 'fa-star-o' }}"></i>
                                     </button>
                                 </form>
                                 

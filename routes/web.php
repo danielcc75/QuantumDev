@@ -173,7 +173,6 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::get('/proyectos', [ProyectoAdminController::class, 'index'])->name('admin.proyectos');
     Route::get('/proyectos/{id}', [ProyectoAdminController::class, 'show'])->name('admin.proyectos.show');
     Route::post('/proyectos/{id}/toggle-visibilidad', [ProyectoAdminController::class, 'toggleVisibilidad'])->name('admin.proyectos.toggle-visibilidad');
-    Route::post('/proyectos/{id}/toggle-destacado', [ProyectoAdminController::class, 'toggleDestacado'])->name('admin.proyectos.toggle-destacado');
     Route::delete('/proyectos/{id}', [ProyectoAdminController::class, 'destroy'])->name('admin.proyectos.destroy');
 
 

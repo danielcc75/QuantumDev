@@ -33,11 +33,6 @@ class ProyectoAdminController extends Controller
             $query->where('visible', $request->visibilidad == 'publico');
         }
         
-        // Filtro por destacado
-        if ($request->destacado && $request->destacado != 'todos') {
-            $query->where('destacado', $request->destacado == 'si');
-        }
-        
         // Filtro por fecha
         if ($request->fecha) {
             $query->whereDate('created_at', $request->fecha);
@@ -53,7 +48,6 @@ class ProyectoAdminController extends Controller
             'completados' => Proyecto::where('estado', 'completado')->count(),
             'en_progreso' => Proyecto::where('estado', 'en_progreso')->count(),
             'pendientes' => Proyecto::where('estado', 'pendiente')->count(),
-            'destacados' => Proyecto::where('destacado', true)->count(),
         ];
         
         return view('admin.proyectos.index', compact('proyectos', 'estadisticas'));
@@ -75,17 +69,6 @@ class ProyectoAdminController extends Controller
         
         $estado = $proyecto->visible ? 'visible al público' : 'oculto';
         return back()->with('success', "Proyecto ahora está {$estado}");
-    }
-    
-    // Marcar/Desmarcar como destacado
-    public function toggleDestacado($id)
-    {
-        $proyecto = Proyecto::findOrFail($id);
-        $proyecto->destacado = !$proyecto->destacado;
-        $proyecto->save();
-        
-        $estado = $proyecto->destacado ? 'destacado' : 'ya no está destacado';
-        return back()->with('success', "Proyecto marcado como {$estado}");
     }
     
     // Eliminar proyecto (deshabilitado)

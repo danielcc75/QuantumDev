@@ -58,10 +58,6 @@
                             <span>{{ $proyecto->visible ? 'Público' : 'Oculto' }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-500">Destacado:</span>
-                            <span>{{ $proyecto->destacado ? 'Sí' : 'No' }}</span>
-                        </div>
-                        <div class="flex justify-between">
                             <span class="text-gray-500">Fecha inicio:</span>
                             <span>{{ $proyecto->fecha_ini ? $proyecto->fecha_ini->format('d/m/Y') : 'N/A' }}</span>
                         </div>
