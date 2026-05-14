@@ -119,32 +119,6 @@
 
 @include('admin.habilidades._modales')
 
-<!-- Modal confirmación eliminar -->
-<div id="modalConfirmEliminar" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
-        <div class="flex items-center mb-4">
-            <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mr-4 flex-shrink-0">
-                <i class="fas fa-exclamation-triangle text-red-600 text-lg"></i>
-            </div>
-            <div>
-                <h3 class="text-lg font-bold text-gray-900">Confirmar eliminación</h3>
-                <p id="modalConfirmEliminarMsg" class="text-sm text-gray-600 mt-1">¿Estás seguro?</p>
-            </div>
-        </div>
-        <p class="text-xs text-gray-400 mb-5">Esta acción no se puede deshacer.</p>
-        <div class="flex justify-end gap-3">
-            <button type="button" id="btnCancelarConfirmEliminar"
-                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium">
-                Cancelar
-            </button>
-            <button type="button" id="btnConfirmarEliminar"
-                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium">
-                <i class="fas fa-trash mr-1"></i> Eliminar
-            </button>
-        </div>
-    </div>
-</div>
-
 <script>
     function activarTab(target) {
         document.querySelectorAll('.tab-btn').forEach(b => {
@@ -229,37 +203,5 @@
         modal.classList.add('hidden');
         modal.classList.remove('flex');
     }
-
-    // ---- Confirmación global de eliminación ----
-    let _pendingDeleteForm = null;
-
-    function cerrarConfirmEliminar() {
-        document.getElementById('modalConfirmEliminar').classList.add('hidden');
-        _pendingDeleteForm = null;
-    }
-
-    document.addEventListener('submit', function (e) {
-        const form = e.target;
-        if (!form.dataset.confirm) return;
-        if (form.dataset.confirmed === '1') { form.removeAttribute('data-confirmed'); return; }
-        e.preventDefault();
-        _pendingDeleteForm = form;
-        document.getElementById('modalConfirmEliminarMsg').textContent = form.dataset.confirm;
-        document.getElementById('modalConfirmEliminar').classList.remove('hidden');
-    });
-
-    document.getElementById('btnConfirmarEliminar').addEventListener('click', function () {
-        if (_pendingDeleteForm) {
-            _pendingDeleteForm.dataset.confirmed = '1';
-            _pendingDeleteForm.submit();
-            cerrarConfirmEliminar();
-        }
-    });
-
-    document.getElementById('btnCancelarConfirmEliminar').addEventListener('click', cerrarConfirmEliminar);
-
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') cerrarConfirmEliminar();
-    });
 </script>
 @endsection

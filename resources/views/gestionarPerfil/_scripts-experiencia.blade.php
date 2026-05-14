@@ -48,10 +48,10 @@ const CONFIRM_CONFIG_EXPERIENCIA = {
         titulo:      '¿Descartar cambios?',
         mensaje:     'Los datos ingresados no se guardarán. Esta acción no se puede deshacer.',
         icon:        'fas fa-times-circle',
-        iconBg:      'bg-gray-100',
-        iconColor:   'text-gray-500',
-        headerColor: 'bg-gray-400',
-        btnClass:    'bg-gray-500 hover:bg-gray-600',
+        iconBg:      'bg-red-50',
+        iconColor:   'text-red-500',
+        headerColor: 'bg-red-500',
+        btnClass:    'bg-red-500 hover:bg-red-600',
         accion:      () => cerrarModalExperiencia(),
     },
     eliminar: {
@@ -67,36 +67,22 @@ const CONFIRM_CONFIG_EXPERIENCIA = {
 };
 
 // ============================================================
-// MODAL DE CONFIRMACIÓN
+// MODAL DE CONFIRMACIÓN (delega al modal global de layouts.app)
 // ============================================================
 function mostrarConfirmacionExperiencia(tipo) {
     const cfg = CONFIRM_CONFIG_EXPERIENCIA[tipo];
-    document.getElementById('confirmTituloExperiencia').textContent  = cfg.titulo;
-    document.getElementById('confirmMensajeExperiencia').textContent = cfg.mensaje;
-    document.getElementById('confirmHeaderExperiencia').className    = `h-1.5 w-full ${cfg.headerColor}`;
-
-    const wrapper = document.getElementById('confirmIconWrapperExperiencia');
-    wrapper.className = `w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 ${cfg.iconBg}`;
-
-    const icon = document.getElementById('confirmIconExperiencia');
-    icon.className = `${cfg.icon} text-2xl ${cfg.iconColor}`;
-
-    const btn = document.getElementById('confirmBtnExperiencia');
-    btn.className = `flex-1 px-4 py-2.5 text-sm text-white rounded-xl font-medium transition ${cfg.btnClass}`;
-    btn.onclick = () => { cerrarConfirmacionExperiencia(); cfg.accion(); };
-
-    document.getElementById('modalConfirmacionExperiencia').classList.remove('hidden');
-    document.getElementById('modalConfirmacionExperiencia').classList.add('flex');
+    if (!cfg) return;
+    window.confirmar({
+        titulo:      cfg.titulo,
+        mensaje:     cfg.mensaje,
+        icon:        cfg.icon,
+        iconBg:      cfg.iconBg,
+        iconColor:   cfg.iconColor,
+        headerColor: cfg.headerColor,
+        btnClass:    cfg.btnClass,
+        onConfirm:   cfg.accion,
+    });
 }
-
-function cerrarConfirmacionExperiencia() {
-    document.getElementById('modalConfirmacionExperiencia').classList.add('hidden');
-    document.getElementById('modalConfirmacionExperiencia').classList.remove('flex');
-}
-
-document.getElementById('modalConfirmacionExperiencia')?.addEventListener('click', function(e) {
-    if (e.target === this) cerrarConfirmacionExperiencia();
-});
 
 // ============================================================
 // HELPER: RESALTAR ERROR

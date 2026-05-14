@@ -247,6 +247,9 @@
         </main>
     </div>
 
+    {{-- Modal global de confirmación (window.confirmar / data-confirm) --}}
+    @include('partials._modal-confirmar')
+
     <script>
         // Dropdowns
         document.querySelectorAll('.dropdown').forEach(dropdown => {

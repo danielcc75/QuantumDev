@@ -19,9 +19,9 @@ const CONFIRM_CONFIG_PERFIL = {
         titulo:    '¿Descartar cambios?',
         mensaje:   'Los datos ingresados no se guardarán. Esta acción no se puede deshacer.',
         icon:      'fas fa-times-circle',
-        iconBg:    'bg-yellow-50',
-        iconColor: 'text-yellow-500',
-        btnClass:  'bg-yellow-500 hover:bg-yellow-600',
+        iconBg:    'bg-red-50',
+        iconColor: 'text-red-500',
+        btnClass:  'bg-red-500 hover:bg-red-600',
         accion:    () => cerrarModalPerfil(),
     },
 };
@@ -39,69 +39,33 @@ const EXITO_CONFIG_PERFIL = {
 
 function mostrarConfirmacionPerfil(tipo) {
     const cfg = CONFIRM_CONFIG_PERFIL[tipo];
-    document.getElementById('confirmTituloPerfil').textContent  = cfg.titulo;
-    document.getElementById('confirmMensajePerfil').textContent = cfg.mensaje;
-
-    const wrapper = document.getElementById('confirmIconWrapperPerfil');
-    wrapper.className = `w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${cfg.iconBg}`;
-
-    const icon = document.getElementById('confirmIconPerfil');
-    icon.className = `${cfg.icon} text-2xl ${cfg.iconColor}`;
-
-    const btn = document.getElementById('confirmBtnPerfil');
-    btn.className = `flex-1 px-4 py-2.5 text-sm text-white rounded-xl font-medium transition ${cfg.btnClass}`;
-    btn.onclick = () => { cerrarConfirmacionPerfil(); cfg.accion(); };
-    
-    const cancelBtn = document.querySelector('#modalConfirmacionPerfil .flex.gap-3 button:first-child');
-    if (cancelBtn) {
-        cancelBtn.style.display = tipo === 'exito' ? 'none' : 'block';
-    }
-
-    document.getElementById('modalConfirmacionPerfil').classList.remove('hidden');
-    document.getElementById('modalConfirmacionPerfil').classList.add('flex');
+    if (!cfg) return;
+    window.confirmar({
+        titulo:    cfg.titulo,
+        mensaje:   cfg.mensaje,
+        icon:      cfg.icon,
+        iconBg:    cfg.iconBg,
+        iconColor: cfg.iconColor,
+        btnClass:  cfg.btnClass,
+        onConfirm: cfg.accion,
+    });
 }
 
 function mostrarExitoPerfil() {
     const cfg = EXITO_CONFIG_PERFIL.exito;
-    document.getElementById('confirmTituloPerfil').textContent  = cfg.titulo;
-    document.getElementById('confirmMensajePerfil').textContent = cfg.mensaje;
-
-    const wrapper = document.getElementById('confirmIconWrapperPerfil');
-    wrapper.className = `w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${cfg.iconBg}`;
-
-    const icon = document.getElementById('confirmIconPerfil');
-    icon.className = `${cfg.icon} text-2xl ${cfg.iconColor}`;
-
-    const btn = document.getElementById('confirmBtnPerfil');
-    btn.className = `flex-1 px-4 py-2.5 text-sm text-white rounded-xl font-medium transition ${cfg.btnClass}`;
-    btn.onclick = () => { cerrarConfirmacionPerfil(); };
-    
-    const cancelBtn = document.querySelector('#modalConfirmacionPerfil .flex.gap-3 button:first-child');
-    if (cancelBtn) {
-        cancelBtn.style.display = 'none';
-    }
-
-    document.getElementById('modalConfirmacionPerfil').classList.remove('hidden');
-    document.getElementById('modalConfirmacionPerfil').classList.add('flex');
-    
-    setTimeout(() => {
-        cerrarConfirmacionPerfil();
-    }, 2000);
+    window.confirmar({
+        tipo:           'success',
+        titulo:         cfg.titulo,
+        mensaje:        cfg.mensaje,
+        icon:           cfg.icon,
+        iconBg:         cfg.iconBg,
+        iconColor:      cfg.iconColor,
+        btnClass:       cfg.btnClass,
+        textoConfirmar: 'OK',
+        soloConfirmar:  true,
+    });
+    setTimeout(() => window.cerrarConfirmar(), 2000);
 }
-
-function cerrarConfirmacionPerfil() {
-    document.getElementById('modalConfirmacionPerfil').classList.add('hidden');
-    document.getElementById('modalConfirmacionPerfil').classList.remove('flex');
-    
-    const cancelBtn = document.querySelector('#modalConfirmacionPerfil .flex.gap-3 button:first-child');
-    if (cancelBtn) {
-        cancelBtn.style.display = 'block';
-    }
-}
-
-document.getElementById('modalConfirmacionPerfil')?.addEventListener('click', function(e) {
-    if (e.target === this) cerrarConfirmacionPerfil();
-});
 
 // ── Helper: resaltar error ─────────────────────────────────────────────────────
 

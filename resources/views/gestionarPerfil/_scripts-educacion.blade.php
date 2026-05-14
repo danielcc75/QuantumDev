@@ -21,9 +21,9 @@ const CONFIRM_CONFIG_EDUCACION = {
         titulo:    '¿Descartar cambios?',
         mensaje:   'Los datos ingresados no se guardarán. Esta acción no se puede deshacer.',
         icon:      'fas fa-times-circle',
-        iconBg:    'bg-yellow-50',
-        iconColor: 'text-yellow-500',
-        btnClass:  'bg-yellow-500 hover:bg-yellow-600',
+        iconBg:    'bg-red-50',
+        iconColor: 'text-red-500',
+        btnClass:  'bg-red-500 hover:bg-red-600',
         accion:    () => cerrarModalEducacion(),
     },
     eliminar: {
@@ -38,35 +38,21 @@ const CONFIRM_CONFIG_EDUCACION = {
 };
 
 // ============================================================
-// MODAL DE CONFIRMACIÓN
+// MODAL DE CONFIRMACIÓN (delega al modal global de layouts.app)
 // ============================================================
 function mostrarConfirmacionEducacion(tipo) {
     const cfg = CONFIRM_CONFIG_EDUCACION[tipo];
-    document.getElementById('confirmTituloEducacion').textContent  = cfg.titulo;
-    document.getElementById('confirmMensajeEducacion').textContent = cfg.mensaje;
-
-    const wrapper = document.getElementById('confirmIconWrapperEducacion');
-    wrapper.className = `w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${cfg.iconBg}`;
-
-    const icon = document.getElementById('confirmIconEducacion');
-    icon.className = `${cfg.icon} text-2xl ${cfg.iconColor}`;
-
-    const btn = document.getElementById('confirmBtnEducacion');
-    btn.className = `flex-1 px-4 py-2.5 text-sm text-white rounded-xl font-medium transition ${cfg.btnClass}`;
-    btn.onclick = () => { cerrarConfirmacionEducacion(); cfg.accion(); };
-
-    document.getElementById('modalConfirmacionEducacion').classList.remove('hidden');
-    document.getElementById('modalConfirmacionEducacion').classList.add('flex');
+    if (!cfg) return;
+    window.confirmar({
+        titulo:    cfg.titulo,
+        mensaje:   cfg.mensaje,
+        icon:      cfg.icon,
+        iconBg:    cfg.iconBg,
+        iconColor: cfg.iconColor,
+        btnClass:  cfg.btnClass,
+        onConfirm: cfg.accion,
+    });
 }
-
-function cerrarConfirmacionEducacion() {
-    document.getElementById('modalConfirmacionEducacion').classList.add('hidden');
-    document.getElementById('modalConfirmacionEducacion').classList.remove('flex');
-}
-
-document.getElementById('modalConfirmacionEducacion')?.addEventListener('click', function(e) {
-    if (e.target === this) cerrarConfirmacionEducacion();
-});
 
 // ============================================================
 // HELPER: RESALTAR ERROR

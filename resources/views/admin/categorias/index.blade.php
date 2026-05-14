@@ -56,7 +56,7 @@
                                     class="text-yellow-600 hover:text-yellow-900 bg-yellow-100 hover:bg-yellow-200 p-2 rounded-lg transition">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <form action="{{ route('admin.categorias.destroy', $categoria->id_categoria) }}" method="POST" class="inline" onsubmit="return confirm('¿Eliminar esta categoría?')">
+                            <form action="{{ route('admin.categorias.destroy', $categoria->id_categoria) }}" method="POST" class="inline" data-confirm="¿Eliminar la categoría «{{ $categoria->nombre }}»?">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 p-2 rounded-lg transition">

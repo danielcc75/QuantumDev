@@ -219,28 +219,7 @@
 
 @include('gestionHabilidadesBlandas.modal')
 
-{{-- Modal de Confirmación --}}
-<div id="modalConfirmacionHabilidad" class="fixed inset-0 bg-black bg-opacity-60 z-[60] hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
-        <div class="p-6 text-center">
-            <div id="confirmIconWrapperHabilidad" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i id="confirmIconHabilidad" class="text-2xl"></i>
-            </div>
-            <h4 id="confirmTituloHabilidad" class="text-lg font-bold text-gray-800 mb-2"></h4>
-            <p id="confirmMensajeHabilidad" class="text-sm text-gray-500 leading-relaxed"></p>
-        </div>
-        <div class="flex gap-3 px-6 pb-6">
-            <button type="button" onclick="cerrarConfirmacionHabilidad()"
-                class="flex-1 px-4 py-2.5 text-sm border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition font-medium">
-                No, cancelar
-            </button>
-            <button type="button" id="confirmBtnHabilidad"
-                class="flex-1 px-4 py-2.5 text-sm text-white rounded-xl font-medium transition">
-                Confirmar
-            </button>
-        </div>
-    </div>
-</div>
+{{-- Modal de confirmación reemplazado por el modal global en layouts.app. --}}
 
 {{-- Scripts de habilidades --}}
 @include('gestionHabilidades._scripts')

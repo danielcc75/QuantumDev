@@ -183,5 +183,8 @@
     @include('auth.register')
     @include('home.scripts-home')
 
+    {{-- Modal global de confirmación (window.confirmar / data-confirm) --}}
+    @include('partials._modal-confirmar')
+
 </body>
 </html>

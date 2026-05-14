@@ -162,5 +162,8 @@
     </div>
 
     @include('_dashboard-scripts')
+
+    {{-- Modal global de confirmación (window.confirmar / data-confirm) --}}
+    @include('partials._modal-confirmar')
 </body>
 </html>

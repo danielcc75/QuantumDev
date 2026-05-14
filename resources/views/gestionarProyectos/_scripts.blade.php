@@ -141,10 +141,10 @@ const CONFIRM_CONFIG = {
         titulo:     '¿Descartar cambios?',
         mensaje:    'Los datos ingresados no se guardarán. Esta acción no se puede deshacer.',
         icon:       'fas fa-times-circle',
-        iconBg:     'bg-gray-100',
-        iconColor:  'text-gray-500',
-        headerColor:'bg-gray-400',
-        btnClass:   'bg-gray-500 hover:bg-gray-600',
+        iconBg:     'bg-red-50',
+        iconColor:  'text-red-500',
+        headerColor:'bg-red-500',
+        btnClass:   'bg-red-500 hover:bg-red-600',
         accion:     () => cerrarModalProyecto(),
     },
     editar: {
@@ -171,26 +171,18 @@ const CONFIRM_CONFIG = {
 
 function mostrarConfirmacion(tipo) {
     const cfg = CONFIRM_CONFIG[tipo];
-    document.getElementById('confirmTitulo').textContent    = cfg.titulo;
-    document.getElementById('confirmMensaje').textContent   = cfg.mensaje;
-    document.getElementById('confirmHeader').className      = `h-1.5 w-full ${cfg.headerColor}`;
-    document.getElementById('confirmIconWrapper').className = `w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 ${cfg.iconBg}`;
-    document.getElementById('confirmIcon').className        = `${cfg.icon} text-2xl ${cfg.iconColor}`;
-
-    const btn = document.getElementById('confirmBtn');
-    btn.className = `flex-1 px-4 py-2.5 text-sm text-white rounded-xl font-medium transition ${cfg.btnClass}`;
-    btn.onclick   = () => { cerrarConfirmacion(); cfg.accion(); };
-
-    setModalVisible('modalConfirmacion', true);
+    if (!cfg) return;
+    window.confirmar({
+        titulo:      cfg.titulo,
+        mensaje:     cfg.mensaje,
+        icon:        cfg.icon,
+        iconBg:      cfg.iconBg,
+        iconColor:   cfg.iconColor,
+        headerColor: cfg.headerColor,
+        btnClass:    cfg.btnClass,
+        onConfirm:   cfg.accion,
+    });
 }
-
-function cerrarConfirmacion() {
-    setModalVisible('modalConfirmacion', false);
-}
-
-document.getElementById('modalConfirmacion').addEventListener('click', function(e) {
-    if (e.target === this) cerrarConfirmacion();
-});
 
 // ── Disparadores de confirmación ──────────────────────────────────────────────
 

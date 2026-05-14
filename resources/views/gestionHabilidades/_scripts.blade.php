@@ -15,9 +15,9 @@
             titulo:    '¿Descartar cambios?',
             mensaje:   'Los datos ingresados no se guardarán. Esta acción no se puede deshacer.',
             icon:      'fas fa-times-circle',
-            iconBg:    'bg-yellow-50',
-            iconColor: 'text-yellow-500',
-            btnClass:  'bg-yellow-500 hover:bg-yellow-600',
+            iconBg:    'bg-red-50',
+            iconColor: 'text-red-500',
+            btnClass:  'bg-red-500 hover:bg-red-600',
             accion:    () => cerrarModalHabilidad(),
         },
         eliminar: {
@@ -33,31 +33,18 @@
 
     function mostrarConfirmacionHabilidad(tipo) {
         const cfg = CONFIRM_CONFIG_HAB[tipo];
-        document.getElementById('confirmTituloHabilidad').textContent  = cfg.titulo;
-        document.getElementById('confirmMensajeHabilidad').textContent = cfg.mensaje;
-
-        const wrapper = document.getElementById('confirmIconWrapperHabilidad');
-        wrapper.className = `w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${cfg.iconBg}`;
-
-        const icon = document.getElementById('confirmIconHabilidad');
-        icon.className = `${cfg.icon} text-2xl ${cfg.iconColor}`;
-
-        const btn = document.getElementById('confirmBtnHabilidad');
-        btn.className = `flex-1 px-4 py-2.5 text-sm text-white rounded-xl font-medium transition ${cfg.btnClass}`;
-        btn.onclick = () => { cerrarConfirmacionHabilidad(); cfg.accion(); };
-
-        document.getElementById('modalConfirmacionHabilidad').classList.remove('hidden');
-        document.getElementById('modalConfirmacionHabilidad').classList.add('flex');
+        if (!cfg) return;
+        window.confirmar({
+            titulo:    cfg.titulo,
+            mensaje:   cfg.mensaje,
+            icon:      cfg.icon,
+            iconBg:    cfg.iconBg,
+            iconColor: cfg.iconColor,
+            btnClass:  cfg.btnClass,
+            onConfirm: cfg.accion,
+        });
     }
-
-    window.cerrarConfirmacionHabilidad = function () {
-        document.getElementById('modalConfirmacionHabilidad').classList.add('hidden');
-        document.getElementById('modalConfirmacionHabilidad').classList.remove('flex');
-    };
-
-    document.getElementById('modalConfirmacionHabilidad')?.addEventListener('click', function (e) {
-        if (e.target === this) cerrarConfirmacionHabilidad();
-    });
+    window.mostrarConfirmacionHabilidad = mostrarConfirmacionHabilidad;
 
     function resaltarErrorHabilidad(campoId, mensaje) {
         const el = document.getElementById(campoId);
