@@ -66,10 +66,11 @@ class PapeleraController extends Controller
     {
         $usuario = Usuario::onlyTrashed()->findOrFail($id);
         $usuario->restore();
+        $usuario->estado = 'activo';
         $usuario->deleted_by = null;
         $usuario->delete_reason = null;
         $usuario->save();
-        
+
         return back()->with('success', "Usuario '{$usuario->nombre} {$usuario->apellido}' restaurado");
     }
     

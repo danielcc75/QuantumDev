@@ -9,6 +9,16 @@
                 <label class="block text-sm font-medium mb-1">Nombre</label>
                 <input type="text" id="categoria_nombre" name="nombre" required maxlength="100" class="w-full px-3 py-2 border rounded-lg">
             </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">URL de imagen</label>
+                <input type="url" id="categoria_imagen" name="imagen" required maxlength="250"
+                       placeholder="https://ejemplo.com/imagen.png"
+                       class="w-full px-3 py-2 border rounded-lg">
+                <div class="flex justify-center mt-3">
+                    <img id="categoria_imagen_preview" src="" alt=""
+                         class="h-16 w-16 rounded-full object-cover border border-gray-200 hidden">
+                </div>
+            </div>
             <div class="flex justify-end gap-3">
                 <button type="button" onclick="cerrarModalEditarCategoria()" class="px-4 py-2 bg-gray-300 rounded-lg">Cancelar</button>
                 <button type="submit" class="px-4 py-2 bg-[#1e3a5f] text-white rounded-lg">Guardar</button>

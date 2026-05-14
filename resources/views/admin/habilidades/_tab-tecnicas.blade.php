@@ -47,7 +47,11 @@
                 <form action="{{ route('admin.categorias.store') }}" method="POST" class="flex flex-wrap gap-3">
                     @csrf
                     <input type="text" name="nombre" required maxlength="100" placeholder="Nueva categoría"
-                        class="flex-1 min-w-[200px] px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#1e3a5f]">
+                        value="{{ old('nombre') }}"
+                        class="flex-1 min-w-[180px] px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#1e3a5f]">
+                    <input type="url" name="imagen" required maxlength="250" placeholder="URL de imagen (https://...)"
+                        value="{{ old('imagen') }}"
+                        class="flex-1 min-w-[220px] px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#1e3a5f]">
                     <button type="submit" class="bg-[#1e3a5f] text-white px-4 py-2 rounded-lg">
                         <i class="fas fa-plus mr-1"></i> Agregar
                     </button>
@@ -57,9 +61,18 @@
                 <div class="flex flex-wrap gap-2">
                     @foreach($categorias as $categoria)
                     <div class="inline-flex items-center bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-sm">
+                        @if($categoria->imagen)
+                            <img src="{{ $categoria->imagen }}" alt="{{ $categoria->nombre }}"
+                                 class="h-6 w-6 rounded-full object-cover border border-gray-200 mr-2"
+                                 onerror="this.onerror=null;this.style.display='none';">
+                        @else
+                            <span class="h-6 w-6 rounded-full bg-gray-100 mr-2 flex items-center justify-center text-gray-400 text-xs">
+                                <i class="fas fa-image"></i>
+                            </span>
+                        @endif
                         <span class="font-medium text-gray-700">{{ $categoria->nombre }}</span>
                         <span class="ml-2 text-xs text-gray-500">({{ $categoria->habilidades_count ?? 0 }})</span>
-                        <button type="button" onclick="abrirModalEditarCategoria({{ $categoria->id_categoria }}, {!! Js::from($categoria->nombre) !!})"
+                        <button type="button" onclick="abrirModalEditarCategoria({{ $categoria->id_categoria }}, {!! Js::from($categoria->nombre) !!}, {!! Js::from($categoria->imagen ?? '') !!})"
                             class="ml-2 text-blue-600 hover:text-blue-800" title="Editar">
                             <i class="fas fa-pen text-xs"></i>
                         </button>

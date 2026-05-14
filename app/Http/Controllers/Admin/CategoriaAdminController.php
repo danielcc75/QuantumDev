@@ -16,13 +16,12 @@ class CategoriaAdminController extends Controller
     
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nombre' => 'required|string|max:100|unique:categoria,nombre',
+            'imagen' => 'required|url|max:250',
         ]);
-        
-        Categoria::create([
-            'nombre' => $request->nombre
-        ]);
+
+        Categoria::create($validated);
 
         return back()->with('success', 'Categoría creada correctamente');
     }
@@ -31,13 +30,12 @@ class CategoriaAdminController extends Controller
     {
         $categoria = Categoria::findOrFail($id);
 
-        $request->validate([
+        $validated = $request->validate([
             'nombre' => 'required|string|max:100|unique:categoria,nombre,' . $id . ',id_categoria',
+            'imagen' => 'required|url|max:250',
         ]);
 
-        $categoria->update([
-            'nombre' => $request->nombre
-        ]);
+        $categoria->update($validated);
 
         return back()->with('success', 'Categoría actualizada correctamente');
     }

@@ -16,6 +16,62 @@
         </button>
     </div>
     
+    <form method="GET" action="{{ route('admin.tecnologias') }}"
+          class="px-6 py-4 bg-gray-50 border-b border-gray-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+        <div class="lg:col-span-2">
+            <label class="block text-xs font-medium text-gray-600 mb-1">Buscar por nombre</label>
+            <div class="relative">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                <input type="text" name="search" value="{{ $search }}" placeholder="Ej: Laravel, React..."
+                    class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Categoría</label>
+            <select name="categoria" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Todas</option>
+                @foreach($categorias as $cat)
+                    <option value="{{ $cat }}" {{ $categoria === $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Período</label>
+            <select name="periodo" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value=""    {{ $periodo === ''    ? 'selected' : '' }}>Cualquier fecha</option>
+                <option value="24h" {{ $periodo === '24h' ? 'selected' : '' }}>Últimas 24 horas</option>
+                <option value="7d"  {{ $periodo === '7d'  ? 'selected' : '' }}>Últimos 7 días</option>
+                <option value="30d" {{ $periodo === '30d' ? 'selected' : '' }}>Últimos 30 días</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Ordenar por</label>
+            <select name="sort" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="nombre"        {{ $sort === 'nombre' ? 'selected' : '' }}>Nombre</option>
+                <option value="categoria"     {{ $sort === 'categoria' ? 'selected' : '' }}>Categoría</option>
+                <option value="created_at"    {{ $sort === 'created_at' ? 'selected' : '' }}>Fecha de creación</option>
+                <option value="id_tecnologia" {{ $sort === 'id_tecnologia' ? 'selected' : '' }}>ID</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Dirección</label>
+            <div class="flex gap-2">
+                <select name="dir" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="asc"  {{ $dir === 'asc'  ? 'selected' : '' }}>Ascendente</option>
+                    <option value="desc" {{ $dir === 'desc' ? 'selected' : '' }}>Descendente</option>
+                </select>
+            </div>
+        </div>
+        <div class="sm:col-span-2 lg:col-span-6 flex flex-wrap gap-2 justify-end">
+            <a href="{{ route('admin.tecnologias') }}" class="px-4 py-2 text-sm border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-100 inline-flex items-center gap-2">
+                <i class="fas fa-times text-xs"></i> Limpiar
+            </a>
+            <button type="submit" class="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg inline-flex items-center gap-2">
+                <i class="fas fa-filter text-xs"></i> Aplicar
+            </button>
+        </div>
+    </form>
+
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -23,6 +79,7 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Creada</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                 </tr>
             </thead>
@@ -37,6 +94,15 @@
                         <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
                             {{ $tecnologia->categoria }}
                         </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        @if($tecnologia->created_at)
+                            <span title="{{ $tecnologia->created_at->format('d/m/Y H:i') }}">
+                                {{ $tecnologia->created_at->diffForHumans() }}
+                            </span>
+                        @else
+                            <span class="text-gray-400">—</span>
+                        @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div class="flex space-x-2">
@@ -56,9 +122,9 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="4" class="px-6 py-12 text-center text-gray-500">
+                    <td colspan="5" class="px-6 py-12 text-center text-gray-500">
                         <i class="fas fa-microchip text-4xl mb-3 opacity-50"></i>
-                        <p>No hay tecnologías registradas</p>
+                        <p>No hay tecnologías registradas con esos filtros</p>
                     </td>
                 </tr>
                 @endforelse

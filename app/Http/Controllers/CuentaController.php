@@ -132,7 +132,10 @@ class CuentaController extends Controller
 
         try {
             $usuario->estado = 'inactivo';
+            $usuario->deleted_by = $usuario->id_usuario;
+            $usuario->delete_reason = 'Cuenta desactivada por el usuario';
             $usuario->save();
+            $usuario->delete();
         } catch (\Exception $e) {
             return response()->json(['ok' => false, 'message' => 'No se pudo desactivar la cuenta: ' . $e->getMessage()], 500);
         }

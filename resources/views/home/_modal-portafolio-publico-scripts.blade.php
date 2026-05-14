@@ -107,21 +107,56 @@
             linksWrap.appendChild(a);
         });
 
-        const tecnicas = [];
-        const grupos = data.habilidades_grupos || {};
-        Object.keys(grupos).forEach(cat => (grupos[cat] || []).forEach(h => tecnicas.push(h)));
+        const grupos = data.habilidades_grupos || [];
         const contTec = document.getElementById('mp_habilidades_tecnicas');
         const emptyTec = document.getElementById('mp_habilidades_tecnicas_empty');
         contTec.innerHTML = '';
-        if (tecnicas.length === 0) {
+        const totalTec = grupos.reduce((acc, g) => acc + ((g.items || []).length), 0);
+        if (totalTec === 0) {
             emptyTec.classList.remove('hidden');
         } else {
             emptyTec.classList.add('hidden');
-            tecnicas.forEach(nombre => {
-                const li = document.createElement('li');
-                li.className = 'flex items-center gap-2.5 hover:text-[#1e3a5f] transition cursor-default';
-                li.innerHTML = `<span class="w-2 h-2 rounded-full bg-gradient-to-br from-[#1e3a5f] to-[#e11d48] ring-2 ring-[#1e3a5f]/15 flex-shrink-0"></span><span>${escapeHtml(nombre)}</span>`;
-                contTec.appendChild(li);
+            grupos.forEach(g => {
+                const items = g.items || [];
+                if (items.length === 0) return;
+
+                const grupoLi = document.createElement('li');
+                grupoLi.className = 'space-y-2';
+
+                const header = document.createElement('div');
+                header.className = 'flex items-center gap-2 pb-1.5 border-b border-gray-100';
+                header.innerHTML = `
+                    ${g.imagen
+                        ? `<img src="${escapeHtml(g.imagen)}" alt="${escapeHtml(g.categoria || '')}" class="h-7 w-7 rounded-full object-cover border border-[#1e3a5f]/15" onerror="this.style.display='none'">`
+                        : `<span class="h-7 w-7 rounded-full bg-[#1e3a5f]/10 text-[#1e3a5f] flex items-center justify-center text-xs"><i class="fas fa-layer-group"></i></span>`
+                    }
+                    <span class="font-semibold text-[#1e3a5f] text-sm">${escapeHtml(g.categoria || 'Otras')}</span>
+                    <span class="text-xs text-gray-400">(${items.length})</span>
+                `;
+                grupoLi.appendChild(header);
+
+                const inner = document.createElement('ul');
+                inner.className = 'space-y-2 pl-1';
+                items.forEach(h => {
+                    const sub = document.createElement('li');
+                    sub.className = 'flex items-start gap-2.5 text-sm text-gray-700';
+                    const anios = h.anios_experiencia || 0;
+                    const aniosTxt = anios === 0 ? 'Menos de 1 año' : `${anios} ${anios === 1 ? 'año' : 'años'}`;
+                    sub.innerHTML = `
+                        <span class="mt-1.5 w-2 h-2 rounded-full bg-gradient-to-br from-[#1e3a5f] to-[#e11d48] ring-2 ring-[#1e3a5f]/15 flex-shrink-0"></span>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <span class="font-medium text-[#1e3a5f]">${escapeHtml(h.nombre)}</span>
+                                <span class="text-[10px] font-semibold uppercase tracking-wider bg-[#1e3a5f]/8 text-[#1e3a5f] border border-[#1e3a5f]/15 px-1.5 py-0.5 rounded">${escapeHtml(h.nivel || '')}</span>
+                                <span class="text-xs text-gray-500"><i class="far fa-calendar text-[#e11d48] mr-0.5"></i>${aniosTxt}</span>
+                            </div>
+                            ${h.descripcion ? `<p class="text-xs text-gray-500 leading-relaxed mt-0.5">${escapeHtml(h.descripcion)}</p>` : ''}
+                        </div>
+                    `;
+                    inner.appendChild(sub);
+                });
+                grupoLi.appendChild(inner);
+                contTec.appendChild(grupoLi);
             });
         }
 

@@ -79,10 +79,25 @@ class ModeracionController extends Controller
             ->where('h.id_perfil', $perfil->id_perfil)
             ->where('h.publicado', true)
             ->whereNull('h.deleted_at')
-            ->select('h.nombre', 'c.nombre as categoria')
+            ->select('h.nombre', 'h.anios_experiencia', 'h.descripcion', 'c.nombre as categoria', 'c.imagen as categoria_imagen')
             ->get()
             ->groupBy(fn($r) => $r->categoria ?? 'Otras')
-            ->map(fn($g) => $g->pluck('nombre')->all());
+            ->map(function ($g, $cat) {
+                return [
+                    'categoria' => $cat,
+                    'imagen'    => optional($g->first())->categoria_imagen,
+                    'items'     => $g->map(function ($r) {
+                        $a = (int) $r->anios_experiencia;
+                        $nivel = $a >= 8 ? 'Experto' : ($a >= 5 ? 'Avanzado' : ($a >= 3 ? 'Intermedio' : 'Básico'));
+                        return [
+                            'nombre'             => $r->nombre,
+                            'anios_experiencia'  => $a,
+                            'nivel'              => $nivel,
+                            'descripcion'        => $r->descripcion,
+                        ];
+                    })->values()->all(),
+                ];
+            })->values()->all();
 
         $proyectosPorExp = DB::table('proyectos')
             ->where('id_perfil', $perfil->id_perfil)
@@ -173,7 +188,7 @@ class ModeracionController extends Controller
 
         $cntProy = count($proyectosLista);
         $cntEmpresas = $exps->pluck('empresa')->unique()->count();
-        $totalHabs = collect($habGrupos)->flatten()->count();
+        $totalHabs = collect($habGrupos)->sum(fn($g) => count($g['items'] ?? []));
 
         $usuarioNombre = $usuarioRow->nombre ?? 'U';
         $usuarioApellido = $usuarioRow->apellido ?? '';

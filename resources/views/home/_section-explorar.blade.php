@@ -92,16 +92,31 @@
                         $links = [];
                         foreach ($linksRows as $l) { $links[strtolower($l->tipo)] = $l->url; }
 
-                        // Habilidades agrupadas por categoría
+                        // Habilidades agrupadas por categoría (incluye imagen y detalle)
                         $habGrupos = DB::table('habilidades as h')
                             ->leftJoin('categoria as c', 'h.id_categoria', '=', 'c.id_categoria')
                             ->where('h.id_perfil', $p->id_perfil)
                             ->where('h.publicado', true)
                             ->whereNull('h.deleted_at')
-                            ->select('h.nombre', 'c.nombre as categoria')
+                            ->select('h.nombre', 'h.anios_experiencia', 'h.descripcion', 'c.nombre as categoria', 'c.imagen as categoria_imagen')
                             ->get()
                             ->groupBy(fn($r) => $r->categoria ?? 'Otras')
-                            ->map(fn($g) => $g->pluck('nombre')->all());
+                            ->map(function ($g, $cat) {
+                                return [
+                                    'categoria' => $cat,
+                                    'imagen'    => optional($g->first())->categoria_imagen,
+                                    'items'     => $g->map(function ($r) {
+                                        $a = (int) $r->anios_experiencia;
+                                        $nivel = $a >= 8 ? 'Experto' : ($a >= 5 ? 'Avanzado' : ($a >= 3 ? 'Intermedio' : 'Básico'));
+                                        return [
+                                            'nombre'             => $r->nombre,
+                                            'anios_experiencia'  => $a,
+                                            'nivel'              => $nivel,
+                                            'descripcion'        => $r->descripcion,
+                                        ];
+                                    })->values()->all(),
+                                ];
+                            })->values()->all();
 
                         // Proyectos vinculados a experiencias (id_experiencia => [proyectos])
                         $proyectosPorExp = DB::table('proyectos')

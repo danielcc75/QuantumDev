@@ -235,10 +235,27 @@ class PortafolioController extends Controller
             ->where('h.id_perfil', $perfil->id_perfil)
             ->whereNull('h.deleted_at')
             ->whereIn('h.id_habilidad', $sel['tecnicas'] ?: [0])
-            ->select('h.nombre', 'c.nombre as categoria')
+            ->select(
+                'h.nombre',
+                'h.anios_experiencia',
+                'h.descripcion',
+                'c.nombre as categoria',
+                'c.imagen as categoria_imagen'
+            )
             ->get()
             ->groupBy(fn($r) => $r->categoria ?? 'Otras')
-            ->map(fn($g) => $g->pluck('nombre')->all());
+            ->map(function ($g, $cat) {
+                return [
+                    'categoria' => $cat,
+                    'imagen'    => optional($g->first())->categoria_imagen,
+                    'items'     => $g->map(fn($r) => [
+                        'nombre'             => $r->nombre,
+                        'anios_experiencia'  => (int) $r->anios_experiencia,
+                        'nivel'              => $this->nivelDesdeAnios($r->anios_experiencia),
+                        'descripcion'        => $r->descripcion,
+                    ])->values()->all(),
+                ];
+            })->values()->all();
 
         $habBlandas = DB::table('perfil_habilidad_blanda as phb')
             ->join('habilidades_blandas as hb', 'phb.id_habilidad_blanda', '=', 'hb.id_habilidad_blanda')
@@ -325,7 +342,7 @@ class PortafolioController extends Controller
 
         $cntEmpresas = collect($exps)->pluck('empresa')->unique()->count();
         $cntProy = count($proyectosLista);
-        $cntHabs = collect($habGrupos)->flatten()->count();
+        $cntHabs = collect($habGrupos)->sum(fn($g) => count($g['items'] ?? []));
 
         $usuarioNombre = $usuario->nombre ?? 'U';
         $usuarioApellido = $usuario->apellido ?? '';

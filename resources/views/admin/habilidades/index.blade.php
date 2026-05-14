@@ -154,10 +154,28 @@
         document.getElementById('modalFusion').classList.remove('flex');
     }
 
-    function abrirModalEditarCategoria(id, nombre) {
+    function actualizarPreviewCategoria(url) {
+        const preview = document.getElementById('categoria_imagen_preview');
+        if (url && url.trim()) {
+            preview.src = url.trim();
+            preview.classList.remove('hidden');
+            preview.onerror = () => preview.classList.add('hidden');
+        } else {
+            preview.classList.add('hidden');
+            preview.src = '';
+        }
+    }
+
+    document.getElementById('categoria_imagen')?.addEventListener('input', (e) => {
+        actualizarPreviewCategoria(e.target.value);
+    });
+
+    function abrirModalEditarCategoria(id, nombre, imagen) {
         const form = document.getElementById('formEditarCategoria');
         form.action = "{{ url('admin/categorias') }}/" + id;
         document.getElementById('categoria_nombre').value = nombre;
+        document.getElementById('categoria_imagen').value = imagen || '';
+        actualizarPreviewCategoria(imagen || '');
         const modal = document.getElementById('modalEditarCategoria');
         modal.classList.remove('hidden');
         modal.classList.add('flex');
