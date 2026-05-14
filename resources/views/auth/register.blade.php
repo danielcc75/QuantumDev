@@ -135,6 +135,41 @@
                 </button>
             </form>
 
+            <div class="flex items-center my-4">
+                <div class="flex-1 border-t border-gray-300"></div>
+                <span class="px-3 text-sm text-gray-500">o continúa con</span>
+                <div class="flex-1 border-t border-gray-300"></div>
+            </div>
+
+            <div class="flex flex-col gap-3">
+
+                <!-- github -->
+                <a href="/auth/github"
+                class="w-full flex items-center justify-center gap-3 border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 py-3 rounded-md font-medium transition">
+
+                    <i class="fab fa-github text-xl"></i>
+                    Continuar con GitHub
+                </a>
+
+                <!-- google -->
+                <a href="/auth/google"
+                class="w-full flex items-center justify-center gap-3 border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 py-3 rounded-md font-medium transition">
+
+                    <i class="fab fa-google text-xl text-red-500"></i>
+                    Continuar con Google
+                </a>
+
+                <!-- linkedin -->
+                <button type="button"
+                    class="w-full flex items-center justify-center gap-3 border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 py-3 rounded-md font-medium transition">
+
+                    <i class="fab fa-linkedin text-xl text-blue-600"></i>
+                    Continuar con LinkedIn
+                    <span class="text-xs text-gray-400">(Próximamente)</span>
+                </button>
+
+            </div>
+
             <p class="text-sm text-center mt-4 text-gray-600">
                 ¿Ya tienes una cuenta?
                 <span onclick="irALogin()" class="text-[#1e3a5f] font-semibold cursor-pointer hover:text-[#e11d48] transition">

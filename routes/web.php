@@ -5,6 +5,7 @@ use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\HabilidadController;
 use App\Http\Controllers\HabilidadBlandaController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 // =========================
 // HOME
@@ -210,3 +211,13 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::delete('/perfil/eliminar-cuenta', [UsuarioWebController::class, 'eliminarCuenta'])->name('perfil.eliminar-cuenta');
     });
 });
+
+// ========================================
+// INTEGRACION GITHUB, GOOGLE Y LINKEDIN
+// ========================================
+
+Route::get('/auth/github', [AuthController::class, 'redirectGithub']);
+Route::get('/auth/github/callback', [AuthController::class, 'callbackGithub']);
+
+Route::get('/auth/google', [AuthController::class, 'redirectGoogle']);
+Route::get('/auth/google/callback', [AuthController::class, 'callbackGoogle']);
