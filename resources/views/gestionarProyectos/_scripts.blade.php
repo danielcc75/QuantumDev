@@ -460,7 +460,7 @@ function abrirModalProyecto() {
     document.getElementById('proj_chips').innerHTML = '';
     document.getElementById('proj_chips_container').classList.add('hidden');
     document.getElementById('modalProyectoTitulo').textContent = 'Crear Nuevo Proyecto';
-    document.getElementById('proj_visible').value = '1';
+    document.getElementById('proj_visible').value = '0';
     resetUrlStatus();
     actualizarFechaFinSegunEstado();
     setModalVisible('modalProyecto', true);
@@ -549,6 +549,9 @@ function submitProyecto() {
         } else {
             grid.insertAdjacentHTML('afterbegin', cardHTML);
             actualizarResumenProyectos(data.proyecto, 'crear');
+            if (typeof window.notificarItemPublicable === 'function') {
+                window.notificarItemPublicable('proyecto');
+            }
         }
 
         // Sincronizar con la lista usada en el modal de Experiencia Laboral

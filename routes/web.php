@@ -110,6 +110,7 @@ Route::put('/cuenta/contrasenia', [UsuarioWebController::class, 'cambiarContrase
 Route::put('/cuenta/visibilidad', [UsuarioWebController::class, 'cambiarVisibilidad'])->name('cuenta.visibilidad');
 Route::get('/cuenta/portafolio/datos', [UsuarioWebController::class, 'datosPortafolio'])->name('cuenta.portafolio.datos');
 Route::put('/cuenta/portafolio/publicar', [UsuarioWebController::class, 'publicarPortafolio'])->name('cuenta.portafolio.publicar');
+Route::post('/cuenta/portafolio/preview', [UsuarioWebController::class, 'previewPortafolio'])->name('cuenta.portafolio.preview');
 Route::put('/cuenta/desactivar',  [UsuarioWebController::class, 'desactivarCuenta'])->name('cuenta.desactivar');
 
 // ============================================================

@@ -9,19 +9,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('habilidades', function (Blueprint $table) {
-            $table->boolean('publicado')->default(true);
+            $table->boolean('publicado')->default(false);
         });
 
         Schema::table('perfil_habilidad_blanda', function (Blueprint $table) {
-            $table->boolean('publicado')->default(true);
+            $table->boolean('publicado')->default(false);
         });
 
         Schema::table('experiencia_laboral', function (Blueprint $table) {
-            $table->boolean('publicado')->default(true);
+            $table->boolean('publicado')->default(false);
         });
 
         Schema::table('formacion_academica', function (Blueprint $table) {
-            $table->boolean('publicado')->default(true);
+            $table->boolean('publicado')->default(false);
         });
     }
 

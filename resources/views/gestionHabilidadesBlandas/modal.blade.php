@@ -169,6 +169,9 @@
             if (data.ok) {
                 cerrarModalHabilidadesBlandas();
                 actualizarChipsBlandasEnVista();
+                if (typeof window.notificarItemPublicable === 'function') {
+                    window.notificarItemPublicable('blanda');
+                }
             } else {
                 alert('No se pudieron guardar las habilidades blandas.');
             }

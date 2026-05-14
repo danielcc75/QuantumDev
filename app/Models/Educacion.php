@@ -20,6 +20,7 @@ class Educacion extends Model
         'descripcion',
         'fecha_ini',
         'fecha_fin',
+        'publicado',
         'deleted_by',
         'delete_reason',
     ];
@@ -27,6 +28,7 @@ class Educacion extends Model
     protected $casts = [
         'fecha_ini' => 'date',
         'fecha_fin' => 'date',
+        'publicado' => 'boolean',
         'deleted_at' => 'datetime',
     ];
 

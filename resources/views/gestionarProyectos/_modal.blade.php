@@ -151,7 +151,7 @@
                         </div>
                     </div>
 
-                    <input type="hidden" id="proj_visible" value="1">
+                    <input type="hidden" id="proj_visible" value="0">
                 </div>
 
             </div>

@@ -253,12 +253,7 @@
                     use Illuminate\Support\Facades\DB;
 
                     $gradPairs = [
-                        ['from' => '#1e3a5f', 'to' => '#3b5a82'],
-                        ['from' => '#0f1f3a', 'to' => '#1e3a5f'],
                         ['from' => '#1e3a5f', 'to' => '#e11d48'],
-                        ['from' => '#1e293b', 'to' => '#1e3a5f'],
-                        ['from' => '#e11d48', 'to' => '#1e3a5f'],
-                        ['from' => '#374151', 'to' => '#1e3a5f'],
                     ];
 
                     // Portafolios públicos: usuarios con perfil PÚBLICO que tengan biografía o algún proyecto/experiencia
@@ -316,6 +311,13 @@
                                               : ($meses > 0 ? 'Menos de 1 año' : 'Sin experiencia registrada');
 
                         $cntProy = DB::table('proyectos')->where('id_perfil', $p->id_perfil)->where('visible', true)->whereNull('deleted_at')->count();
+
+                        $cntEmpresas = DB::table('experiencia_laboral')
+                            ->where('id_perfil', $p->id_perfil)
+                            ->where('publicado', true)
+                            ->whereNull('deleted_at')
+                            ->distinct()
+                            ->count('empresa');
 
                         // Links sociales (tipo => url)
                         $linksRows = DB::table('perfil_links')->where('id_perfil', $p->id_perfil)->get();
@@ -416,7 +418,7 @@
                             'nombre'      => trim(($p->nombre ?? '') . ' ' . ($p->apellido ?? '')),
                             'iniciales'   => strtoupper(substr($p->nombre ?? 'U', 0, 1) . substr($p->apellido ?? '', 0, 1)),
                             'rol'         => $cargo,
-                            'descripcion' => $p->biografia ?: 'Profesional construyendo su portafolio digital.',
+                            'descripcion' => $p->biografia ?: '',
                             'tags'        => $tags,
                             'tags_extra'  => $extraTags,
                             'anios'       => $anioStr,
@@ -424,6 +426,7 @@
                             'proyectos'   => $cntProy . ' proyecto' . ($cntProy === 1 ? '' : 's'),
                             'cnt_proy'    => $cntProy,
                             'cnt_habs'    => $totalHabs,
+                            'cnt_empresas'=> $cntEmpresas,
                             'ubicacion'   => $p->ubicacion ?: 'Sin ubicación',
                             'email'       => $usuarioRow->correo_electronico ?? null,
                             'telefono'    => $usuarioRow->telefono ?? null,
@@ -524,417 +527,8 @@
 
     </main>
 
-    {{-- ===== Modal Portafolio ===== --}}
-    <div id="modalPortafolio"
-         class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm overflow-y-auto"
-         onclick="cerrarModalPortafolioFondo(event)">
-        <div class="min-h-full flex items-start justify-center p-4 py-8">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden" onclick="event.stopPropagation()">
+    @include('home._modal_portafolio_publico')
 
-                {{-- Hero --}}
-                <div id="mp_hero" class="relative px-6 sm:px-10 pt-10 pb-12 text-white"
-                     style="background-image: linear-gradient(135deg, #1e3a5f 0%, #e11d48 100%);">
-                    <button type="button" onclick="cerrarModalPortafolio()"
-                            class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/15 hover:bg-white/30 transition flex items-center justify-center">
-                        <i class="fas fa-times"></i>
-                    </button>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
-                        {{-- Identidad --}}
-                        <div class="lg:col-span-3">
-                            <div class="flex items-start gap-4">
-                                <div id="mp_avatar"
-                                     class="w-20 h-20 rounded-full bg-white/95 text-[#1e3a5f] flex items-center justify-center font-extrabold text-2xl ring-4 ring-white/30 shadow-lg flex-shrink-0">
-                                    JP
-                                </div>
-                                <div class="min-w-0">
-                                    <h2 id="mp_nombre" class="text-2xl sm:text-3xl font-extrabold leading-tight"></h2>
-                                    <p id="mp_rol" class="text-white/90 font-semibold mt-0.5"></p>
-                                    <p id="mp_bio_corta" class="text-sm text-white/80 mt-2 max-w-xl leading-relaxed"></p>
-                                </div>
-                            </div>
-
-                            <div id="mp_links" class="flex flex-wrap gap-2 mt-5"></div>
-                        </div>
-
-                        {{-- Contacto --}}
-                        <div class="lg:col-span-2 flex flex-col gap-2">
-                            <div id="mp_contact_email" class="flex items-center gap-3 bg-white/12 border border-white/20 rounded-xl px-4 py-3 hidden">
-                                <div class="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center"><i class="fas fa-envelope"></i></div>
-                                <div class="min-w-0">
-                                    <p class="text-[11px] uppercase tracking-wider text-white/70">Email</p>
-                                    <p class="text-sm font-medium truncate"></p>
-                                </div>
-                            </div>
-                            <div id="mp_contact_tel" class="flex items-center gap-3 bg-white/12 border border-white/20 rounded-xl px-4 py-3 hidden">
-                                <div class="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center"><i class="fas fa-phone"></i></div>
-                                <div>
-                                    <p class="text-[11px] uppercase tracking-wider text-white/70">Teléfono</p>
-                                    <p class="text-sm font-medium"></p>
-                                </div>
-                            </div>
-                            <div id="mp_contact_loc" class="flex items-center gap-3 bg-white/12 border border-white/20 rounded-xl px-4 py-3 hidden">
-                                <div class="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center"><i class="fas fa-map-marker-alt"></i></div>
-                                <div>
-                                    <p class="text-[11px] uppercase tracking-wider text-white/70">Ubicación</p>
-                                    <p class="text-sm font-medium"></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Sobre mí --}}
-                <section class="px-6 sm:px-10 py-8 bg-gray-50">
-                    <h3 class="text-center text-lg font-bold text-[#1e3a5f] mb-5">
-                        <span class="inline-block border-b-2 border-[#e11d48] pb-1">Sobre mí</span>
-                    </h3>
-                    <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-                        <p id="mp_bio" class="text-sm text-gray-700 leading-relaxed text-center"></p>
-
-                        <div class="grid grid-cols-3 gap-3 mt-6">
-                            <div class="bg-gradient-to-br from-[#1e3a5f]/5 to-[#1e3a5f]/10 border border-[#1e3a5f]/15 rounded-xl p-4 text-center">
-                                <div class="w-10 h-10 rounded-lg bg-[#1e3a5f] text-white flex items-center justify-center mx-auto mb-2">
-                                    <i class="fas fa-briefcase"></i>
-                                </div>
-                                <p id="mp_stat_anios" class="text-2xl font-extrabold text-[#1e3a5f]">0</p>
-                                <p class="text-xs text-gray-600 mt-0.5">Años de experiencia</p>
-                            </div>
-                            <div class="bg-gradient-to-br from-[#e11d48]/5 to-[#e11d48]/10 border border-[#e11d48]/15 rounded-xl p-4 text-center">
-                                <div class="w-10 h-10 rounded-lg bg-[#e11d48] text-white flex items-center justify-center mx-auto mb-2">
-                                    <i class="fas fa-folder-open"></i>
-                                </div>
-                                <p id="mp_stat_proy" class="text-2xl font-extrabold text-[#1e3a5f]">0</p>
-                                <p class="text-xs text-gray-600 mt-0.5">Proyectos</p>
-                            </div>
-                            <div class="bg-gradient-to-br from-[#1e3a5f]/5 to-[#e11d48]/10 border border-gray-200 rounded-xl p-4 text-center">
-                                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#1e3a5f] to-[#e11d48] text-white flex items-center justify-center mx-auto mb-2">
-                                    <i class="fas fa-award"></i>
-                                </div>
-                                <p id="mp_stat_habs" class="text-2xl font-extrabold text-[#1e3a5f]">0</p>
-                                <p class="text-xs text-gray-600 mt-0.5">Habilidades</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {{-- Habilidades --}}
-                <section class="px-6 sm:px-10 py-8">
-                    <h3 class="text-center text-lg font-bold text-[#1e3a5f] mb-5">
-                        <span class="inline-block border-b-2 border-[#e11d48] pb-1">Habilidades</span>
-                    </h3>
-                    <div id="mp_habilidades_grupos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-                    <p id="mp_habilidades_empty" class="text-sm text-gray-400 italic text-center hidden">No hay habilidades registradas todavía.</p>
-                </section>
-
-                {{-- Habilidades Blandas --}}
-                <section class="px-6 sm:px-10 py-8 bg-gray-50">
-                    <h3 class="text-center text-lg font-bold text-[#1e3a5f] mb-5">
-                        <span class="inline-block border-b-2 border-[#e11d48] pb-1">Habilidades Blandas</span>
-                    </h3>
-                    <div id="mp_habilidades_blandas" class="flex flex-wrap gap-2 justify-center"></div>
-                    <p id="mp_habilidades_blandas_empty" class="text-sm text-gray-400 italic text-center hidden">No hay habilidades blandas registradas.</p>
-                </section>
-
-                {{-- Experiencia laboral --}}
-                <section class="px-6 sm:px-10 py-8">
-                    <h3 class="text-center text-lg font-bold text-[#1e3a5f] mb-5">
-                        <span class="inline-block border-b-2 border-[#e11d48] pb-1">Experiencia laboral</span>
-                    </h3>
-                    <div id="mp_experiencias" class="flex flex-col gap-3"></div>
-                    <p id="mp_experiencias_empty" class="text-sm text-gray-400 italic text-center hidden">No hay experiencia laboral registrada.</p>
-                </section>
-
-                {{-- Formación académica --}}
-                <section class="px-6 sm:px-10 py-8 bg-gray-50">
-                    <h3 class="text-center text-lg font-bold text-[#1e3a5f] mb-5">
-                        <span class="inline-block border-b-2 border-[#e11d48] pb-1">Formación académica</span>
-                    </h3>
-                    <div id="mp_formacion" class="flex flex-col gap-3"></div>
-                    <p id="mp_formacion_empty" class="text-sm text-gray-400 italic text-center hidden">No hay formación académica registrada.</p>
-                </section>
-
-                {{-- Proyectos --}}
-                <section class="px-6 sm:px-10 py-8">
-                    <h3 class="text-center text-lg font-bold text-[#1e3a5f] mb-5">
-                        <span class="inline-block border-b-2 border-[#e11d48] pb-1">Proyectos</span>
-                    </h3>
-                    <div id="mp_proyectos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-                    <p id="mp_proyectos_empty" class="text-sm text-gray-400 italic text-center hidden">No hay proyectos publicados.</p>
-                </section>
-
-            </div>
-        </div>
-    </div>
-
-    <script>
-    (function () {
-        const modal = document.getElementById('modalPortafolio');
-
-        const ICONS_LINK = {
-            github:    'fab fa-github',
-            linkedin:  'fab fa-linkedin',
-            twitter:   'fab fa-twitter',
-            x:         'fab fa-x-twitter',
-            facebook:  'fab fa-facebook',
-            instagram: 'fab fa-instagram',
-            youtube:   'fab fa-youtube',
-            website:   'fas fa-globe',
-            web:       'fas fa-globe',
-            sitio:     'fas fa-globe',
-            portfolio: 'fas fa-globe',
-            email:     'fas fa-envelope',
-        };
-
-        function setText(id, value) {
-            const el = document.getElementById(id);
-            if (el) el.textContent = value ?? '';
-        }
-
-        function escapeHtml(s) {
-            const d = document.createElement('div');
-            d.textContent = s ?? '';
-            return d.innerHTML;
-        }
-
-        window.abrirModalPortafolio = function (btn) {
-            let data;
-            try { data = JSON.parse(btn.dataset.portafolio); } catch (e) { return; }
-
-            // Hero
-            const hero = document.getElementById('mp_hero');
-            hero.style.backgroundImage = `linear-gradient(135deg, ${data.cover_from || '#1e3a5f'} 0%, ${data.cover_to || '#e11d48'} 100%)`;
-
-            document.getElementById('mp_avatar').textContent = data.iniciales || '??';
-            setText('mp_nombre', data.nombre);
-            setText('mp_rol', data.rol);
-            setText('mp_bio_corta', data.descripcion);
-            setText('mp_bio', data.descripcion);
-            setText('mp_stat_anios', data.anios_num ?? 0);
-            setText('mp_stat_proy', data.cnt_proy ?? 0);
-            setText('mp_stat_habs', data.cnt_habs ?? 0);
-
-            // Contacto
-            const setContact = (wrapperId, value) => {
-                const wrap = document.getElementById(wrapperId);
-                const p = wrap.querySelector('p:last-child');
-                if (value) {
-                    p.textContent = value;
-                    wrap.classList.remove('hidden');
-                } else {
-                    wrap.classList.add('hidden');
-                }
-            };
-            setContact('mp_contact_email', data.email);
-            setContact('mp_contact_tel',   data.telefono);
-            setContact('mp_contact_loc',   data.ubicacion);
-
-            // Links sociales
-            const linksWrap = document.getElementById('mp_links');
-            linksWrap.innerHTML = '';
-            const links = data.links || {};
-            Object.keys(links).forEach(tipo => {
-                const url  = links[tipo];
-                if (!url) return;
-                const icon = ICONS_LINK[tipo] || 'fas fa-link';
-                const label = tipo.charAt(0).toUpperCase() + tipo.slice(1);
-                const a = document.createElement('a');
-                a.href = url;
-                a.target = '_blank';
-                a.rel = 'noopener noreferrer';
-                a.className = 'inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-medium px-3 py-1.5 rounded-full transition';
-                a.innerHTML = `<i class="${icon}"></i> ${escapeHtml(label)}`;
-                linksWrap.appendChild(a);
-            });
-
-            // Habilidades por categoría
-            const grupos = data.habilidades_grupos || {};
-            const cont   = document.getElementById('mp_habilidades_grupos');
-            const empty  = document.getElementById('mp_habilidades_empty');
-            cont.innerHTML = '';
-            const nombresCats = Object.keys(grupos);
-            if (nombresCats.length === 0) {
-                empty.classList.remove('hidden');
-            } else {
-                empty.classList.add('hidden');
-                nombresCats.forEach((cat, i) => {
-                    const items = grupos[cat] || [];
-                    const accent = i % 2 === 0 ? '#1e3a5f' : '#e11d48';
-                    const card = document.createElement('div');
-                    card.className = 'bg-white border border-gray-100 rounded-2xl p-5 shadow-sm';
-                    card.innerHTML = `
-                        <div class="flex items-center gap-2 mb-3">
-                            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white" style="background:${accent}">
-                                <i class="fas fa-code text-xs"></i>
-                            </div>
-                            <h4 class="font-bold text-[#1e3a5f] text-sm">${escapeHtml(cat)}</h4>
-                        </div>
-                        <div class="flex flex-wrap gap-1.5">
-                            ${items.map(it => `<span class="text-xs font-medium px-2.5 py-0.5 rounded-full border" style="color:${accent};border-color:${accent}33;background:${accent}14">${escapeHtml(it)}</span>`).join('')}
-                        </div>`;
-                    cont.appendChild(card);
-                });
-            }
-
-            // Habilidades blandas
-            const blandas      = data.habilidades_blandas || [];
-            const contBlandas  = document.getElementById('mp_habilidades_blandas');
-            const emptyBlandas = document.getElementById('mp_habilidades_blandas_empty');
-            contBlandas.innerHTML = '';
-            if (blandas.length === 0) {
-                emptyBlandas.classList.remove('hidden');
-            } else {
-                emptyBlandas.classList.add('hidden');
-                blandas.forEach(nombre => {
-                    const span = document.createElement('span');
-                    span.className = 'bg-[#1e3a5f] text-white px-3 py-1.5 rounded-full text-xs font-medium';
-                    span.textContent = nombre;
-                    contBlandas.appendChild(span);
-                });
-            }
-
-            // Experiencias
-            renderTimeline(
-                'mp_experiencias', 'mp_experiencias_empty',
-                data.experiencias || [],
-                (e) => {
-                    const proys = e.proyectos || [];
-                    const proysHtml = proys.length ? `
-                        <div class="mt-3 pt-3 border-t border-gray-100">
-                            <p class="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-2">
-                                <i class="fas fa-folder text-[#1e3a5f]/60 mr-1"></i> Proyectos relacionados
-                            </p>
-                            <div class="flex flex-wrap gap-1.5">
-                                ${proys.map(pr => pr.url_link
-                                    ? `<a href="${pr.url_link}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-medium bg-[#1e3a5f]/8 hover:bg-[#1e3a5f]/15 text-[#1e3a5f] border border-[#1e3a5f]/15 px-2.5 py-1 rounded-full transition cursor-pointer"><i class="fas fa-code-branch text-[10px]"></i>${escapeHtml(pr.nombre)}<i class="fas fa-external-link-alt text-[9px] opacity-70"></i></a>`
-                                    : `<button type="button" onclick="irAProyecto(${pr.id_proyecto})" class="inline-flex items-center gap-1.5 text-xs font-medium bg-[#1e3a5f]/8 hover:bg-[#1e3a5f]/15 text-[#1e3a5f] border border-[#1e3a5f]/15 px-2.5 py-1 rounded-full transition cursor-pointer"><i class="fas fa-code-branch text-[10px]"></i>${escapeHtml(pr.nombre)}<i class="fas fa-arrow-down text-[9px] opacity-70"></i></button>`
-                                ).join('')}
-                            </div>
-                        </div>` : '';
-                    return `
-                    <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm border-l-4 border-l-[#1e3a5f]">
-                        <div class="flex items-start justify-between gap-2">
-                            <div class="min-w-0">
-                                <h4 class="font-bold text-[#1e3a5f] text-sm">${escapeHtml(e.cargo)}</h4>
-                                <p class="text-xs font-semibold text-[#e11d48] mt-0.5">${escapeHtml(e.empresa)}</p>
-                            </div>
-                            ${e.trabajo_actual
-                                ? '<span class="text-[10px] font-semibold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded-full whitespace-nowrap">Actual</span>'
-                                : ''}
-                        </div>
-                        <p class="text-xs text-gray-500 mt-1.5 flex items-center gap-1.5">
-                            <i class="far fa-calendar"></i>
-                            ${formatRangoFecha(e.fecha_ini, e.fecha_fin, e.trabajo_actual)}
-                        </p>
-                        ${e.descripcion ? `<p class="text-sm text-gray-600 leading-relaxed mt-2">${escapeHtml(e.descripcion)}</p>` : ''}
-                        ${proysHtml}
-                    </div>`;
-                }
-            );
-
-            // Formación
-            renderTimeline(
-                'mp_formacion', 'mp_formacion_empty',
-                data.formacion || [],
-                (f) => `
-                    <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm border-l-4 border-l-[#e11d48]">
-                        <div class="flex items-start justify-between gap-2">
-                            <div class="min-w-0">
-                                <h4 class="font-bold text-[#1e3a5f] text-sm">${escapeHtml(f.titulo)}</h4>
-                                <p class="text-xs font-semibold text-[#e11d48] mt-0.5">${escapeHtml(f.institucion)}</p>
-                            </div>
-                            ${f.nivel ? `<span class="text-[10px] font-semibold uppercase tracking-wider bg-[#1e3a5f]/8 text-[#1e3a5f] border border-[#1e3a5f]/15 px-2 py-0.5 rounded-full whitespace-nowrap">${escapeHtml(f.nivel)}</span>` : ''}
-                        </div>
-                        <p class="text-xs text-gray-500 mt-1.5 flex items-center gap-1.5">
-                            <i class="far fa-calendar"></i>
-                            ${formatRangoFecha(f.fecha_ini, f.fecha_fin, false)}
-                        </p>
-                        ${f.descripcion ? `<p class="text-sm text-gray-600 leading-relaxed mt-2">${escapeHtml(f.descripcion)}</p>` : ''}
-                    </div>`
-            );
-
-            // Proyectos
-            const ESTADO_LABELS = {
-                en_progreso: { label: 'En curso',     bg: 'bg-[#1e3a5f]/10', text: 'text-[#1e3a5f]' },
-                completado:  { label: 'Completado',   bg: 'bg-emerald-50',   text: 'text-emerald-700' },
-                pendiente:   { label: 'Pendiente',    bg: 'bg-gray-100',     text: 'text-gray-600' },
-                cancelado:   { label: 'Cancelado',    bg: 'bg-red-50',       text: 'text-[#e11d48]' },
-            };
-            renderTimeline(
-                'mp_proyectos', 'mp_proyectos_empty',
-                data.proyectos_lista || [],
-                (pr) => {
-                    const estado = ESTADO_LABELS[pr.estado] || ESTADO_LABELS.pendiente;
-                    const tags = (pr.tecnologias || '').split(',').map(t => t.trim()).filter(Boolean);
-                    return `
-                    <div id="mp_proy_${pr.id_proyecto}" class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col gap-2">
-                        <div class="flex items-start justify-between gap-2">
-                            <h4 class="font-bold text-[#1e3a5f] text-sm leading-tight">${escapeHtml(pr.nombre)}</h4>
-                            <span class="text-[10px] font-semibold uppercase tracking-wider ${estado.bg} ${estado.text} px-2 py-0.5 rounded-full whitespace-nowrap">${estado.label}</span>
-                        </div>
-                        ${pr.descripcion ? `<p class="text-xs text-gray-600 leading-relaxed">${escapeHtml(pr.descripcion)}</p>` : ''}
-                        <p class="text-xs text-gray-500 flex items-center gap-1.5">
-                            <i class="far fa-calendar"></i>
-                            ${formatRangoFecha(pr.fecha_ini, pr.fecha_fin, false)}
-                        </p>
-                        ${tags.length ? `<div class="flex flex-wrap gap-1.5">${tags.slice(0, 6).map(t => `<span class="text-[11px] font-medium bg-[#1e3a5f]/8 text-[#1e3a5f] border border-[#1e3a5f]/15 px-2 py-0.5 rounded-full">${escapeHtml(t)}</span>`).join('')}${tags.length > 6 ? `<span class="text-[11px] font-medium bg-[#e11d48]/8 text-[#e11d48] border border-[#e11d48]/15 px-2 py-0.5 rounded-full">+${tags.length - 6}</span>` : ''}</div>` : ''}
-                        ${pr.url_link ? `<a href="${pr.url_link}" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-[#e11d48] hover:text-[#1e3a5f] transition mt-1 inline-flex items-center gap-1"><i class="fas fa-external-link-alt text-[10px]"></i> Ver proyecto</a>` : ''}
-                    </div>`;
-                }
-            );
-
-            modal.classList.remove('hidden');
-            modal.scrollTop = 0;
-            document.body.style.overflow = 'hidden';
-        };
-
-        window.irAProyecto = function (idProyecto) {
-            const card = document.getElementById('mp_proy_' + idProyecto);
-            if (!card) return;
-            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            card.classList.add('ring-2', 'ring-[#e11d48]', 'ring-offset-2');
-            setTimeout(() => card.classList.remove('ring-2', 'ring-[#e11d48]', 'ring-offset-2'), 1800);
-        };
-
-        function renderTimeline(contId, emptyId, items, builder) {
-            const cont  = document.getElementById(contId);
-            const empty = document.getElementById(emptyId);
-            cont.innerHTML = '';
-            if (!items || items.length === 0) {
-                empty.classList.remove('hidden');
-                return;
-            }
-            empty.classList.add('hidden');
-            cont.innerHTML = items.map(builder).join('');
-        }
-
-        function formatRangoFecha(ini, fin, actual) {
-            if (!ini) return '';
-            const f = (s) => {
-                const d = new Date(s + 'T12:00:00');
-                if (isNaN(d.getTime())) return '';
-                const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-                return `${meses[d.getMonth()]} ${d.getFullYear()}`;
-            };
-            const ini2 = f(ini);
-            const fin2 = actual ? 'Actualidad' : (fin ? f(fin) : '—');
-            return `${ini2} – ${fin2}`;
-        }
-
-        window.cerrarModalPortafolio = function () {
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-        };
-
-        window.cerrarModalPortafolioFondo = function (e) {
-            if (e.target === modal) cerrarModalPortafolio();
-        };
-
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && !modal.classList.contains('hidden')) cerrarModalPortafolio();
-        });
-    })();
-    </script>
 
     <!-- footer -->
     <footer class="bg-[#1e3a5f] text-white">

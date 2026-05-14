@@ -507,6 +507,9 @@ function submitEducacion() {
                 if (existing) existing.outerHTML = cardHTML;
             } else {
                 lista?.insertAdjacentHTML('afterbegin', cardHTML);
+                if (typeof window.notificarItemPublicable === 'function') {
+                    window.notificarItemPublicable('educacion');
+                }
             }
 
             recalcularStatsEducacion();

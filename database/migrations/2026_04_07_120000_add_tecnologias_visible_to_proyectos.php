@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::table('proyectos', function (Blueprint $table) {
             $table->text('tecnologias')->nullable()->after('referencias');
-            $table->boolean('visible')->default(true)->after('tecnologias');
+            $table->boolean('visible')->default(false)->after('tecnologias');
         });
     }
 

@@ -70,7 +70,8 @@ class EducacionController extends Controller
             'nivel' => $request->nivel,
             'descripcion' => $request->descripcion,
             'fecha_ini' => $request->fecha_ini,
-            'fecha_fin' => $request->en_curso ? null : $request->fecha_fin
+            'fecha_fin' => $request->en_curso ? null : $request->fecha_fin,
+            'publicado' => false,
         ]);
 
         return response()->json([

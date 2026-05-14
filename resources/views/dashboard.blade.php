@@ -97,7 +97,30 @@
 
         $progresoColor = $progreso < 40 ? '#e11d48' : ($progreso < 75 ? '#f59e0b' : '#1e3a5f');
         $progresoLabel = $progreso < 40 ? 'Perfil incompleto' : ($progreso < 75 ? 'Perfil en progreso' : 'Perfil casi completo');
+
+        $visibilidadDash = $perfilDash->visibilidad ?? 'privado';
     @endphp
+
+    <script>
+        // Visibilidad actual del perfil (publico/privado) — usada por los flujos de creación
+        window.PERFIL_VISIBILIDAD = @json($visibilidadDash);
+
+        // Cuando se crea un elemento, si el perfil es público actualizamos el banner de
+        // "elementos sin publicar" (no muestra popups). El banner vive en la sección
+        // de Configuración de cuenta → Visibilidad del perfil.
+        window.notificarItemPublicable = function (tipo) {
+            if (window.PERFIL_VISIBILIDAD !== 'publico') return;
+
+            const aviso = document.getElementById('aviso-sin-publicar');
+            const countEl = document.getElementById('aviso-sin-publicar-count');
+            if (!aviso || !countEl) return;
+
+            const actual = parseInt(countEl.textContent || '0', 10) || 0;
+            countEl.textContent = actual + 1;
+            aviso.classList.remove('hidden');
+            aviso.classList.add('flex');
+        };
+    </script>
 
     <!-- barra superior -->
     <header class="bg-white shadow-md sticky top-0 z-20">

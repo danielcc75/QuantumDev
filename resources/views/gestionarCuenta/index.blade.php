@@ -4,6 +4,16 @@
     use Illuminate\Support\Facades\DB;
     $perfilCuenta = DB::table('perfil')->where('id_usuario', $userId)->first();
     $visibilidad  = $perfilCuenta->visibilidad ?? 'publico';
+
+    $perfilIdCuenta = $perfilCuenta->id_perfil ?? null;
+    $itemsSinPublicar = 0;
+    if ($perfilIdCuenta) {
+        $itemsSinPublicar += DB::table('proyectos')->where('id_perfil', $perfilIdCuenta)->where('visible', false)->whereNull('deleted_at')->count();
+        $itemsSinPublicar += DB::table('habilidades')->where('id_perfil', $perfilIdCuenta)->where('publicado', false)->whereNull('deleted_at')->count();
+        $itemsSinPublicar += DB::table('experiencia_laboral')->where('id_perfil', $perfilIdCuenta)->where('publicado', false)->whereNull('deleted_at')->count();
+        $itemsSinPublicar += DB::table('formacion_academica')->where('id_perfil', $perfilIdCuenta)->where('publicado', false)->whereNull('deleted_at')->count();
+        $itemsSinPublicar += DB::table('perfil_habilidad_blanda')->where('id_perfil', $perfilIdCuenta)->where('publicado', false)->count();
+    }
 @endphp
 
 {{-- Separador visual --}}
@@ -114,6 +124,24 @@
                     {{ $visibilidad === 'publico' ? 'Público' : 'Privado' }}
                 </span>
             </div>
+
+            {{-- Aviso de elementos sin publicar --}}
+            <div id="aviso-sin-publicar"
+                 class="{{ ($visibilidad === 'publico' && $itemsSinPublicar > 0) ? 'flex' : 'hidden' }} mt-4 items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-circle-info text-amber-600 text-sm"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p class="text-sm font-medium text-amber-900">
+                        Tienes <span id="aviso-sin-publicar-count">{{ $itemsSinPublicar }}</span> elemento(s) sin publicar
+                    </p>
+                    <p class="text-xs text-amber-700 mt-0.5">Actualiza tu publicación para mostrarlos en tu portafolio público.</p>
+                </div>
+                <button type="button" onclick="editarPublicacion()"
+                    class="text-xs font-semibold text-amber-900 hover:text-amber-700 underline flex-shrink-0">
+                    Actualizar publicación
+                </button>
+            </div>
         </div>
 
         {{-- ── Zona de peligro ──────────────────────────────────────────── --}}
@@ -215,23 +243,54 @@
         desc.textContent  = 'Cualquier persona puede ver tu portafolio';
         badge.className   = 'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-[#1e3a5f]/10 text-[#1e3a5f]';
         badge.innerHTML   = '<i class="fas fa-globe text-[10px]"></i> Público';
+        window.PERFIL_VISIBILIDAD = 'publico';
+    };
+
+    // ── Editar publicación (re-abrir modal cuando ya está público) ─────────
+    window.editarPublicacion = function () {
+        if (typeof window.abrirModalPublicar === 'function') {
+            window.abrirModalPublicar();
+        }
     };
 
     // ── Visibilidad ────────────────────────────────────────────────────────
     window.confirmarCambiarVisibilidad = function () {
         const btn    = document.getElementById('btn-visibilidad');
         const actual = btn.dataset.actual;
-        const nueva  = actual === 'publico' ? 'privado' : 'publico';
 
-        // Activando público: abrir modal de selección
-        if (nueva === 'publico') {
-            if (typeof window.abrirModalPublicar === 'function') {
-                window.abrirModalPublicar();
-            }
+        // Si ya está público, ofrecer editar publicación o pasar a privado
+        if (actual === 'publico') {
+            Swal.fire({
+                title: 'Tu portafolio está público',
+                text:  '¿Qué deseas hacer?',
+                icon:  'question',
+                showCancelButton: true,
+                showDenyButton:   true,
+                confirmButtonColor: '#1e3a5f',
+                denyButtonColor:    '#e11d48',
+                cancelButtonColor:  '#6b7280',
+                confirmButtonText:  'Editar publicación',
+                denyButtonText:     'Hacer privado',
+                cancelButtonText:   'Cancelar'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    window.editarPublicacion();
+                } else if (result.isDenied) {
+                    cambiarVisibilidadAPrivado();
+                }
+            });
             return;
         }
 
-        // Pasando a privado: confirmación rápida
+        // Si está privado: abrir modal de publicación (flujo existente)
+        if (typeof window.abrirModalPublicar === 'function') {
+            window.abrirModalPublicar();
+        }
+    };
+
+    // Pasar a privado (extraído del flujo original)
+    function cambiarVisibilidadAPrivado() {
+        const btn = document.getElementById('btn-visibilidad');
         Swal.fire({
             title: '¿Hacer perfil privado?',
             text: 'Solo tú podrás ver tu portafolio.',
@@ -263,6 +322,7 @@
                     desc.textContent  = 'Solo tú puedes ver tu portafolio';
                     badge.className   = 'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 text-gray-500';
                     badge.innerHTML   = '<i class="fas fa-lock text-[10px]"></i> Privado';
+                    window.PERFIL_VISIBILIDAD = 'privado';
 
                     Swal.fire({ icon: 'success', title: '¡Listo!', text: 'Tu perfil ahora es privado.', confirmButtonColor: '#1e3a5f', timer: 2000, showConfirmButton: false });
                 } else {
@@ -271,7 +331,7 @@
             })
             .catch(() => Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'No se pudo conectar al servidor.', confirmButtonColor: '#1e3a5f' }));
         });
-    };
+    }
 
     // ── Desactivar cuenta ──────────────────────────────────────────────────
     window.confirmarDesactivarCuenta = function () {
@@ -326,3 +386,4 @@
 </script>
 
 @include('gestionarCuenta._modal_publicar')
+@include('home._modal_portafolio_publico')

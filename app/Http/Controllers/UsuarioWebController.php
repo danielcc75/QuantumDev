@@ -748,6 +748,183 @@ class UsuarioWebController extends Controller
         }
     }
 
+    /**
+     * Devuelve el portafolio del usuario en el mismo formato que consume el
+     * modal público (welcome.blade.php), filtrado por la selección actual
+     * que el usuario tiene en el modal "Publicar". Sirve para Vista previa.
+     */
+    public function previewPortafolio(Request $request)
+    {
+        if (!session('usuario_id')) {
+            return response()->json(['ok' => false, 'message' => 'No autenticado'], 401);
+        }
+
+        $perfil = Perfil::where('id_usuario', session('usuario_id'))->first();
+        if (!$perfil) {
+            return response()->json(['ok' => false, 'message' => 'Perfil no encontrado'], 404);
+        }
+
+        $sel = [
+            'tecnicas'    => array_map('intval', (array) $request->input('tecnicas', [])),
+            'blandas'     => array_map('intval', (array) $request->input('blandas', [])),
+            'experiencia' => array_map('intval', (array) $request->input('experiencia', [])),
+            'educacion'   => array_map('intval', (array) $request->input('educacion', [])),
+            'proyectos'   => array_map('intval', (array) $request->input('proyectos', [])),
+        ];
+
+        $usuario = DB::table('usuario')->where('id_usuario', session('usuario_id'))->first();
+        $nombre  = trim(($usuario->nombre ?? '') . ' ' . ($usuario->apellido ?? ''));
+
+        // Cargo más reciente
+        $cargo = DB::table('experiencia_laboral')
+            ->where('id_perfil', $perfil->id_perfil)
+            ->whereNull('deleted_at')
+            ->orderByDesc('fecha_ini')
+            ->value('cargo') ?? 'Desarrollador';
+
+        // Links sociales
+        $linksRows = DB::table('perfil_links')->where('id_perfil', $perfil->id_perfil)->get();
+        $links = [];
+        foreach ($linksRows as $l) { $links[strtolower($l->tipo)] = $l->url; }
+
+        // Habilidades técnicas agrupadas por categoría (filtradas por selección)
+        $habGrupos = DB::table('habilidades as h')
+            ->leftJoin('categoria as c', 'h.id_categoria', '=', 'c.id_categoria')
+            ->where('h.id_perfil', $perfil->id_perfil)
+            ->whereNull('h.deleted_at')
+            ->whereIn('h.id_habilidad', $sel['tecnicas'] ?: [0])
+            ->select('h.nombre', 'c.nombre as categoria')
+            ->get()
+            ->groupBy(fn($r) => $r->categoria ?? 'Otras')
+            ->map(fn($g) => $g->pluck('nombre')->all());
+
+        // Habilidades blandas (filtradas)
+        $habBlandas = DB::table('perfil_habilidad_blanda as phb')
+            ->join('habilidades_blandas as hb', 'phb.id_habilidad_blanda', '=', 'hb.id_habilidad_blanda')
+            ->where('phb.id_perfil', $perfil->id_perfil)
+            ->whereIn('phb.id_perfil_habilidad_blanda', $sel['blandas'] ?: [0])
+            ->pluck('hb.nombre')
+            ->all();
+
+        // Proyectos seleccionados por experiencia (para "Proyectos relacionados")
+        $proyectosPorExp = DB::table('proyectos')
+            ->where('id_perfil', $perfil->id_perfil)
+            ->whereNull('deleted_at')
+            ->whereIn('id_proyecto', $sel['proyectos'] ?: [0])
+            ->whereNotNull('id_experiencia')
+            ->get()
+            ->groupBy('id_experiencia');
+
+        // Experiencias filtradas
+        $experiencias = DB::table('experiencia_laboral')
+            ->where('id_perfil', $perfil->id_perfil)
+            ->whereNull('deleted_at')
+            ->whereIn('id_experiencia', $sel['experiencia'] ?: [0])
+            ->orderByDesc('fecha_ini')
+            ->get()
+            ->map(function ($e) use ($proyectosPorExp) {
+                $vinculados = ($proyectosPorExp->get($e->id_experiencia) ?? collect())
+                    ->map(fn($pr) => [
+                        'id_proyecto' => $pr->id_proyecto,
+                        'nombre'      => $pr->nombre,
+                        'url_link'    => $pr->url_link ?? null,
+                    ])->values()->all();
+                return [
+                    'cargo'          => $e->cargo,
+                    'empresa'        => $e->empresa,
+                    'descripcion'    => $e->descripcion,
+                    'fecha_ini'      => $e->fecha_ini,
+                    'fecha_fin'      => $e->fecha_fin,
+                    'trabajo_actual' => (bool) $e->trabajo_actual,
+                    'proyectos'      => $vinculados,
+                ];
+            })->all();
+
+        // Proyectos seleccionados
+        $proyectosLista = DB::table('proyectos')
+            ->where('id_perfil', $perfil->id_perfil)
+            ->whereNull('deleted_at')
+            ->whereIn('id_proyecto', $sel['proyectos'] ?: [0])
+            ->orderByDesc('fecha_ini')
+            ->get()
+            ->map(fn($pr) => [
+                'id_proyecto' => $pr->id_proyecto,
+                'nombre'      => $pr->nombre,
+                'descripcion' => $pr->descripcion,
+                'url_link'    => $pr->url_link,
+                'fecha_ini'   => $pr->fecha_ini,
+                'fecha_fin'   => $pr->fecha_fin,
+                'estado'      => $pr->estado,
+                'tecnologias' => $pr->tecnologias,
+            ])->all();
+
+        // Formación filtrada
+        $formacion = DB::table('formacion_academica')
+            ->where('id_perfil', $perfil->id_perfil)
+            ->whereNull('deleted_at')
+            ->whereIn('id_formacion', $sel['educacion'] ?: [0])
+            ->orderByDesc('fecha_ini')
+            ->get()
+            ->map(fn($f) => [
+                'titulo'      => $f->titulo,
+                'institucion' => $f->institucion,
+                'nivel'       => $f->nivel,
+                'descripcion' => $f->descripcion,
+                'fecha_ini'   => $f->fecha_ini,
+                'fecha_fin'   => $f->fecha_fin,
+            ])->all();
+
+        // Cálculo de años de experiencia (sólo seleccionadas)
+        $meses = 0;
+        $exps  = DB::table('experiencia_laboral')
+            ->where('id_perfil', $perfil->id_perfil)
+            ->whereIn('id_experiencia', $sel['experiencia'] ?: [0])
+            ->whereNull('deleted_at')->get();
+        foreach ($exps as $e) {
+            $ini = \Carbon\Carbon::parse($e->fecha_ini);
+            $fin = ($e->trabajo_actual || !$e->fecha_fin) ? \Carbon\Carbon::now() : \Carbon\Carbon::parse($e->fecha_fin);
+            $meses += max(0, $ini->diffInMonths($fin));
+        }
+        $aniosNum = (int) floor($meses / 12);
+
+        $cntEmpresas = collect($exps)->pluck('empresa')->unique()->count();
+        $cntProy = count($proyectosLista);
+        $cntHabs = collect($habGrupos)->flatten()->count();
+
+        $usuarioNombre = $usuario->nombre ?? 'U';
+        $usuarioApellido = $usuario->apellido ?? '';
+
+        $portafolio = [
+            'id_perfil'           => $perfil->id_perfil,
+            'nombre'              => $nombre ?: 'Mi perfil',
+            'iniciales'           => strtoupper(substr($usuarioNombre, 0, 1) . substr($usuarioApellido, 0, 1)),
+            'rol'                 => $cargo,
+            'descripcion'         => $perfil->biografia ?: '',
+            'tags'                => [],
+            'tags_extra'          => 0,
+            'anios'               => $aniosNum > 0 ? ($aniosNum . ' año' . ($aniosNum === 1 ? '' : 's')) : ($meses > 0 ? 'Menos de 1 año' : 'Sin experiencia registrada'),
+            'anios_num'           => $aniosNum,
+            'proyectos'           => $cntProy . ' proyecto' . ($cntProy === 1 ? '' : 's'),
+            'cnt_proy'            => $cntProy,
+            'cnt_habs'            => $cntHabs,
+            'cnt_empresas'        => $cntEmpresas,
+            'ubicacion'           => $perfil->ubicacion ?: 'Sin ubicación',
+            'email'               => $usuario->correo_electronico ?? null,
+            'telefono'            => $usuario->telefono ?? null,
+            'links'               => $links,
+            'habilidades_grupos'  => $habGrupos,
+            'habilidades_blandas' => $habBlandas,
+            'experiencias'        => $experiencias,
+            'proyectos_lista'     => $proyectosLista,
+            'formacion'           => $formacion,
+            'foto'                => $perfil->foto_perfil,
+            'cover_from'          => '#1e3a5f',
+            'cover_to'            => '#e11d48',
+        ];
+
+        return response()->json(['ok' => true, 'portafolio' => $portafolio]);
+    }
+
     private function nivelDesdeAnios(?int $anios): string
     {
         $a = (int) $anios;
@@ -806,7 +983,8 @@ class UsuarioWebController extends Controller
         foreach ($request->habilidades ?? [] as $idHabilidad) {
             PerfilHabilidadBlanda::create([
                 'id_perfil' => $perfilId,
-                'id_habilidad_blanda' => $idHabilidad
+                'id_habilidad_blanda' => $idHabilidad,
+                'publicado' => false,
             ]);
         }
 

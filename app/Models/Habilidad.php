@@ -18,12 +18,14 @@ class Habilidad extends Model
         'nombre',
         'anios_experiencia',
         'descripcion',
+        'publicado',
         'deleted_by',
         'delete_reason',
     ];
 
     protected $casts = [
         'deleted_at' => 'datetime',
+        'publicado'  => 'boolean',
     ];
 
     public function perfil()

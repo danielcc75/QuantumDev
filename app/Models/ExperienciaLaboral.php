@@ -21,6 +21,7 @@ class ExperienciaLaboral extends Model
         'fecha_ini',
         'fecha_fin',
         'trabajo_actual',
+        'publicado',
         'deleted_by',
         'delete_reason',
     ];
@@ -29,6 +30,7 @@ class ExperienciaLaboral extends Model
         'fecha_ini' => 'date',
         'fecha_fin' => 'date',
         'trabajo_actual' => 'boolean',
+        'publicado' => 'boolean',
         'deleted_at' => 'datetime',
     ];
 

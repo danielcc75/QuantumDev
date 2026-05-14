@@ -41,10 +41,12 @@ class HabilidadController extends Controller
             'id_categoria'       => $request->categoria,
             'anios_experiencia'  => $request->anosExperiencia,
             'descripcion'        => $request->descripcion,
-            'id_perfil'         => $usuario->perfil->id_perfil,
+            'id_perfil'          => $usuario->perfil->id_perfil,
+            'publicado'          => false,
         ]);
 
-        return redirect(route('dashboard') . '?seccion=habilidades')->with('success', 'Habilidad creada correctamente');
+        return redirect(route('dashboard') . '?seccion=habilidades')
+            ->with('success', 'Habilidad creada correctamente');
     }
 
     // =========================

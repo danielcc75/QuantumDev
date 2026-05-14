@@ -40,7 +40,7 @@ class ProyectoController extends Controller
             'fecha_ini'      => $request->fecha_ini,
             'fecha_fin'      => $request->fecha_fin ?: null,
             'estado'         => $request->estado ?? 'pendiente',
-            'visible'        => $request->visible ?? 1,
+            'visible'        => $request->visible ?? 0,
         ]);
 
         return response()->json(['success' => true, 'proyecto' => $proyecto]);

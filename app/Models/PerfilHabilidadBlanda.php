@@ -11,6 +11,11 @@ class PerfilHabilidadBlanda extends Model
 
     protected $fillable = [
         'id_perfil',
-        'id_habilidad_blanda'
+        'id_habilidad_blanda',
+        'publicado',
+    ];
+
+    protected $casts = [
+        'publicado' => 'boolean',
     ];
 }

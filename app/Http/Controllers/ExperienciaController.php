@@ -71,7 +71,8 @@ class ExperienciaController extends Controller
             'referencias' => $request->referencias,
             'fecha_ini' => $request->fecha_ini,
             'fecha_fin' => $request->trabajo_actual ? null : $request->fecha_fin,
-            'trabajo_actual' => $request->trabajo_actual ?? false
+            'trabajo_actual' => $request->trabajo_actual ?? false,
+            'publicado' => false,
         ]);
 
         return response()->json([

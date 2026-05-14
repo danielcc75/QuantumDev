@@ -123,11 +123,10 @@
                         </div>
                     </div>
                 </div>
-                <a id="mp-vista-previa" href="#" target="_blank"
+                <button type="button" id="mp-vista-previa"
                    class="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-xl border border-[#1e3a5f]/30 text-[#1e3a5f] hover:bg-[#1e3a5f]/5 transition">
                     <i class="fas fa-eye text-xs"></i> Vista previa
-                    <i class="fas fa-external-link-alt text-[10px]"></i>
-                </a>
+                </button>
             </div>
         </div>
     </div>
@@ -206,7 +205,6 @@
             const slug = data.slug || '';
             urlLink.textContent = baseUrl + '/' + slug;
             urlLink.href = '/' + slug;
-            btnVista.href = '/' + slug;
 
             actualizarConteos();
             mostrarTab('todo');
@@ -361,6 +359,41 @@
         });
     });
 
+    btnVista.addEventListener('click', () => {
+        const payload = {};
+        todasLasSecciones().forEach(s => {
+            payload[s] = estado[s].filter(i => i.publicado).map(i => i.id);
+        });
+
+        const textoOriginal = btnVista.innerHTML;
+        btnVista.disabled = true;
+        btnVista.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i> Cargando...';
+
+        fetch('{{ route("cuenta.portafolio.preview") }}', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrf, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify(payload)
+        })
+        .then(r => r.json())
+        .then(res => {
+            btnVista.disabled = false;
+            btnVista.innerHTML = textoOriginal;
+            if (!res.ok || !res.portafolio) {
+                Swal.fire({ icon: 'error', title: 'No se pudo cargar la vista previa', text: res.message || '', confirmButtonColor: '#1e3a5f' });
+                return;
+            }
+            if (typeof window.abrirModalPortafolio === 'function') {
+                window.abrirModalPortafolio({ data: res.portafolio, preview: true });
+            }
+        })
+        .catch(() => {
+            btnVista.disabled = false;
+            btnVista.innerHTML = textoOriginal;
+            Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'No se pudo obtener la vista previa.', confirmButtonColor: '#1e3a5f' });
+        });
+    });
+
     btnPublicar.addEventListener('click', () => {
         const payload = {};
         todasLasSecciones().forEach(s => {
@@ -384,6 +417,23 @@
                 cerrarModal();
                 if (typeof window.aplicarVisibilidadPublica === 'function') {
                     window.aplicarVisibilidadPublica();
+                }
+
+                // Recalcular banner "elementos sin publicar"
+                const aviso  = document.getElementById('aviso-sin-publicar');
+                const countEl = document.getElementById('aviso-sin-publicar-count');
+                if (aviso && countEl) {
+                    const sinPublicar = todasLasSecciones()
+                        .flatMap(s => estado[s])
+                        .filter(it => !it.publicado).length;
+                    countEl.textContent = sinPublicar;
+                    if (sinPublicar > 0) {
+                        aviso.classList.remove('hidden');
+                        aviso.classList.add('flex');
+                    } else {
+                        aviso.classList.add('hidden');
+                        aviso.classList.remove('flex');
+                    }
                 }
                 Swal.fire({
                     icon: 'success',
