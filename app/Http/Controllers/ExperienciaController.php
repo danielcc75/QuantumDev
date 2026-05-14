@@ -159,6 +159,6 @@ class ExperienciaController extends Controller
         public function show($id)
     {
         $experiencia = ExperienciaLaboral::findOrFail($id);
-        return response()->json($experiencia);  // ← IGUAL QUE PROYECTOS, solo devuelve el objeto
+        return response()->json($experiencia);
     }
 }
