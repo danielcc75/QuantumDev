@@ -38,6 +38,19 @@ class ExperienciaController extends Controller
         return $experiencia && $experiencia->id_perfil == $perfilId;
     }
 
+    private function reglasValidacion()
+    {
+        return [
+            'empresa' => 'required|string|max:150',
+            'cargo' => 'required|string|max:100',
+            'descripcion' => 'nullable|string',
+            'referencias' => 'nullable|string',
+            'fecha_ini' => 'required|date',
+            'fecha_fin' => 'nullable|date|after_or_equal:fecha_ini',
+            'trabajo_actual' => 'boolean',
+        ];
+    }
+
     /**
      * Guardar nueva experiencia laboral
      */
@@ -47,15 +60,7 @@ class ExperienciaController extends Controller
             return response()->json(['error' => 'No autenticado'], 401);
         }
 
-        $request->validate([
-            'empresa' => 'required|string|max:150',
-            'cargo' => 'required|string|max:100',
-            'descripcion' => 'nullable|string',
-            'referencias' => 'nullable|string',
-            'fecha_ini' => 'required|date',
-            'fecha_fin' => 'nullable|date|after_or_equal:fecha_ini',
-            'trabajo_actual' => 'boolean'
-        ]);
+        $request->validate($this->reglasValidacion());
 
         $perfilId = $this->getPerfilId();
         
@@ -91,15 +96,7 @@ class ExperienciaController extends Controller
             return response()->json(['error' => 'No autenticado'], 401);
         }
 
-        $request->validate([
-            'empresa' => 'required|string|max:150',
-            'cargo' => 'required|string|max:100',
-            'descripcion' => 'nullable|string',
-            'referencias' => 'nullable|string',
-            'fecha_ini' => 'required|date',
-            'fecha_fin' => 'nullable|date|after_or_equal:fecha_ini',
-            'trabajo_actual' => 'boolean'
-        ]);
+        $request->validate($this->reglasValidacion());
 
         $experiencia = ExperienciaLaboral::find($id);
         
