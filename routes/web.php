@@ -7,6 +7,7 @@ use App\Http\Controllers\PortafolioController;
 use App\Http\Controllers\CuentaController;
 use App\Http\Controllers\PerfilWebController;
 use App\Http\Controllers\AuthWebController;
+use App\Http\Controllers\NovedadesController;
 use Illuminate\Support\Facades\Route;
 
 // =========================
@@ -23,6 +24,9 @@ Route::post('/login', [AuthWebController::class, 'login'])->name('login.store');
 Route::post('/register', [AuthWebController::class, 'register'])->name('register.store');
 Route::post('/logout', [AuthWebController::class, 'logout'])->name('logout');
 Route::get('/dashboard', [AuthWebController::class, 'dashboard'])->name('dashboard');
+
+// Novedades (panel lateral del dashboard)
+Route::post('/novedades/marcar-vistas', [NovedadesController::class, 'marcarVistas'])->name('novedades.marcar-vistas');
 
 
 

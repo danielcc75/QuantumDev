@@ -53,24 +53,71 @@
 
 
                 <!-- campana -->
+                @php
+                    $novedadesHeader      = $novedades ?? collect();
+                    $perfilHeader         = $usuario->perfil ?? null;
+                    $portafolioOcultoHdr  = $perfilHeader && !$perfilHeader->visible;
+                    $notaModeracionHdr    = $perfilHeader->moderation_note ?? null;
+                    $avisoModeracionHdr   = $portafolioOcultoHdr || $notaModeracionHdr;
+                    $totalNotificaciones  = $novedadesHeader->count() + ($avisoModeracionHdr ? 1 : 0);
+                @endphp
                 <div class="relative dropdown">
-                    <button class="text-gray-500 hover:text-[#1e3a5f] focus:outline-none transition-colors">
+                    <button class="text-gray-500 hover:text-[#1e3a5f] focus:outline-none transition-colors relative">
                         <i class="fas fa-bell text-xl"></i>
-                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-[#e11d48] rounded-full"></span>
+                        @if($totalNotificaciones > 0)
+                            <span id="badge-notificaciones"
+                                  class="absolute -top-1 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 bg-[#e11d48] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                {{ $totalNotificaciones > 9 ? '9+' : $totalNotificaciones }}
+                            </span>
+                        @else
+                            <span id="badge-notificaciones" class="hidden"></span>
+                        @endif
                     </button>
                     <div class="dropdown-menu hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-100 z-30">
-                        <div class="p-3 border-b border-gray-100">
+                        <div class="p-3 border-b border-gray-100 flex items-center justify-between">
                             <p class="font-semibold text-[#1e3a5f]">Notificaciones</p>
+                            @if($novedadesHeader->isNotEmpty())
+                                <button type="button"
+                                        id="btn-marcar-novedades-vistas-header"
+                                        class="text-xs text-blue-600 hover:underline">
+                                    Marcar leídas
+                                </button>
+                            @endif
                         </div>
-                        <div class="max-h-96 overflow-y-auto">
-                            <div class="p-3 hover:bg-gray-50 border-b border-gray-100">
-                                <p class="text-sm text-gray-800">Actualizaste tu portafolio</p>
-                                <p class="text-xs text-gray-500">Hace 2 horas</p>
-                            </div>
-                            <div class="p-3 hover:bg-gray-50 border-b border-gray-100">
-                                <p class="text-sm text-gray-800">Nuevo artículo disponible</p>
-                                <p class="text-xs text-gray-500">Hace 1 día</p>
-                            </div>
+                        <div class="max-h-96 overflow-y-auto" id="contenedor-notificaciones-header">
+                            @if($portafolioOcultoHdr)
+                                <div class="p-3 bg-red-50 border-b border-gray-100">
+                                    <p class="text-sm font-medium text-red-800">
+                                        <i class="fas fa-eye-slash mr-1"></i> Tu portafolio fue ocultado
+                                    </p>
+                                    @if($notaModeracionHdr)
+                                        <p class="text-xs text-red-700 mt-1">{{ $notaModeracionHdr }}</p>
+                                    @endif
+                                </div>
+                            @elseif($notaModeracionHdr)
+                                <div class="p-3 bg-yellow-50 border-b border-gray-100">
+                                    <p class="text-sm font-medium text-yellow-800">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i> Aviso del administrador
+                                    </p>
+                                    <p class="text-xs text-yellow-700 mt-1">{{ $notaModeracionHdr }}</p>
+                                </div>
+                            @endif
+
+                            @forelse($novedadesHeader as $novedad)
+                                <div class="p-3 hover:bg-gray-50 border-b border-gray-100 novedad-item-header"
+                                     data-tipo="{{ $novedad['tipo'] }}"
+                                     data-id="{{ $novedad['id_entidad'] }}">
+                                    <p class="text-sm text-gray-800">
+                                        <i class="{{ $novedad['icono'] }} {{ $novedad['color'] }} mr-1 text-xs"></i>
+                                        {{ $novedad['titulo'] }}
+                                    </p>
+                                    <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($novedad['created_at'])->diffForHumans() }}</p>
+                                </div>
+                            @empty
+                                @unless($avisoModeracionHdr)
+                                    <p class="p-4 text-xs text-gray-500 italic text-center">Sin notificaciones</p>
+                                @endunless
+                            @endforelse
                         </div>
                     </div>
                 </div>

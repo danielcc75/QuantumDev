@@ -289,5 +289,76 @@
         inputBusqueda.addEventListener('focus', () => {
             if (inputBusqueda.value.trim()) resultadosPanel.classList.remove('hidden');
         });
-        
+
+        // ── Marcar novedades como leídas (campana + sidebar) ────────────────
+        async function marcarNovedadesVistas(botones) {
+            const nodos = document.querySelectorAll('.novedad-item, .novedad-item-header');
+            const itemsMap = new Map();
+            nodos.forEach(el => {
+                const key = `${el.dataset.tipo}-${el.dataset.id}`;
+                itemsMap.set(key, { tipo: el.dataset.tipo, id_entidad: parseInt(el.dataset.id, 10) });
+            });
+            const items = Array.from(itemsMap.values());
+            if (!items.length) return;
+
+            botones.forEach(b => b && (b.disabled = true));
+            try {
+                const res = await fetch('{{ route('novedades.marcar-vistas') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ items }),
+                });
+                if (!res.ok) {
+                    botones.forEach(b => b && (b.disabled = false));
+                    return;
+                }
+
+                document.querySelectorAll('.novedad-item, .novedad-item-header').forEach(el => el.remove());
+                botones.forEach(b => b && b.remove());
+
+                // Sidebar vacío
+                const contSide = document.getElementById('contenedor-notificaciones');
+                if (contSide && !contSide.querySelector('div')) {
+                    const vacio = document.createElement('p');
+                    vacio.className = 'text-xs text-gray-500 italic';
+                    vacio.textContent = 'No hay novedades recientes.';
+                    contSide.appendChild(vacio);
+                }
+
+                // Header dropdown vacío
+                const contHdr = document.getElementById('contenedor-notificaciones-header');
+                if (contHdr && !contHdr.querySelector('div')) {
+                    const vacio = document.createElement('p');
+                    vacio.className = 'p-4 text-xs text-gray-500 italic text-center';
+                    vacio.textContent = 'Sin notificaciones';
+                    contHdr.appendChild(vacio);
+                }
+
+                // Actualizar badge: restar las novedades marcadas; quedan solo los avisos de moderación (si los hay)
+                const badge = document.getElementById('badge-notificaciones');
+                if (badge) {
+                    const quedanAvisos = !!document.querySelector('#contenedor-notificaciones-header > div');
+                    if (quedanAvisos) {
+                        badge.textContent = '1';
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                        badge.textContent = '';
+                    }
+                }
+            } catch (e) {
+                botones.forEach(b => b && (b.disabled = false));
+            }
+        }
+
+        const btnNovSidebar = document.getElementById('btn-marcar-novedades-vistas');
+        const btnNovHeader  = document.getElementById('btn-marcar-novedades-vistas-header');
+        const grupoBotones = [btnNovSidebar, btnNovHeader];
+        btnNovSidebar?.addEventListener('click', () => marcarNovedadesVistas(grupoBotones));
+        btnNovHeader?.addEventListener('click',  () => marcarNovedadesVistas(grupoBotones));
+
     </script>

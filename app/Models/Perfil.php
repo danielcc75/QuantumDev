@@ -15,7 +15,13 @@ class Perfil extends Model
         'foto_perfil',
         'biografia',
         'ubicacion',
-        'visibilidad'
+        'visibilidad',
+        'visible',
+        'moderation_note',
+    ];
+
+    protected $casts = [
+        'visible' => 'boolean',
     ];
 
     public function usuario()

@@ -42,29 +42,63 @@
                 </div>
 
                 <div class="bg-gray-50 rounded-xl p-4 right-sidebar-item">
-                    <h3 class="font-semibold text-gray-800 mb-4">Notificaciones y novedades</h3>
-                    <div class="space-y-3">
-                        <div class="flex items-start space-x-3 pb-3 border-b border-gray-200">
-                            <i class="fas fa-folder-open text-blue-500 mt-1 text-sm"></i>
-                            <div>
-                                <p class="font-medium text-gray-800 text-sm">Actualizaste tu portafolio principal</p>
-                                <p class="text-xs text-gray-500">Hace 2 horas - Agregaste 3 nuevos proyectos</p>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-gray-800">Notificaciones y novedades</h3>
+                        @if(($novedades ?? collect())->isNotEmpty())
+                            <button type="button"
+                                    id="btn-marcar-novedades-vistas"
+                                    class="text-xs text-blue-600 hover:underline">
+                                Marcar leídas
+                            </button>
+                        @endif
+                    </div>
+                    <div class="space-y-3" id="contenedor-notificaciones">
+                        @php
+                            $perfilUsuario = $usuario->perfil ?? null;
+                            $portafolioOculto = $perfilUsuario && !$perfilUsuario->visible;
+                            $notaModeracion   = $perfilUsuario->moderation_note ?? null;
+                            $novedades = $novedades ?? collect();
+                        @endphp
+
+                        @if($portafolioOculto)
+                            <div class="flex items-start space-x-3 pb-3 border-b border-gray-200 bg-red-50 -mx-4 -mt-1 px-4 py-2 rounded-t-xl">
+                                <i class="fas fa-eye-slash text-red-600 mt-1 text-sm"></i>
+                                <div>
+                                    <p class="font-medium text-red-800 text-sm">Un administrador ocultó tu portafolio</p>
+                                    @if($notaModeracion)
+                                        <p class="text-xs text-red-700 mt-1"><span class="font-semibold">Motivo:</span> {{ $notaModeracion }}</p>
+                                    @else
+                                        <p class="text-xs text-red-700 mt-1">No se indicó motivo. Contacta al administrador.</p>
+                                    @endif
+                                </div>
                             </div>
-                        </div>
-                        <div class="flex items-start space-x-3 pb-3 border-b border-gray-200">
-                            <i class="fas fa-newspaper text-green-500 mt-1 text-sm"></i>
-                            <div>
-                                <p class="font-medium text-gray-800 text-sm">Nuevo artículo disponible</p>
-                                <p class="text-xs text-gray-500">Diseño de dashboards - Lectura recomendada</p>
+                        @elseif($notaModeracion)
+                            <div class="flex items-start space-x-3 pb-3 border-b border-gray-200 bg-yellow-50 -mx-4 -mt-1 px-4 py-2 rounded-t-xl">
+                                <i class="fas fa-exclamation-triangle text-yellow-600 mt-1 text-sm"></i>
+                                <div>
+                                    <p class="font-medium text-yellow-800 text-sm">Aviso del administrador</p>
+                                    <p class="text-xs text-yellow-700 mt-1">{{ $notaModeracion }}</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="flex items-start space-x-3">
-                            <i class="fab fa-github text-gray-700 mt-1 text-sm"></i>
-                            <div>
-                                <p class="font-medium text-gray-800 text-sm">Repositorio conectado</p>
-                                <p class="text-xs text-gray-500">Sincronización activa con GitHub</p>
+                        @endif
+
+                        @forelse($novedades as $novedad)
+                            <div class="flex items-start space-x-3 pb-3 @if(!$loop->last) border-b border-gray-200 @endif novedad-item"
+                                 data-tipo="{{ $novedad['tipo'] }}"
+                                 data-id="{{ $novedad['id_entidad'] }}">
+                                <i class="{{ $novedad['icono'] }} {{ $novedad['color'] }} mt-1 text-sm"></i>
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-800 text-sm">{{ $novedad['titulo'] }}</p>
+                                    <p class="text-xs text-gray-500">
+                                        {{ $novedad['detalle'] }} · {{ \Carbon\Carbon::parse($novedad['created_at'])->diffForHumans() }}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
+                        @empty
+                            @unless($portafolioOculto || $notaModeracion)
+                                <p class="text-xs text-gray-500 italic">No hay novedades recientes.</p>
+                            @endunless
+                        @endforelse
                     </div>
                 </div>
 

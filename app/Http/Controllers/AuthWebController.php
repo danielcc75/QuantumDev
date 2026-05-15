@@ -8,6 +8,7 @@ use App\Models\Categoria;
 use App\Models\Habilidad;
 use App\Models\HabilidadBlanda;
 use App\Models\PerfilHabilidadBlanda;
+use App\Services\NovedadesService;
 use App\Traits\LogsActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -163,12 +164,15 @@ class AuthWebController extends Controller
             ->pluck('id_habilidad_blanda')
             ->toArray();
 
+        $novedades = app(NovedadesService::class)->paraUsuario($usuario->id_usuario);
+
         return view('dashboard', compact(
             'usuario',
             'categorias',
             'habilidades',
             'habilidadesBlandasActivas',
-            'habilidadesBlandasSeleccionadas'
+            'habilidadesBlandasSeleccionadas',
+            'novedades'
         ));
     }
 
