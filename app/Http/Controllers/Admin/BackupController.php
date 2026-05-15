@@ -226,15 +226,23 @@ class BackupController extends Controller
     }
 
     // Descargar backup existente
-    public function download($filename)
+    public function download(Request $request)
     {
+        $filename = $request->query('file', '');
+
+        if (!preg_match('/^[A-Za-z0-9._-]+\.sql$/', $filename) || str_contains($filename, '..')) {
+            return back()->with('error', 'Nombre de backup inválido');
+        }
+
         $path = storage_path('app/backups/' . $filename);
-        
+
         if (file_exists($path)) {
             $this->logAdminAction('backup_descargado', "Backup descargado: {$filename}");
-            return response()->download($path);
+            return response()->download($path, $filename, [
+                'Content-Type' => 'application/octet-stream',
+            ]);
         }
-        
+
         return back()->with('error', 'Backup no encontrado');
     }
     

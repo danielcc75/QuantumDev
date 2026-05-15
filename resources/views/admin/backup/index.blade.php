@@ -164,7 +164,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div class="flex space-x-2">
-                                <a href="{{ route('admin.backup.download', $backup['name']) }}"
+                                <a href="{{ route('admin.backup.download', ['file' => $backup['name']]) }}"
                                    class="text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200 p-2 rounded-lg transition"
                                    title="Descargar">
                                     <i class="fas fa-download"></i>
