@@ -178,7 +178,6 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     // Gestión de Habilidades (Catálogo global)
     Route::get('/habilidades', [HabilidadAdminController::class, 'index'])->name('admin.habilidades');
     Route::post('/habilidades/{id}/toggle', [HabilidadAdminController::class, 'toggleEstado'])->name('admin.habilidades.toggle');
-    Route::post('/habilidades/fusionar', [HabilidadAdminController::class, 'fusionar'])->name('admin.habilidades.fusionar');
     Route::delete('/habilidades/{id}', [HabilidadAdminController::class, 'destroy'])->name('admin.habilidades.destroy');
 
     // Gestión de Proyectos

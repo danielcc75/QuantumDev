@@ -8,7 +8,6 @@ use App\Models\Habilidad;
 use App\Models\HabilidadBlanda;
 use App\Models\Categoria;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class HabilidadAdminController extends Controller
 {
@@ -60,44 +59,6 @@ class HabilidadAdminController extends Controller
         $estado = $habilidad->activa ? 'activada' : 'desactivada';
         $this->logAdminAction('habilidad_estado_cambiado', "Habilidad «{$habilidad->nombre}» {$estado}");
         return back()->with('success', "Habilidad {$estado} correctamente");
-    }
-    
-    // Fusionar habilidades duplicadas
-    public function fusionar(Request $request)
-    {
-        $request->validate([
-            'nombre_original' => 'required|string',
-            'nombre_fusion' => 'required|string',
-            'categoria_id' => 'required|exists:categoria,id_categoria'
-        ]);
-        
-        // Encontrar habilidades a fusionar
-        $habilidadesOriginales = Habilidad::where('nombre', $request->nombre_original)->get();
-        $habilidadFusion = Habilidad::where('nombre', $request->nombre_fusion)->first();
-        
-        if (!$habilidadFusion) {
-            // Crear nueva habilidad fusionada
-            $habilidadFusion = Habilidad::create([
-                'nombre' => $request->nombre_fusion,
-                'id_categoria' => $request->categoria_id,
-                'activa' => true
-            ]);
-        }
-        
-        // Mover todas las referencias a la nueva habilidad
-        foreach ($habilidadesOriginales as $original) {
-            if ($original->id != $habilidadFusion->id) {
-                // Actualizar los perfiles que usan esta habilidad
-                DB::table('perfil_habilidad')
-                    ->where('id_habilidad', $original->id)
-                    ->update(['id_habilidad' => $habilidadFusion->id]);
-                
-                $original->delete();
-            }
-        }
-        
-        $this->logAdminAction('habilidades_fusionadas', "«{$request->nombre_original}» fusionada en «{$request->nombre_fusion}»");
-        return back()->with('success', "Habilidades fusionadas exitosamente en '{$request->nombre_fusion}'");
     }
     
     // Eliminar habilidad

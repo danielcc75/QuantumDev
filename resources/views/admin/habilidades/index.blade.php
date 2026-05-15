@@ -142,18 +142,6 @@
         activarTab(@json(session('active_tab')));
     @endif
 
-    function abrirModalFusion(nombre) {
-        document.getElementById('nombre_original').value = nombre;
-        document.getElementById('formFusion').action = "{{ route('admin.habilidades.fusionar') }}";
-        document.getElementById('modalFusion').classList.remove('hidden');
-        document.getElementById('modalFusion').classList.add('flex');
-    }
-
-    function cerrarModalFusion() {
-        document.getElementById('modalFusion').classList.add('hidden');
-        document.getElementById('modalFusion').classList.remove('flex');
-    }
-
     function actualizarPreviewCategoria(url) {
         const preview = document.getElementById('categoria_imagen_preview');
         if (url && url.trim()) {

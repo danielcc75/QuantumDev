@@ -28,10 +28,6 @@
                     @foreach($habilidadesDuplicadas as $duplicada)
                     <div class="flex justify-between items-center">
                         <span class="text-gray-700">{{ $duplicada->nombre }} ({{ $duplicada->total }} veces)</span>
-                        <button onclick="abrirModalFusion('{{ $duplicada->nombre }}')"
-                            class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg text-sm">
-                            <i class="fas fa-code-branch mr-1"></i> Fusionar
-                        </button>
                     </div>
                     @endforeach
                 </div>
