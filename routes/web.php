@@ -8,6 +8,7 @@ use App\Http\Controllers\CuentaController;
 use App\Http\Controllers\PerfilWebController;
 use App\Http\Controllers\AuthWebController;
 use App\Http\Controllers\NovedadesController;
+use App\Http\Controllers\CalendarioController;
 use Illuminate\Support\Facades\Route;
 
 // =========================
@@ -27,6 +28,9 @@ Route::get('/dashboard', [AuthWebController::class, 'dashboard'])->name('dashboa
 
 // Novedades (panel lateral del dashboard)
 Route::post('/novedades/marcar-vistas', [NovedadesController::class, 'marcarVistas'])->name('novedades.marcar-vistas');
+
+// Calendario (eventos en rango)
+Route::get('/calendario/eventos', [CalendarioController::class, 'eventos'])->name('calendario.eventos');
 
 
 

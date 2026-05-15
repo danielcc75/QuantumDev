@@ -355,4 +355,140 @@
         btnNovSidebar?.addEventListener('click', () => marcarNovedadesVistas(grupoBotones));
         btnNovHeader?.addEventListener('click',  () => marcarNovedadesVistas(grupoBotones));
 
+        // ── Calendario interactivo ───────────────────────────────────────────
+        (function inicializarCalendario() {
+            const widget = document.getElementById('widget-calendario');
+            if (!widget) return;
+
+            const endpoint = widget.dataset.endpoint;
+            const hoyStr   = widget.dataset.hoy; // YYYY-MM-DD
+            const titulo   = document.getElementById('cal-titulo');
+            const grid     = document.getElementById('cal-grid');
+            const panelLista = document.getElementById('cal-panel-lista');
+            const panelTitulo = document.getElementById('cal-panel-titulo');
+            const btnPrev = document.getElementById('cal-prev');
+            const btnNext = document.getElementById('cal-next');
+
+            const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            const hoy = parseFecha(hoyStr);
+            let mesVisible = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+            let diaSeleccionado = formatearFecha(hoy);
+            let eventosCache = {}; // { 'YYYY-MM-DD': [eventos] }
+
+            function parseFecha(str) {
+                const [y, m, d] = str.split('-').map(Number);
+                return new Date(y, m - 1, d);
+            }
+            function formatearFecha(d) {
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${y}-${m}-${day}`;
+            }
+            function formatearLargoEsp(str) {
+                const d = parseFecha(str);
+                return `${d.getDate()} de ${MESES[d.getMonth()].toLowerCase()} de ${d.getFullYear()}`;
+            }
+
+            async function cargarMes() {
+                const y = mesVisible.getFullYear();
+                const m = mesVisible.getMonth();
+                const desde = new Date(y, m, 1);
+                const hasta = new Date(y, m + 1, 0);
+                titulo.textContent = `${MESES[m]} ${y}`;
+
+                renderizarGrid(desde, hasta, {}); // mientras carga
+
+                try {
+                    const url = `${endpoint}?desde=${formatearFecha(desde)}&hasta=${formatearFecha(hasta)}`;
+                    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                    const data = await res.json();
+                    eventosCache = data.eventos || {};
+                } catch (e) {
+                    eventosCache = {};
+                }
+                renderizarGrid(desde, hasta, eventosCache);
+                renderizarPanel(diaSeleccionado);
+            }
+
+            function renderizarGrid(desde, hasta, eventos) {
+                grid.innerHTML = '';
+                const primerDiaSemana = (desde.getDay() + 6) % 7; // lunes = 0
+                const diasEnMes = hasta.getDate();
+                const hoyFmt = formatearFecha(hoy);
+
+                for (let i = 0; i < primerDiaSemana; i++) {
+                    const v = document.createElement('div');
+                    grid.appendChild(v);
+                }
+
+                for (let d = 1; d <= diasEnMes; d++) {
+                    const fechaIter = new Date(desde.getFullYear(), desde.getMonth(), d);
+                    const fechaStr  = formatearFecha(fechaIter);
+                    const tieneEventos = !!(eventos[fechaStr] && eventos[fechaStr].length);
+                    const esHoy = fechaStr === hoyFmt;
+                    const esSeleccionado = fechaStr === diaSeleccionado;
+
+                    const cell = document.createElement('button');
+                    cell.type = 'button';
+                    cell.dataset.fecha = fechaStr;
+                    cell.className = [
+                        'relative py-1.5 rounded-md text-sm transition-colors',
+                        esSeleccionado ? 'bg-[#1e3a5f] text-white font-semibold'
+                                       : (esHoy ? 'bg-blue-100 text-blue-700 font-semibold' : 'text-gray-700 hover:bg-gray-200'),
+                    ].join(' ');
+                    cell.innerHTML = `
+                        <span>${d}</span>
+                        ${tieneEventos ? `<span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full ${esSeleccionado ? 'bg-white' : 'bg-[#e11d48]'}"></span>` : ''}
+                    `;
+                    cell.addEventListener('click', () => {
+                        diaSeleccionado = fechaStr;
+                        renderizarGrid(desde, hasta, eventos);
+                        renderizarPanel(fechaStr);
+                    });
+                    grid.appendChild(cell);
+                }
+            }
+
+            function renderizarPanel(fechaStr) {
+                panelTitulo.textContent = `Eventos · ${formatearLargoEsp(fechaStr)}`;
+                const eventos = eventosCache[fechaStr] || [];
+
+                if (!eventos.length) {
+                    panelLista.innerHTML = '<p class="text-xs text-gray-400 italic">Sin eventos ese día.</p>';
+                    return;
+                }
+
+                panelLista.innerHTML = eventos.map(ev => `
+                    <div class="flex items-start gap-2 text-xs">
+                        <span class="${ev.color} w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0"></span>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-800">
+                                <i class="${ev.icono} ${ev.colorTexto} mr-1"></i>
+                                ${escapeHtmlCal(ev.titulo)}
+                            </p>
+                            ${ev.detalle ? `<p class="text-gray-500">${escapeHtmlCal(ev.detalle)}</p>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            function escapeHtmlCal(s) {
+                const d = document.createElement('div');
+                d.textContent = s ?? '';
+                return d.innerHTML;
+            }
+
+            btnPrev.addEventListener('click', () => {
+                mesVisible = new Date(mesVisible.getFullYear(), mesVisible.getMonth() - 1, 1);
+                cargarMes();
+            });
+            btnNext.addEventListener('click', () => {
+                mesVisible = new Date(mesVisible.getFullYear(), mesVisible.getMonth() + 1, 1);
+                cargarMes();
+            });
+
+            cargarMes();
+        })();
+
     </script>

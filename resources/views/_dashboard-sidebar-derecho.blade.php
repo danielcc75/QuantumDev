@@ -9,35 +9,29 @@
             </button>
             <div class="p-6 space-y-6">
 
-                <div class="bg-gray-50 rounded-xl p-4 right-sidebar-item">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-semibold text-gray-800">Calendario</h3>
-                        <a href="#" class="text-sm text-blue-600 hover:text-blue-800">Ver agenda →</a>
+                <div class="bg-gray-50 rounded-xl p-4 right-sidebar-item"
+                     id="widget-calendario"
+                     data-hoy="{{ \Carbon\Carbon::now()->toDateString() }}"
+                     data-endpoint="{{ route('calendario.eventos') }}">
+                    <div class="flex justify-between items-center mb-3">
+                        <button type="button" id="cal-prev" class="w-7 h-7 rounded-full hover:bg-gray-200 text-gray-600 flex items-center justify-center" aria-label="Mes anterior">
+                            <i class="fas fa-chevron-left text-xs"></i>
+                        </button>
+                        <h3 class="font-semibold text-gray-800 text-sm" id="cal-titulo">—</h3>
+                        <button type="button" id="cal-next" class="w-7 h-7 rounded-full hover:bg-gray-200 text-gray-600 flex items-center justify-center" aria-label="Mes siguiente">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
                     </div>
-                    @php
-                        $hoyC       = \Carbon\Carbon::now();
-                        $meses      = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-                        $mesNombre  = $meses[$hoyC->month - 1] . ' ' . $hoyC->year;
-                        $diasSemana = ['L','M','X','J','V','S','D'];
-                        $offset     = $hoyC->copy()->startOfMonth()->dayOfWeekIso - 1;
-                        $diasEnMes  = $hoyC->daysInMonth;
-                        $diaHoy     = $hoyC->day;
-                    @endphp
-                    <div class="text-center mb-4">
-                        <p class="text-lg font-medium text-gray-700">{{ $mesNombre }}</p>
+                    <div class="grid grid-cols-7 gap-1 text-center text-xs text-gray-500 font-medium mb-1">
+                        <div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div><div>D</div>
                     </div>
-                    <div class="grid grid-cols-7 gap-1 text-center text-sm">
-                        @foreach($diasSemana as $dia)
-                            <div class="text-gray-500 font-medium py-1">{{ $dia }}</div>
-                        @endforeach
-                        @for($i = 0; $i < $offset; $i++)
-                            <div></div>
-                        @endfor
-                        @for($i = 1; $i <= $diasEnMes; $i++)
-                            <div class="py-1 {{ $i == $diaHoy ? 'bg-blue-600 text-white rounded-full w-7 h-7 flex items-center justify-center mx-auto' : 'text-gray-700' }}">
-                                {{ $i }}
-                            </div>
-                        @endfor
+                    <div id="cal-grid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
+
+                    <div id="cal-panel-eventos" class="mt-4 pt-3 border-t border-gray-200">
+                        <p class="text-xs font-medium text-gray-700 mb-2" id="cal-panel-titulo">Eventos del día</p>
+                        <div id="cal-panel-lista" class="space-y-2 max-h-56 overflow-y-auto">
+                            <p class="text-xs text-gray-400 italic">Selecciona un día para ver sus eventos.</p>
+                        </div>
                     </div>
                 </div>
 
