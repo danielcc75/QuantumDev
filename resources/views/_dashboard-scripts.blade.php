@@ -67,6 +67,18 @@
             resaltarLink(seccionId);
         }
 
+        window.irAConfiguracionCuenta = function () {
+            cambiarSeccion('perfil');
+            setTimeout(() => {
+                const seccionConfig = document.getElementById('seccion-configuracion');
+                if (seccionConfig && seccionConfig.classList.contains('hidden') && typeof toggleConfiguracionCuenta === 'function') {
+                    toggleConfiguracionCuenta();
+                } else if (seccionConfig) {
+                    seccionConfig.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 50);
+        };
+
         document.querySelectorAll('.seccion-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
