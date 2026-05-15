@@ -292,14 +292,8 @@
 
         // ── Marcar novedades como leídas (campana + sidebar) ────────────────
         async function marcarNovedadesVistas(botones) {
-            const nodos = document.querySelectorAll('.novedad-item, .novedad-item-header');
-            const itemsMap = new Map();
-            nodos.forEach(el => {
-                const key = `${el.dataset.tipo}-${el.dataset.id}`;
-                itemsMap.set(key, { tipo: el.dataset.tipo, id_entidad: parseInt(el.dataset.id, 10) });
-            });
-            const items = Array.from(itemsMap.values());
-            if (!items.length) return;
+            const hayItemsVisibles = !!document.querySelector('.novedad-item, .novedad-item-header');
+            if (!hayItemsVisibles) return;
 
             botones.forEach(b => b && (b.disabled = true));
             try {
@@ -310,7 +304,7 @@
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
                         'Accept': 'application/json',
                     },
-                    body: JSON.stringify({ items }),
+                    body: JSON.stringify({ todas: true }),
                 });
                 if (!res.ok) {
                     botones.forEach(b => b && (b.disabled = false));

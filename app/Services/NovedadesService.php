@@ -102,4 +102,44 @@ class NovedadesService
 
         return $insertados;
     }
+
+    public function marcarTodasComoVistas(int $idUsuario): int
+    {
+        $desde = Carbon::now()->subDays(self::VENTANA_DIAS);
+
+        $vistas = NovedadVista::where('id_usuario', $idUsuario)
+            ->get()
+            ->groupBy('tipo')
+            ->map(fn ($g) => $g->pluck('id_entidad')->all());
+
+        $pendientes = [
+            NovedadVista::TIPO_TECNOLOGIA => Tecnologia::where('created_at', '>=', $desde)
+                ->when(isset($vistas[NovedadVista::TIPO_TECNOLOGIA]),
+                    fn ($q) => $q->whereNotIn('id_tecnologia', $vistas[NovedadVista::TIPO_TECNOLOGIA]))
+                ->pluck('id_tecnologia'),
+            NovedadVista::TIPO_CATEGORIA => Categoria::where('created_at', '>=', $desde)
+                ->when(isset($vistas[NovedadVista::TIPO_CATEGORIA]),
+                    fn ($q) => $q->whereNotIn('id_categoria', $vistas[NovedadVista::TIPO_CATEGORIA]))
+                ->pluck('id_categoria'),
+            NovedadVista::TIPO_HABILIDAD_BLANDA => HabilidadBlanda::where('created_at', '>=', $desde)
+                ->where('estado', 'activo')
+                ->when(isset($vistas[NovedadVista::TIPO_HABILIDAD_BLANDA]),
+                    fn ($q) => $q->whereNotIn('id_habilidad_blanda', $vistas[NovedadVista::TIPO_HABILIDAD_BLANDA]))
+                ->pluck('id_habilidad_blanda'),
+        ];
+
+        $insertados = 0;
+        foreach ($pendientes as $tipo => $ids) {
+            foreach ($ids as $id) {
+                NovedadVista::firstOrCreate([
+                    'id_usuario' => $idUsuario,
+                    'tipo'       => $tipo,
+                    'id_entidad' => (int) $id,
+                ]);
+                $insertados++;
+            }
+        }
+
+        return $insertados;
+    }
 }

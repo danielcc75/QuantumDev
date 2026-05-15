@@ -13,13 +13,21 @@ class NovedadesController extends Controller
             return response()->json(['success' => false, 'message' => 'No autenticado'], 401);
         }
 
+        $idUsuario = session('usuario_id');
+
+        // Si se piden todas, ignoramos items y marcamos toda la ventana de novedades.
+        if ($request->boolean('todas')) {
+            $insertados = $service->marcarTodasComoVistas($idUsuario);
+            return response()->json(['success' => true, 'marcadas' => $insertados]);
+        }
+
         $data = $request->validate([
-            'items'              => 'required|array|max:50',
+            'items'              => 'required|array|max:200',
             'items.*.tipo'       => 'required|string|in:tecnologia,categoria,habilidad_blanda',
             'items.*.id_entidad' => 'required|integer|min:1',
         ]);
 
-        $insertados = $service->marcarComoVistas(session('usuario_id'), $data['items']);
+        $insertados = $service->marcarComoVistas($idUsuario, $data['items']);
 
         return response()->json(['success' => true, 'marcadas' => $insertados]);
     }
