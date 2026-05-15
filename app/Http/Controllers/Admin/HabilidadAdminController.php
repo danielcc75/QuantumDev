@@ -37,16 +37,9 @@ class HabilidadAdminController extends Controller
             ->orderByRaw('count(*) desc')
             ->first();
         
-        // Habilidades duplicadas - versión corregida
-        $habilidadesDuplicadas = Habilidad::select('nombre')
-            ->selectRaw('count(*) as total')
-            ->groupBy('nombre')
-            ->havingRaw('count(*) > 1')
-            ->get();
-        
         $habilidadesBlandas = HabilidadBlanda::orderBy('nombre')->get();
 
-        return view('admin.habilidades.index', compact('habilidades', 'categorias', 'habilidadPopular', 'habilidadesDuplicadas', 'habilidadesBlandas'));
+        return view('admin.habilidades.index', compact('habilidades', 'categorias', 'habilidadPopular', 'habilidadesBlandas'));
     }
         
     // Desactivar/Activar habilidad globalmente

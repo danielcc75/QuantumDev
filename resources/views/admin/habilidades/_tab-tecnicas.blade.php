@@ -1,7 +1,7 @@
         <div data-tab-panel="tecnicas" class="p-6 space-y-6">
 
             <!-- Estadísticas -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-white rounded-xl shadow p-6 border-l-4 border-blue-500">
                     <p class="text-gray-500 text-sm">Total Habilidades</p>
                     <p class="text-3xl font-bold">{{ $habilidades->total() }}</p>
@@ -11,28 +11,7 @@
                     <p class="text-xl font-bold">{{ $habilidadPopular->nombre ?? 'N/A' }}</p>
                     <p class="text-sm text-gray-500">{{ $habilidadPopular->total ?? 0 }} usuarios</p>
                 </div>
-                <div class="bg-white rounded-xl shadow p-6 border-l-4 border-yellow-500">
-                    <p class="text-gray-500 text-sm">Habilidades duplicadas</p>
-                    <p class="text-3xl font-bold">{{ $habilidadesDuplicadas->count() }}</p>
-                    <p class="text-sm text-gray-500">Mismos nombres diferentes</p>
-                </div>
             </div>
-
-            @if($habilidadesDuplicadas->count() > 0)
-            <div class="bg-yellow-50 rounded-xl shadow p-6 border border-yellow-200">
-                <h3 class="font-bold text-yellow-800 mb-3">
-                    <i class="fas fa-exclamation-triangle mr-2"></i>
-                    Habilidades duplicadas detectadas
-                </h3>
-                <div class="space-y-2">
-                    @foreach($habilidadesDuplicadas as $duplicada)
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-700">{{ $duplicada->nombre }} ({{ $duplicada->total }} veces)</span>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-            @endif
 
             <!-- Gestión de Categorías -->
             <div class="bg-gray-50 rounded-xl p-4 space-y-4">
