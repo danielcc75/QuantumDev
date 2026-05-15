@@ -1,310 +1,152 @@
         <section id="explorar" class="py-20 bg-white scroll-mt-28">
-            <div class="max-w-7xl mx-auto px-6 text-center">
-                <span class="inline-block text-sm font-semibold tracking-wide uppercase text-[#e11d48] bg-red-50 px-4 py-1 rounded-full mb-4">
-                    Explorar
-                </span>
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center">
+                    <span class="inline-block text-sm font-semibold tracking-wide uppercase text-[#e11d48] bg-red-50 px-4 py-1 rounded-full mb-4">
+                        Explorar
+                    </span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-[#1e3a5f] mb-4">
+                        Proyectos y portafolios públicos
+                    </h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                        Encuentra desarrolladores filtrando por tecnología, categoría, experiencia o ubicación.
+                    </p>
+                </div>
 
-                <h2 class="text-3xl md:text-4xl font-bold text-[#1e3a5f] mb-4">
-                    Proyectos y portafolios publicos
-                </h2>
-
-                <p class="text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                    Aqui podras descubrir proyectos compartidos por otros usuarios y explorar
-                    distintos perfiles dentro de la plataforma de una forma clara y accesible.
-                </p>
-           
-           
-           
-           
                 @php
                     use Illuminate\Support\Facades\DB;
-
-                    $gradPairs = [
-                        ['from' => '#1e3a5f', 'to' => '#e11d48'],
-                    ];
-
-                    // Portafolios públicos: usuarios con perfil PÚBLICO que tengan biografía o algún proyecto/experiencia
-                    $portafoliosBase = DB::table('usuario as u')
-                        ->join('perfil as p', 'u.id_usuario', '=', 'p.id_usuario')
-                        ->select('u.id_usuario', 'u.nombre', 'u.apellido', 'p.id_perfil', 'p.biografia', 'p.ubicacion', 'p.foto_perfil')
-                        ->where('p.visibilidad', 'publico')
-                        ->where('p.visible', true)
-                        ->where(function ($q) {
-                            $q->whereNotNull('p.biografia')
-                              ->orWhereExists(function ($sub) {
-                                  $sub->select(DB::raw(1))->from('proyectos')
-                                      ->whereColumn('proyectos.id_perfil', 'p.id_perfil')
-                                      ->whereNull('proyectos.deleted_at');
-                              })
-                              ->orWhereExists(function ($sub) {
-                                  $sub->select(DB::raw(1))->from('experiencia_laboral')
-                                      ->whereColumn('experiencia_laboral.id_perfil', 'p.id_perfil')
-                                      ->whereNull('experiencia_laboral.deleted_at');
-                              });
-                        })
-                        ->orderByDesc('p.id_perfil')
-                        ->limit(6)
-                        ->get();
-
-                    $portafolios = $portafoliosBase->values()->map(function ($p, $idx) use ($gradPairs) {
-                        $usuarioRow = DB::table('usuario')->where('id_usuario', $p->id_usuario)->first();
-
-                        $cargo = DB::table('experiencia_laboral')
-                            ->where('id_perfil', $p->id_perfil)
-                            ->where('publicado', true)
-                            ->whereNull('deleted_at')
-                            ->orderByDesc('fecha_ini')
-                            ->value('cargo') ?? 'Desarrollador';
-
-                        $tags = DB::table('habilidades')
-                            ->where('id_perfil', $p->id_perfil)
-                            ->where('publicado', true)
-                            ->whereNull('deleted_at')
-                            ->orderByDesc('id_habilidad')
-                            ->limit(3)
-                            ->pluck('nombre')
-                            ->all();
-                        $totalHabs = DB::table('habilidades')->where('id_perfil', $p->id_perfil)->where('publicado', true)->whereNull('deleted_at')->count();
-                        $extraTags = max(0, $totalHabs - count($tags));
-
-                        $exps  = DB::table('experiencia_laboral')->where('id_perfil', $p->id_perfil)->where('publicado', true)->whereNull('deleted_at')->get();
-                        $meses = 0;
-                        foreach ($exps as $e) {
-                            $ini = \Carbon\Carbon::parse($e->fecha_ini);
-                            $fin = ($e->trabajo_actual || !$e->fecha_fin) ? \Carbon\Carbon::now() : \Carbon\Carbon::parse($e->fecha_fin);
-                            $meses += max(0, $ini->diffInMonths($fin));
-                        }
-                        $anios   = (int) floor($meses / 12);
-                        $anioStr = $anios > 0 ? ($anios . ' año' . ($anios === 1 ? '' : 's'))
-                                              : ($meses > 0 ? 'Menos de 1 año' : 'Sin experiencia registrada');
-
-                        $cntProy = DB::table('proyectos')->where('id_perfil', $p->id_perfil)->where('visible', true)->whereNull('deleted_at')->count();
-
-                        $cntEmpresas = DB::table('experiencia_laboral')
-                            ->where('id_perfil', $p->id_perfil)
-                            ->where('publicado', true)
-                            ->whereNull('deleted_at')
-                            ->distinct()
-                            ->count('empresa');
-
-                        // Links sociales (tipo => url)
-                        $linksRows = DB::table('perfil_links')->where('id_perfil', $p->id_perfil)->get();
-                        $links = [];
-                        foreach ($linksRows as $l) { $links[strtolower($l->tipo)] = $l->url; }
-
-                        // Habilidades agrupadas por categoría (incluye imagen y detalle)
-                        $habGrupos = DB::table('habilidades as h')
-                            ->leftJoin('categoria as c', 'h.id_categoria', '=', 'c.id_categoria')
-                            ->where('h.id_perfil', $p->id_perfil)
-                            ->where('h.publicado', true)
-                            ->whereNull('h.deleted_at')
-                            ->select('h.nombre', 'h.anios_experiencia', 'h.descripcion', 'c.nombre as categoria', 'c.imagen as categoria_imagen')
-                            ->get()
-                            ->groupBy(fn($r) => $r->categoria ?? 'Otras')
-                            ->map(function ($g, $cat) {
-                                return [
-                                    'categoria' => $cat,
-                                    'imagen'    => optional($g->first())->categoria_imagen,
-                                    'items'     => $g->map(function ($r) {
-                                        $a = (int) $r->anios_experiencia;
-                                        $nivel = $a >= 8 ? 'Experto' : ($a >= 5 ? 'Avanzado' : ($a >= 3 ? 'Intermedio' : 'Básico'));
-                                        return [
-                                            'nombre'             => $r->nombre,
-                                            'anios_experiencia'  => $a,
-                                            'nivel'              => $nivel,
-                                            'descripcion'        => $r->descripcion,
-                                        ];
-                                    })->values()->all(),
-                                ];
-                            })->values()->all();
-
-                        // Proyectos vinculados a experiencias (id_experiencia => [proyectos])
-                        $proyectosPorExp = DB::table('proyectos')
-                            ->where('id_perfil', $p->id_perfil)
-                            ->where('visible', true)
-                            ->whereNotNull('id_experiencia')
-                            ->whereNull('deleted_at')
-                            ->get()
-                            ->groupBy('id_experiencia');
-
-                        // Experiencias (todas) con sus proyectos vinculados
-                        $experiencias = DB::table('experiencia_laboral')
-                            ->where('id_perfil', $p->id_perfil)
-                            ->where('publicado', true)
-                            ->whereNull('deleted_at')
-                            ->orderByDesc('fecha_ini')
-                            ->get()
-                            ->map(function ($e) use ($proyectosPorExp) {
-                                $vinculados = ($proyectosPorExp->get($e->id_experiencia) ?? collect())
-                                    ->map(fn($pr) => [
-                                        'id_proyecto' => $pr->id_proyecto,
-                                        'nombre'      => $pr->nombre,
-                                        'url_link'    => $pr->url_link ?? null,
-                                    ])->values()->all();
-                                return [
-                                    'cargo'          => $e->cargo,
-                                    'empresa'        => $e->empresa,
-                                    'descripcion'    => $e->descripcion,
-                                    'fecha_ini'      => $e->fecha_ini,
-                                    'fecha_fin'      => $e->fecha_fin,
-                                    'trabajo_actual' => (bool) $e->trabajo_actual,
-                                    'proyectos'      => $vinculados,
-                                ];
-                            })->all();
-
-                        // Proyectos (visibles)
-                        $proyectosLista = DB::table('proyectos')
-                            ->where('id_perfil', $p->id_perfil)
-                            ->where('visible', 1)
-                            ->whereNull('deleted_at')
-                            ->orderByDesc('fecha_ini')
-                            ->get()
-                            ->map(fn($pr) => [
-                                'id_proyecto' => $pr->id_proyecto,
-                                'nombre'      => $pr->nombre,
-                                'descripcion' => $pr->descripcion,
-                                'url_link'    => $pr->url_link,
-                                'fecha_ini'   => $pr->fecha_ini,
-                                'fecha_fin'   => $pr->fecha_fin,
-                                'estado'      => $pr->estado,
-                                'tecnologias' => $pr->tecnologias,
-                            ])->all();
-
-                        // Habilidades blandas del perfil
-                        $habBlandas = DB::table('perfil_habilidad_blanda as phb')
-                            ->join('habilidades_blandas as hb', 'phb.id_habilidad_blanda', '=', 'hb.id_habilidad_blanda')
-                            ->where('phb.id_perfil', $p->id_perfil)
-                            ->where('phb.publicado', true)
-                            ->pluck('hb.nombre')
-                            ->all();
-
-                        // Formación académica
-                        $formacion = DB::table('formacion_academica')
-                            ->where('id_perfil', $p->id_perfil)
-                            ->where('publicado', true)
-                            ->whereNull('deleted_at')
-                            ->orderByDesc('fecha_ini')
-                            ->get()
-                            ->map(fn($f) => [
-                                'titulo'      => $f->titulo,
-                                'institucion' => $f->institucion,
-                                'nivel'       => $f->nivel,
-                                'descripcion' => $f->descripcion,
-                                'fecha_ini'   => $f->fecha_ini,
-                                'fecha_fin'   => $f->fecha_fin,
-                            ])->all();
-
-                        $grad = $gradPairs[$idx % count($gradPairs)];
-
-                        return (object) [
-                            'id_perfil'   => $p->id_perfil,
-                            'nombre'      => trim(($p->nombre ?? '') . ' ' . ($p->apellido ?? '')),
-                            'iniciales'   => strtoupper(substr($p->nombre ?? 'U', 0, 1) . substr($p->apellido ?? '', 0, 1)),
-                            'rol'         => $cargo,
-                            'descripcion' => $p->biografia ?: '',
-                            'tags'        => $tags,
-                            'tags_extra'  => $extraTags,
-                            'anios'       => $anioStr,
-                            'anios_num'   => $anios,
-                            'proyectos'   => $cntProy . ' proyecto' . ($cntProy === 1 ? '' : 's'),
-                            'cnt_proy'    => $cntProy,
-                            'cnt_habs'    => $totalHabs,
-                            'cnt_empresas'=> $cntEmpresas,
-                            'ubicacion'   => $p->ubicacion ?: 'Sin ubicación',
-                            'email'       => $usuarioRow->correo_electronico ?? null,
-                            'telefono'    => $usuarioRow->telefono ?? null,
-                            'links'       => $links,
-                            'habilidades_grupos'  => $habGrupos,
-                            'habilidades_blandas' => $habBlandas,
-                            'experiencias' => $experiencias,
-                            'proyectos_lista' => $proyectosLista,
-                            'formacion'   => $formacion,
-                            'foto'        => $p->foto_perfil,
-                            'cover_from'  => $grad['from'],
-                            'cover_to'    => $grad['to'],
-                        ];
-                    });
+                    $categoriasCat = DB::table('categoria')->orderBy('nombre')->get(['id_categoria', 'nombre']);
+                    $tecnologiasGrupos = DB::table('tecnologias')
+                        ->orderBy('categoria')
+                        ->orderBy('nombre')
+                        ->get(['nombre', 'categoria'])
+                        ->groupBy(fn ($t) => $t->categoria ?: 'Sin categoría');
+                    $categoriasTec = $tecnologiasGrupos->keys()->sort()->values();
                 @endphp
 
-                @if($portafolios->isEmpty())
-                    <div class="mt-10 bg-gray-50 border border-dashed border-gray-200 rounded-2xl p-12 text-center">
-                        <div class="w-16 h-16 rounded-full bg-[#1e3a5f]/8 flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-users text-2xl text-[#1e3a5f]/50"></i>
+                {{-- Formulario de filtros --}}
+                <form id="form-buscador-portafolios"
+                      onsubmit="event.preventDefault(); buscarPortafolios(true);"
+                      class="mt-10 bg-gray-50 border border-gray-200 rounded-2xl p-5 md:p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {{-- Texto libre --}}
+                        <div class="lg:col-span-2">
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Buscar</label>
+                            <input type="text" name="q" maxlength="150" placeholder="Nombre, biografía o cargo..."
+                                   class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30 text-sm">
                         </div>
-                        <p class="text-gray-700 font-semibold">Aún no hay portafolios públicos</p>
-                        <p class="text-sm text-gray-500 mt-1">Sé el primero en compartir tu perfil con la comunidad.</p>
+
+                        {{-- Años mínimos --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Años mín. experiencia</label>
+                            <input type="number" name="anios_min" min="0" max="60" placeholder="0"
+                                   class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30 text-sm">
+                        </div>
+
+                        {{-- Categoría de tecnología (single — filtra el dropdown de tecnologías + filtra resultados) --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Categoría de tecnología</label>
+                            <select name="categoria_tec" data-buscador-single="categoriatec">
+                                <option value="">Todas las categorías</option>
+                                @foreach($categoriasTec as $catTec)
+                                    <option value="{{ $catTec }}">{{ $catTec }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Tecnologías (multiselect con pills, agrupadas por categoría de tecnología) --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Tecnologías</label>
+                            <select name="tecnologias[]" multiple data-buscador-multi="tecnologias"
+                                    placeholder="Selecciona una o varias">
+                                @foreach($tecnologiasGrupos as $categoria => $tecs)
+                                    <optgroup label="{{ $categoria }}">
+                                        @foreach($tecs as $tec)
+                                            <option value="{{ $tec->nombre }}" data-cat-tec="{{ $categoria }}">{{ $tec->nombre }}</option>
+                                        @endforeach
+                                    </optgroup>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Categorías (multiselect con pills) --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Categorías de habilidades</label>
+                            <select name="categorias[]" multiple data-buscador-multi="categorias"
+                                    placeholder="Selecciona una o varias">
+                                @foreach($categoriasCat as $cat)
+                                    <option value="{{ $cat->id_categoria }}">{{ $cat->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Ubicación --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Ubicación</label>
+                            <input type="text" name="ubicacion" maxlength="120" placeholder="Ciudad o país"
+                                   class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30 text-sm">
+                        </div>
                     </div>
-                @else
-                <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
-                    @foreach($portafolios as $p)
-                        <article class="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all-soft overflow-hidden flex flex-col">
-                            {{-- Cover --}}
-                            <div class="relative h-28"
-                                 style="background-image: linear-gradient(135deg, {{ $p->cover_from }} 0%, {{ $p->cover_to }} 100%);">
-                                <div class="absolute inset-0 opacity-20"
-                                     style="background-image: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.3) 0%, transparent 50%);"></div>
 
-                                {{-- Avatar --}}
-                                @if(!empty($p->foto))
-                                    <img src="{{ $p->foto }}" alt="{{ $p->nombre }}"
-                                        class="absolute -bottom-6 left-5 w-14 h-14 rounded-full object-cover ring-4 ring-white shadow-md bg-white">
-                                @else
-                                    <div class="absolute -bottom-6 left-5 w-14 h-14 rounded-full bg-[#1e3a5f] text-white flex items-center justify-center font-bold text-base ring-4 ring-white shadow-md">
-                                        {{ $p->iniciales }}
-                                    </div>
-                                @endif
-                            </div>
+                    {{-- Checkbox + botones --}}
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mt-5 pt-4 border-t border-gray-200">
+                        <label class="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                            <input type="checkbox" name="con_proyectos" value="1" class="rounded text-[#1e3a5f] focus:ring-[#1e3a5f]">
+                            Solo con proyectos publicados
+                        </label>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="limpiarFiltrosPortafolios()"
+                                    class="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-lg transition">
+                                Limpiar
+                            </button>
+                            <button type="submit"
+                                    class="px-5 py-2 bg-[#1e3a5f] hover:bg-[#162a45] text-white text-sm font-semibold rounded-lg transition shadow-sm flex items-center gap-2">
+                                <i class="fas fa-search text-xs"></i>
+                                Buscar
+                            </button>
+                        </div>
+                    </div>
+                </form>
 
-                            {{-- Body --}}
-                            <div class="px-5 pt-9 pb-5 flex flex-col gap-3 flex-1">
-                                <div>
-                                    <h3 class="font-bold text-gray-900 text-base leading-tight">{{ $p->nombre }}</h3>
-                                    <p class="text-sm font-semibold text-[#e11d48] mt-0.5">{{ $p->rol }}</p>
-                                </div>
-
-                                <p class="text-sm text-gray-600 leading-relaxed line-clamp-2">{{ $p->descripcion }}</p>
-
-                                {{-- Tags --}}
-                                <div class="flex flex-wrap gap-1.5">
-                                    @foreach($p->tags as $tag)
-                                        <span class="text-xs font-medium bg-[#1e3a5f]/8 text-[#1e3a5f] border border-[#1e3a5f]/15 px-2.5 py-0.5 rounded-full">{{ $tag }}</span>
-                                    @endforeach
-                                    @if(($p->tags_extra ?? 0) > 0)
-                                        <span class="text-xs font-medium bg-[#e11d48]/8 text-[#e11d48] border border-[#e11d48]/15 px-2.5 py-0.5 rounded-full">+{{ $p->tags_extra }}</span>
-                                    @endif
-                                </div>
-
-                                {{-- Métricas --}}
-                                <div class="flex items-center justify-between text-xs text-gray-600 pt-3 mt-auto border-t border-gray-100">
-                                    <span class="flex items-center gap-1.5">
-                                        <i class="fas fa-briefcase text-[#1e3a5f]"></i>
-                                        {{ $p->anios }}
-                                    </span>
-                                    <span class="flex items-center gap-1.5">
-                                        <i class="fas fa-code text-[#1e3a5f]"></i>
-                                        {{ $p->proyectos }}
-                                    </span>
-                                </div>
-
-                                {{-- Pie --}}
-                                <div class="flex items-center justify-between text-xs">
-                                    <span class="text-gray-500 flex items-center gap-1.5">
-                                        <i class="fas fa-map-marker-alt text-gray-400"></i>
-                                        {{ $p->ubicacion }}
-                                    </span>
-                                    <button type="button"
-                                            data-portafolio='@json($p)'
-                                            onclick="abrirModalPortafolio(this)"
-                                            class="font-semibold text-[#e11d48] hover:text-[#1e3a5f] transition-colors flex items-center gap-1">
-                                        Ver portafolio
-                                        <i class="fas fa-external-link-alt text-[10px]"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </article>
-                    @endforeach
+                {{-- Estado + contador --}}
+                <div class="flex items-center justify-between mt-6 mb-3 text-sm text-gray-600">
+                    <p id="buscador-portafolios-estado">Cargando portafolios...</p>
                 </div>
-                @endif
+
+                {{-- Resultados --}}
+                <div id="buscador-portafolios-resultados"
+                     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-left"></div>
+
+                {{-- Skeleton (mientras carga) --}}
+                <div id="buscador-portafolios-skeleton" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-2">
+                    @for($i = 0; $i < 3; $i++)
+                        <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden animate-pulse">
+                            <div class="h-28 bg-gray-200"></div>
+                            <div class="px-5 pt-9 pb-5 space-y-3">
+                                <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+                                <div class="h-3 bg-gray-200 rounded w-1/3"></div>
+                                <div class="h-3 bg-gray-200 rounded w-full"></div>
+                                <div class="h-3 bg-gray-200 rounded w-3/4"></div>
+                            </div>
+                        </div>
+                    @endfor
+                </div>
+
+                {{-- Estado vacío --}}
+                <div id="buscador-portafolios-vacio" class="hidden mt-6 bg-gray-50 border border-dashed border-gray-200 rounded-2xl p-12 text-center">
+                    <div class="w-16 h-16 rounded-full bg-[#1e3a5f]/8 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-users text-2xl text-[#1e3a5f]/50"></i>
+                    </div>
+                    <p class="text-gray-700 font-semibold">No encontramos portafolios con esos filtros</p>
+                    <p class="text-sm text-gray-500 mt-1">Prueba ajustando los filtros o limpiándolos.</p>
+                </div>
+
+                {{-- Cargar más --}}
+                <div class="text-center mt-8">
+                    <button type="button" id="btn-buscador-cargar-mas"
+                            onclick="buscarPortafolios(false)"
+                            class="hidden px-6 py-2.5 bg-white border border-[#1e3a5f] text-[#1e3a5f] hover:bg-[#1e3a5f] hover:text-white text-sm font-semibold rounded-lg transition">
+                        Cargar más
+                    </button>
+                </div>
             </div>
         </section>
-

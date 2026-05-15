@@ -9,6 +9,7 @@ use App\Http\Controllers\PerfilWebController;
 use App\Http\Controllers\AuthWebController;
 use App\Http\Controllers\NovedadesController;
 use App\Http\Controllers\CalendarioController;
+use App\Http\Controllers\PortafolioBuscadorController;
 use Illuminate\Support\Facades\Route;
 
 // =========================
@@ -31,6 +32,9 @@ Route::post('/novedades/marcar-vistas', [NovedadesController::class, 'marcarVist
 
 // Calendario (eventos en rango)
 Route::get('/calendario/eventos', [CalendarioController::class, 'eventos'])->name('calendario.eventos');
+
+// Buscador público de portafolios (home)
+Route::get('/portafolios/buscar', [PortafolioBuscadorController::class, 'buscar'])->name('portafolios.buscar');
 
 
 

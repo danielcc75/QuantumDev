@@ -9,6 +9,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/scripts/choices.min.js" defer></script>
+
     <style>
         html {
             scroll-behavior: smooth;
@@ -42,6 +45,70 @@
         .hero-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+        }
+
+        /* Choices.js: armonizar con Tailwind del buscador */
+        .choices { margin-bottom: 0; font-size: 0.875rem; }
+        .choices__inner.buscador-choice {
+            min-height: 38px;
+            padding: 4px 6px;
+            border-radius: 0.5rem;
+            border-color: #d1d5db;
+            background: #fff;
+        }
+        .choices[data-type*="select-multiple"] .choices__button { margin-left: 6px; }
+        .choices__list--multiple .choices__item {
+            border-radius: 9999px;
+            padding: 2px 10px;
+            font-weight: 500;
+        }
+        /* Pills de TECNOLOGÍAS — azul oscuro corporativo */
+        .buscador-multi-tecnologias .choices__list--multiple .choices__item {
+            background-color: #1e3a5f;
+            border-color: #1e3a5f;
+        }
+        .buscador-multi-tecnologias .choices__list--dropdown .choices__item--selectable.is-highlighted {
+            background-color: #1e3a5f;
+            color: #fff;
+        }
+        /* Pills de CATEGORÍAS — rojo coral del sistema */
+        .buscador-multi-categorias .choices__list--multiple .choices__item {
+            background-color: #e11d48;
+            border-color: #e11d48;
+        }
+        .buscador-multi-categorias .choices__list--dropdown .choices__item--selectable.is-highlighted {
+            background-color: #e11d48;
+            color: #fff;
+        }
+        /* Single de CATEGORÍA DE TECNOLOGÍA — verde esmeralda en hover/highlight */
+        .buscador-single-categoriatec .choices__list--dropdown .choices__item--selectable.is-highlighted {
+            background-color: #10b981;
+            color: #fff;
+        }
+        .buscador-single-categoriatec.is-focused .choices__inner.buscador-choice {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+        .choices.is-focused .choices__inner.buscador-choice {
+            border-color: #1e3a5f;
+            box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.15);
+        }
+        /* Encabezados de grupo (optgroup) dentro del dropdown */
+        .choices__list--dropdown .choices__group {
+            background: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+        }
+        .choices__list--dropdown .choices__group .choices__heading {
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.04em;
+            color: #6b7280;
+            font-weight: 700;
+            padding: 6px 10px;
+            border: none;
+        }
+        .choices__list--dropdown .choices__item--choice {
+            padding-left: 18px;
         }
     </style>
 </head>
