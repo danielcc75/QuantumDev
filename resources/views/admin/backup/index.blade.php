@@ -169,11 +169,12 @@
                                    title="Descargar">
                                     <i class="fas fa-download"></i>
                                 </a>
-                                <form action="{{ route('admin.backup.destroy', $backup['name']) }}"
+                                <form action="{{ route('admin.backup.destroy') }}"
                                       method="POST" class="inline"
                                       data-confirm="¿Eliminar el backup «{{ $backup['name'] }}»?">
                                     @csrf
                                     @method('DELETE')
+                                    <input type="hidden" name="file" value="{{ $backup['name'] }}">
                                     <button type="submit"
                                         class="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 p-2 rounded-lg transition"
                                         title="Eliminar">

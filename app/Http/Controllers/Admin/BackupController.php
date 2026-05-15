@@ -247,16 +247,22 @@ class BackupController extends Controller
     }
     
     // Eliminar backup
-    public function destroy($filename)
+    public function destroy(Request $request)
     {
+        $filename = $request->input('file', '');
+
+        if (!preg_match('/^[A-Za-z0-9._-]+\.sql$/', $filename) || str_contains($filename, '..')) {
+            return back()->with('error', 'Nombre de backup inválido');
+        }
+
         $path = storage_path('app/backups/' . $filename);
-        
+
         if (file_exists($path)) {
             unlink($path);
             $this->logAdminAction('backup_eliminado', "Backup eliminado: {$filename}");
             return back()->with('success', 'Backup eliminado correctamente');
         }
-        
+
         return back()->with('error', 'Backup no encontrado');
     }
 }

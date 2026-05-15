@@ -196,7 +196,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::post('/backup/create', [BackupController::class, 'create'])->name('admin.backup.create');
     Route::post('/backup/create-por-fechas', [BackupController::class, 'createByDates'])->name('admin.backup.createByDates');
     Route::get('/backup/download', [BackupController::class, 'download'])->name('admin.backup.download');
-    Route::delete('/backup/{filename}', [BackupController::class, 'destroy'])->name('admin.backup.destroy');
+    Route::delete('/backup/delete', [BackupController::class, 'destroy'])->name('admin.backup.destroy');
 
     // Papelera
     Route::prefix('papelera')->group(function () {
