@@ -15,7 +15,7 @@ class HabilidadAdminController extends Controller
     // Listar todas las habilidades del sistema
     public function index(Request $request)
     {
-        $query = Habilidad::with('categoria');
+        $query = Habilidad::with(['categoria', 'perfil.usuario']);
         
         // Búsqueda
         if ($request->search) {

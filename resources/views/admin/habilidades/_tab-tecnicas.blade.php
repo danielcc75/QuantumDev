@@ -89,7 +89,7 @@
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">HABILIDAD</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">CATEGORÍA</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">USUARIOS</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">USUARIO</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">ESTADO</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">ACCIONES</th>
                         </tr>
@@ -99,7 +99,7 @@
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4">{{ $habilidad->nombre }}</td>
                             <td class="px-6 py-4">{{ $habilidad->categoria->nombre ?? 'Sin categoría' }}</td>
-                            <td class="px-6 py-4">{{ $habilidad->perfil_id ? 1 : 0 }} usuarios</td>
+                            <td class="px-6 py-4">{{ $habilidad->perfil?->usuario?->nombre_completo ?? 'Sin usuario' }}</td>
                             <td class="px-6 py-4">
                                 <span class="px-2 py-1 rounded-full text-xs {{ $habilidad->activa ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                     {{ $habilidad->activa ? 'Activa' : 'Inactiva' }}
