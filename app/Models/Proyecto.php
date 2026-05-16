@@ -25,6 +25,7 @@ class Proyecto extends Model
         'tecnologias',
         'visible',
         'destacado',
+        'moderation_note',
         'deleted_by',
         'delete_reason'
     ];

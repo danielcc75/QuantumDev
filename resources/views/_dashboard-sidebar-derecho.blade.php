@@ -52,6 +52,9 @@
                             $portafolioOculto = $perfilUsuario && !$perfilUsuario->visible;
                             $notaModeracion   = $perfilUsuario->moderation_note ?? null;
                             $novedades = $novedades ?? collect();
+                            $proyectosOcultosMod = $proyectosOcultosMod ?? collect();
+                            $habilidadesOcultasMod = $habilidadesOcultasMod ?? collect();
+                            $hayAvisos = $portafolioOculto || $notaModeracion || $proyectosOcultosMod->isNotEmpty() || $habilidadesOcultasMod->isNotEmpty();
                         @endphp
 
                         @if($portafolioOculto)
@@ -76,6 +79,26 @@
                             </div>
                         @endif
 
+                        @foreach($proyectosOcultosMod as $proyOculto)
+                            <div class="flex items-start space-x-3 pb-3 border-b border-gray-200 bg-orange-50 -mx-4 px-4 py-2">
+                                <i class="fas fa-folder-minus text-orange-600 mt-1 text-sm"></i>
+                                <div>
+                                    <p class="font-medium text-orange-800 text-sm">Proyecto oculto: «{{ $proyOculto->nombre }}»</p>
+                                    <p class="text-xs text-orange-700 mt-1"><span class="font-semibold">Motivo:</span> {{ $proyOculto->moderation_note }}</p>
+                                </div>
+                            </div>
+                        @endforeach
+
+                        @foreach($habilidadesOcultasMod as $habOculta)
+                            <div class="flex items-start space-x-3 pb-3 border-b border-gray-200 bg-orange-50 -mx-4 px-4 py-2">
+                                <i class="fas fa-code text-orange-600 mt-1 text-sm"></i>
+                                <div>
+                                    <p class="font-medium text-orange-800 text-sm">Habilidad oculta: «{{ $habOculta->nombre }}»</p>
+                                    <p class="text-xs text-orange-700 mt-1"><span class="font-semibold">Motivo:</span> {{ $habOculta->moderation_note }}</p>
+                                </div>
+                            </div>
+                        @endforeach
+
                         @forelse($novedades as $novedad)
                             <div class="flex items-start space-x-3 pb-3 @if(!$loop->last) border-b border-gray-200 @endif novedad-item"
                                  data-tipo="{{ $novedad['tipo'] }}"
@@ -89,7 +112,7 @@
                                 </div>
                             </div>
                         @empty
-                            @unless($portafolioOculto || $notaModeracion)
+                            @unless($hayAvisos)
                                 <p class="text-xs text-gray-500 italic">No hay novedades recientes.</p>
                             @endunless
                         @endforelse

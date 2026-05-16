@@ -111,19 +111,23 @@
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex space-x-2">
-                                <a href="{{ route('admin.proyectos.show', $proyecto->id_proyecto) }}" 
-                                   class="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200" title="Ver">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                
-                                <form action="{{ route('admin.proyectos.toggle-visibilidad', $proyecto->id_proyecto) }}" method="POST" class="inline">
-                                    @csrf
-                                    <button type="submit" class="p-2 rounded-lg bg-orange-100 text-orange-600 hover:bg-orange-200" 
-                                            title="{{ $proyecto->visible ? 'Ocultar' : 'Mostrar' }}">
-                                        <i class="fas {{ $proyecto->visible ? 'fa-eye-slash' : 'fa-eye' }}"></i>
+                                <a href="{{ route('admin.proyectos.show', $proyecto->id_proyecto) }}"
+                                   class="text-blue-600 bg-blue-100 hover:bg-blue-200 p-2 rounded-lg">Ver</a>
+
+                                @if($proyecto->visible)
+                                    <button type="button"
+                                        onclick="abrirModalOcultarProyecto({{ $proyecto->id_proyecto }}, {!! Js::from($proyecto->nombre) !!})"
+                                        class="text-orange-600 bg-orange-100 hover:bg-orange-200 p-2 rounded-lg">
+                                        Ocultar
                                     </button>
-                                </form>
-                                
+                                @else
+                                    <form action="{{ route('admin.proyectos.toggle-visibilidad', $proyecto->id_proyecto) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="text-green-700 bg-green-100 hover:bg-green-200 p-2 rounded-lg">
+                                            Mostrar
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </td>
                     </tr>
@@ -142,4 +146,94 @@
         </div>
     </div>
 </div>
+
+{{-- Modal: motivo para ocultar proyecto --}}
+<div id="modalOcultarProyecto" class="fixed inset-0 z-[80] hidden bg-black/50 backdrop-blur-sm" onclick="cerrarModalOcultarProyectoFondo(event)">
+    <div class="min-h-full flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden" onclick="event.stopPropagation()">
+            <div class="bg-gradient-to-r from-[#1e3a5f] to-[#e11d48] px-6 py-4 flex items-center justify-between">
+                <h3 class="text-white font-bold text-lg">
+                    <i class="fas fa-eye-slash mr-2"></i> Ocultar proyecto
+                </h3>
+                <button type="button" onclick="cerrarModalOcultarProyecto()" class="text-white/90 hover:text-white text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="formOcultarProyecto" method="POST">
+                @csrf
+                <div class="p-6 space-y-4">
+                    <p class="text-sm text-gray-700">
+                        Vas a ocultar el proyecto
+                        <span id="modalOcultarProyectoNombre" class="font-semibold text-gray-900"></span>.
+                        Indica el motivo (será visible para el dueño del proyecto en su panel).
+                    </p>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Motivo <span class="text-red-500">*</span>
+                        </label>
+                        <textarea name="motivo" id="modalOcultarProyectoMotivo" rows="4" maxlength="500" required
+                            class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:border-[#1e3a5f] focus:ring-2 focus:ring-[#1e3a5f]/20 outline-none"
+                            placeholder="Ej. Contenido inapropiado, datos sensibles expuestos, denuncia recibida..."></textarea>
+                        <p id="modalOcultarProyectoError" class="hidden mt-1 text-xs text-red-600"></p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 px-6 py-3 flex justify-end gap-2">
+                    <button type="button" onclick="cerrarModalOcultarProyecto()"
+                        class="px-4 py-2 rounded-lg text-sm text-gray-700 bg-gray-200 hover:bg-gray-300">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="px-4 py-2 rounded-lg text-sm text-white bg-[#e11d48] hover:bg-[#be123c]">
+                        <i class="fas fa-eye-slash mr-1"></i> Confirmar ocultar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const __modalOcultarProyecto = document.getElementById('modalOcultarProyecto');
+    const __formOcultarProyecto  = document.getElementById('formOcultarProyecto');
+    const __motivoProyectoInput  = document.getElementById('modalOcultarProyectoMotivo');
+    const __motivoProyectoError  = document.getElementById('modalOcultarProyectoError');
+
+    function abrirModalOcultarProyecto(idProyecto, nombre) {
+        __formOcultarProyecto.action = `/admin/proyectos/${idProyecto}/toggle-visibilidad`;
+        document.getElementById('modalOcultarProyectoNombre').textContent = nombre || '';
+        __motivoProyectoInput.value = '';
+        __motivoProyectoError.classList.add('hidden');
+        __motivoProyectoError.textContent = '';
+        __modalOcultarProyecto.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => __motivoProyectoInput.focus(), 50);
+    }
+
+    function cerrarModalOcultarProyecto() {
+        __modalOcultarProyecto.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    function cerrarModalOcultarProyectoFondo(event) {
+        if (event.target === __modalOcultarProyecto) cerrarModalOcultarProyecto();
+    }
+
+    __formOcultarProyecto.addEventListener('submit', function (e) {
+        if (!__motivoProyectoInput.value.trim()) {
+            e.preventDefault();
+            __motivoProyectoError.textContent = 'Debes indicar el motivo para ocultar el proyecto.';
+            __motivoProyectoError.classList.remove('hidden');
+            __motivoProyectoInput.focus();
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !__modalOcultarProyecto.classList.contains('hidden')) {
+            cerrarModalOcultarProyecto();
+        }
+    });
+</script>
 @endsection

@@ -42,15 +42,35 @@ class HabilidadAdminController extends Controller
         return view('admin.habilidades.index', compact('habilidades', 'categorias', 'habilidadPopular', 'habilidadesBlandas'));
     }
         
+    // Ver detalle de una habilidad técnica
+    public function show($id)
+    {
+        $habilidad = Habilidad::with(['categoria', 'perfil.usuario'])->findOrFail($id);
+        return view('admin.habilidades.show', compact('habilidad'));
+    }
+
     // Desactivar/Activar habilidad globalmente
-    public function toggleEstado($id)
+    public function toggleEstado(Request $request, $id)
     {
         $habilidad = Habilidad::findOrFail($id);
+
+        // Si va a ocultar (desactivar), exige un motivo y lo guarda
+        if ($habilidad->activa) {
+            $request->validate([
+                'motivo' => 'required|string|max:500',
+            ], [
+                'motivo.required' => 'Debes indicar el motivo para ocultar la habilidad.',
+            ]);
+            $habilidad->moderation_note = $request->motivo;
+        } else {
+            $habilidad->moderation_note = null;
+        }
+
         $habilidad->activa = !$habilidad->activa;
         $habilidad->save();
-        
+
         $estado = $habilidad->activa ? 'activada' : 'desactivada';
-        $this->logAdminAction('habilidad_estado_cambiado', "Habilidad «{$habilidad->nombre}» {$estado}");
+        $this->logAdminAction('habilidad_estado_cambiado', "Habilidad «{$habilidad->nombre}» {$estado}" . (!$habilidad->activa && $habilidad->moderation_note ? " | Motivo: {$habilidad->moderation_note}" : ''));
         return back()->with('success', "Habilidad {$estado} correctamente");
     }
     

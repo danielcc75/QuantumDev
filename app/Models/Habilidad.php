@@ -19,6 +19,8 @@ class Habilidad extends Model
         'anios_experiencia',
         'descripcion',
         'publicado',
+        'activa',
+        'moderation_note',
         'deleted_by',
         'delete_reason',
     ];

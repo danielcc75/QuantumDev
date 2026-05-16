@@ -54,12 +54,18 @@
 
                 <!-- campana -->
                 @php
-                    $novedadesHeader      = $novedades ?? collect();
-                    $perfilHeader         = $usuario->perfil ?? null;
-                    $portafolioOcultoHdr  = $perfilHeader && !$perfilHeader->visible;
-                    $notaModeracionHdr    = $perfilHeader->moderation_note ?? null;
-                    $avisoModeracionHdr   = $portafolioOcultoHdr || $notaModeracionHdr;
-                    $totalNotificaciones  = $novedadesHeader->count() + ($avisoModeracionHdr ? 1 : 0);
+                    $novedadesHeader        = $novedades ?? collect();
+                    $perfilHeader           = $usuario->perfil ?? null;
+                    $portafolioOcultoHdr    = $perfilHeader && !$perfilHeader->visible;
+                    $notaModeracionHdr      = $perfilHeader->moderation_note ?? null;
+                    $proyectosOcultosModHdr = $proyectosOcultosMod ?? collect();
+                    $habilidadesOcultasModHdr = $habilidadesOcultasMod ?? collect();
+                    $avisoModeracionHdr     = $portafolioOcultoHdr || $notaModeracionHdr;
+                    $hayAvisosHdr           = $avisoModeracionHdr || $proyectosOcultosModHdr->isNotEmpty() || $habilidadesOcultasModHdr->isNotEmpty();
+                    $totalNotificaciones    = $novedadesHeader->count()
+                                            + ($avisoModeracionHdr ? 1 : 0)
+                                            + $proyectosOcultosModHdr->count()
+                                            + $habilidadesOcultasModHdr->count();
                 @endphp
                 <div class="relative dropdown">
                     <button class="text-gray-500 hover:text-[#1e3a5f] focus:outline-none transition-colors relative">
@@ -103,6 +109,24 @@
                                 </div>
                             @endif
 
+                            @foreach($proyectosOcultosModHdr as $proyOcultoH)
+                                <div class="p-3 bg-orange-50 border-b border-gray-100">
+                                    <p class="text-sm font-medium text-orange-800">
+                                        <i class="fas fa-folder-minus mr-1"></i> Proyecto oculto: «{{ $proyOcultoH->nombre }}»
+                                    </p>
+                                    <p class="text-xs text-orange-700 mt-1"><span class="font-semibold">Motivo:</span> {{ $proyOcultoH->moderation_note }}</p>
+                                </div>
+                            @endforeach
+
+                            @foreach($habilidadesOcultasModHdr as $habOcultaH)
+                                <div class="p-3 bg-orange-50 border-b border-gray-100">
+                                    <p class="text-sm font-medium text-orange-800">
+                                        <i class="fas fa-code mr-1"></i> Habilidad oculta: «{{ $habOcultaH->nombre }}»
+                                    </p>
+                                    <p class="text-xs text-orange-700 mt-1"><span class="font-semibold">Motivo:</span> {{ $habOcultaH->moderation_note }}</p>
+                                </div>
+                            @endforeach
+
                             @forelse($novedadesHeader as $novedad)
                                 <div class="p-3 hover:bg-gray-50 border-b border-gray-100 novedad-item-header"
                                      data-tipo="{{ $novedad['tipo'] }}"
@@ -114,7 +138,7 @@
                                     <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($novedad['created_at'])->diffForHumans() }}</p>
                                 </div>
                             @empty
-                                @unless($avisoModeracionHdr)
+                                @unless($hayAvisosHdr)
                                     <p class="p-4 text-xs text-gray-500 italic text-center">Sin notificaciones</p>
                                 @endunless
                             @endforelse

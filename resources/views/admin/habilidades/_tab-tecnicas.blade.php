@@ -107,19 +107,23 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex space-x-2">
-                                    <form action="{{ route('admin.habilidades.toggle', $habilidad->id_habilidad) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="p-2 rounded-lg {{ $habilidad->activa ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-600' }}">
-                                            <i class="fas {{ $habilidad->activa ? 'fa-ban' : 'fa-check' }}"></i>
+                                    <a href="{{ route('admin.habilidades.show', $habilidad->id_habilidad) }}"
+                                       class="text-blue-600 bg-blue-100 hover:bg-blue-200 p-2 rounded-lg">Ver</a>
+
+                                    @if($habilidad->activa)
+                                        <button type="button"
+                                            onclick="abrirModalOcultarHabilidad({{ $habilidad->id_habilidad }}, {!! Js::from($habilidad->nombre) !!})"
+                                            class="text-orange-600 bg-orange-100 hover:bg-orange-200 p-2 rounded-lg">
+                                            Ocultar
                                         </button>
-                                    </form>
-                                    <form action="{{ route('admin.habilidades.destroy', $habilidad->id_habilidad) }}" method="POST" data-confirm="¿Eliminar la habilidad «{{ $habilidad->nombre }}»?">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="p-2 rounded-lg bg-red-100 text-red-600">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                    @else
+                                        <form action="{{ route('admin.habilidades.toggle', $habilidad->id_habilidad) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="text-green-700 bg-green-100 hover:bg-green-200 p-2 rounded-lg">
+                                                Mostrar
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

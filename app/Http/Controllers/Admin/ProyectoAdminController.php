@@ -63,14 +63,28 @@ class ProyectoAdminController extends Controller
     }
     
     // Cambiar visibilidad (ocultar/mostrar)
-    public function toggleVisibilidad($id)
+    public function toggleVisibilidad(Request $request, $id)
     {
         $proyecto = Proyecto::findOrFail($id);
+
+        // Si va a ocultar, exige un motivo y lo guarda
+        if ($proyecto->visible) {
+            $request->validate([
+                'motivo' => 'required|string|max:500',
+            ], [
+                'motivo.required' => 'Debes indicar el motivo para ocultar el proyecto.',
+            ]);
+            $proyecto->moderation_note = $request->motivo;
+        } else {
+            // Al volver a mostrarlo, limpiamos el motivo anterior
+            $proyecto->moderation_note = null;
+        }
+
         $proyecto->visible = !$proyecto->visible;
         $proyecto->save();
-        
+
         $estado = $proyecto->visible ? 'visible' : 'oculto';
-        $this->logAdminAction('proyecto_visibilidad_cambiada', "Proyecto «{$proyecto->nombre}» (ID {$proyecto->id_proyecto}) marcado como {$estado}");
+        $this->logAdminAction('proyecto_visibilidad_cambiada', "Proyecto «{$proyecto->nombre}» (ID {$proyecto->id_proyecto}) marcado como {$estado}" . (!$proyecto->visible && $proyecto->moderation_note ? " | Motivo: {$proyecto->moderation_note}" : ''));
         return back()->with('success', "Proyecto ahora está {$estado} al público");
     }
     

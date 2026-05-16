@@ -8,6 +8,7 @@ use App\Models\Categoria;
 use App\Models\Habilidad;
 use App\Models\HabilidadBlanda;
 use App\Models\PerfilHabilidadBlanda;
+use App\Models\Proyecto;
 use App\Services\NovedadesService;
 use App\Traits\LogsActivity;
 use Illuminate\Http\Request;
@@ -166,13 +167,26 @@ class AuthWebController extends Controller
 
         $novedades = app(NovedadesService::class)->paraUsuario($usuario->id_usuario);
 
+        // Avisos de moderación: proyectos y habilidades que el admin ocultó con motivo
+        $proyectosOcultosMod = Proyecto::where('id_perfil', $usuario->perfil->id_perfil)
+            ->where('visible', false)
+            ->whereNotNull('moderation_note')
+            ->get(['id_proyecto', 'nombre', 'moderation_note']);
+
+        $habilidadesOcultasMod = Habilidad::where('id_perfil', $usuario->perfil->id_perfil)
+            ->where('activa', false)
+            ->whereNotNull('moderation_note')
+            ->get(['id_habilidad', 'nombre', 'moderation_note']);
+
         return view('dashboard', compact(
             'usuario',
             'categorias',
             'habilidades',
             'habilidadesBlandasActivas',
             'habilidadesBlandasSeleccionadas',
-            'novedades'
+            'novedades',
+            'proyectosOcultosMod',
+            'habilidadesOcultasMod'
         ));
     }
 

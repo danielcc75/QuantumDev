@@ -192,4 +192,94 @@
         modal.classList.remove('flex');
     }
 </script>
+
+{{-- Modal: motivo para ocultar habilidad técnica --}}
+<div id="modalOcultarHabilidad" class="fixed inset-0 z-[80] hidden bg-black/50 backdrop-blur-sm" onclick="cerrarModalOcultarHabilidadFondo(event)">
+    <div class="min-h-full flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden" onclick="event.stopPropagation()">
+            <div class="bg-gradient-to-r from-[#1e3a5f] to-[#e11d48] px-6 py-4 flex items-center justify-between">
+                <h3 class="text-white font-bold text-lg">
+                    <i class="fas fa-eye-slash mr-2"></i> Ocultar habilidad
+                </h3>
+                <button type="button" onclick="cerrarModalOcultarHabilidad()" class="text-white/90 hover:text-white text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="formOcultarHabilidad" method="POST">
+                @csrf
+                <div class="p-6 space-y-4">
+                    <p class="text-sm text-gray-700">
+                        Vas a ocultar la habilidad
+                        <span id="modalOcultarHabilidadNombre" class="font-semibold text-gray-900"></span>.
+                        Indica el motivo (será visible para el dueño de la habilidad en su panel).
+                    </p>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Motivo <span class="text-red-500">*</span>
+                        </label>
+                        <textarea name="motivo" id="modalOcultarHabilidadMotivo" rows="4" maxlength="500" required
+                            class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:border-[#1e3a5f] focus:ring-2 focus:ring-[#1e3a5f]/20 outline-none"
+                            placeholder="Ej. Nombre poco profesional, duplicado, no corresponde a la categoría..."></textarea>
+                        <p id="modalOcultarHabilidadError" class="hidden mt-1 text-xs text-red-600"></p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 px-6 py-3 flex justify-end gap-2">
+                    <button type="button" onclick="cerrarModalOcultarHabilidad()"
+                        class="px-4 py-2 rounded-lg text-sm text-gray-700 bg-gray-200 hover:bg-gray-300">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="px-4 py-2 rounded-lg text-sm text-white bg-[#e11d48] hover:bg-[#be123c]">
+                        <i class="fas fa-eye-slash mr-1"></i> Confirmar ocultar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const __modalOcultarHab = document.getElementById('modalOcultarHabilidad');
+    const __formOcultarHab  = document.getElementById('formOcultarHabilidad');
+    const __motivoHabInput  = document.getElementById('modalOcultarHabilidadMotivo');
+    const __motivoHabError  = document.getElementById('modalOcultarHabilidadError');
+
+    function abrirModalOcultarHabilidad(idHab, nombre) {
+        __formOcultarHab.action = `/admin/habilidades/${idHab}/toggle`;
+        document.getElementById('modalOcultarHabilidadNombre').textContent = nombre || '';
+        __motivoHabInput.value = '';
+        __motivoHabError.classList.add('hidden');
+        __motivoHabError.textContent = '';
+        __modalOcultarHab.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => __motivoHabInput.focus(), 50);
+    }
+
+    function cerrarModalOcultarHabilidad() {
+        __modalOcultarHab.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    function cerrarModalOcultarHabilidadFondo(event) {
+        if (event.target === __modalOcultarHab) cerrarModalOcultarHabilidad();
+    }
+
+    __formOcultarHab.addEventListener('submit', function (e) {
+        if (!__motivoHabInput.value.trim()) {
+            e.preventDefault();
+            __motivoHabError.textContent = 'Debes indicar el motivo para ocultar la habilidad.';
+            __motivoHabError.classList.remove('hidden');
+            __motivoHabInput.focus();
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !__modalOcultarHab.classList.contains('hidden')) {
+            cerrarModalOcultarHabilidad();
+        }
+    });
+</script>
 @endsection
