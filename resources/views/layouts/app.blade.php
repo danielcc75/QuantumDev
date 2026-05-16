@@ -196,6 +196,10 @@
                         <i class="fas fa-trash-alt w-5 h-5 mr-3 {{ request()->routeIs('admin.papelera*') ? 'text-white' : 'text-gray-500' }}"></i>
                         <span class="font-medium">Papelera</span>
                     </a>
+                    <a href="{{ route('admin.configuracion') }}" class="flex items-center px-6 py-3 text-gray-700 transition-all sidebar-item {{ request()->routeIs('admin.configuracion*') ? 'bg-[#1e3a5f] text-white' : '' }}">
+                        <i class="fas fa-cog w-5 h-5 mr-3 {{ request()->routeIs('admin.configuracion*') ? 'text-white' : 'text-gray-500' }}"></i>
+                        <span class="font-medium">Configuración</span>
+                    </a>
 
                     <hr class="my-4 mx-4 border-gray-200">
 

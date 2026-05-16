@@ -218,7 +218,7 @@
             <div>
                 <h2 class="font-bold text-lg">Portafolio Digital</h2>
                 <p class="text-sm mt-2 text-gray-300">
-                    Construyendo espacios digitales donde estudiantes y desarrolladores puedan mostrar su talento de forma clara y profesional.
+                    {{ $configSitio?->descripcion ?? 'Construyendo espacios digitales donde estudiantes y desarrolladores puedan mostrar su talento de forma clara y profesional.' }}
                 </p>
             </div>
 
@@ -234,9 +234,9 @@
 
             <div>
                 <h3 class="font-semibold mb-2">Contacto</h3>
-                <p class="text-gray-300 text-sm">QuantumDev</p>
-                <p class="text-gray-300 text-sm">Email: contacto@quantumdev.dev</p>
-                <p class="text-gray-300 text-sm">Tel: +591 700 123 456</p>
+                <p class="text-gray-300 text-sm">{{ $configSitio?->nombre_empresa ?? 'QuantumDev' }}</p>
+                <p class="text-gray-300 text-sm">Email: {{ $configSitio?->email_contacto ?? 'contacto@quantumdev.dev' }}</p>
+                <p class="text-gray-300 text-sm">Tel: {{ $configSitio?->telefono ?? '+591 700 123 456' }}</p>
             </div>
 
         </div>

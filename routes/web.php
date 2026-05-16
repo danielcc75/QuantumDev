@@ -130,6 +130,7 @@ use App\Http\Controllers\Admin\ModeracionController;
 use App\Http\Controllers\Admin\LogsController;
 use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\PapeleraController;
+use App\Http\Controllers\Admin\ConfiguracionSitioController;
 
 Route::prefix('admin')->middleware(['admin'])->group(function () {
     
@@ -186,6 +187,10 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::post('/proyectos/{id}/toggle-visibilidad', [ProyectoAdminController::class, 'toggleVisibilidad'])->name('admin.proyectos.toggle-visibilidad');
     Route::delete('/proyectos/{id}', [ProyectoAdminController::class, 'destroy'])->name('admin.proyectos.destroy');
 
+
+    // Configuración del sitio
+    Route::get('/configuracion', [ConfiguracionSitioController::class, 'index'])->name('admin.configuracion');
+    Route::put('/configuracion', [ConfiguracionSitioController::class, 'update'])->name('admin.configuracion.update');
 
     // Bitacoras
     Route::get('/logs', [LogsController::class, 'index'])->name('admin.logs');
