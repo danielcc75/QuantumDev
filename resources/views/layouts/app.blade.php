@@ -71,7 +71,7 @@
                 </button>
 
                 <!-- logo -->
-                <a href="{{ $esAdmin ? route('admin.dashboard') : route('dashboard') }}" class="flex items-center gap-2 md:gap-3 transition-all-soft hover-scale flex-shrink-0">
+                <a href="{{ $esAdmin ? url('/') : route('dashboard') }}" class="flex items-center gap-2 md:gap-3 transition-all-soft hover-scale flex-shrink-0">
                     <img src="/logo.png" class="h-8 md:h-11" alt="Logo">
                     <div class="hidden sm:flex flex-col leading-none">
                         <span class="font-bold text-[#1e3a5f] text-base md:text-lg">Portafolio</span>
@@ -106,8 +106,8 @@
 
                     <div class="dropdown-menu hidden absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-lg border border-gray-100 z-30">
                         @if($esAdmin)
-                            <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-tachometer-alt mr-2"></i> Ir al dashboard usuario
+                            <a href="{{ url('/') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-home mr-2"></i> Ir a la home page
                             </a>
                             <div class="border-t border-gray-100"></div>
                         @endif
