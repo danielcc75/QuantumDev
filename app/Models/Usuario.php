@@ -23,7 +23,8 @@ class Usuario extends Model
         'ultimo_acceso',
         'is_admin',
         'deleted_by',
-        'delete_reason'
+        'delete_reason',
+        'github_id'
     ];
 
     protected $casts = [

@@ -11,6 +11,7 @@ use App\Http\Controllers\NovedadesController;
 use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\PortafolioBuscadorController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 // =========================
 // HOME
@@ -230,3 +231,13 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::put('/perfil/desactivar-cuenta', [CuentaController::class, 'desactivar'])->name('admin.perfil.desactivar-cuenta');
     });
 });
+
+// ========================================
+// INTEGRACION GITHUB, GOOGLE Y LINKEDIN
+// ========================================
+
+Route::get('/auth/github', [AuthController::class, 'redirectGithub']);
+Route::get('/auth/github/callback', [AuthController::class, 'callbackGithub']);
+
+Route::get('/auth/google', [AuthController::class, 'redirectGoogle']);
+Route::get('/auth/google/callback', [AuthController::class, 'callbackGoogle']);
