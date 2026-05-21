@@ -479,7 +479,7 @@
         const btnCargarMas = document.getElementById('btn-buscador-cargar-mas');
         if (!form || !contenedor) return;
 
-        const LIMITE = 12;
+        const LIMITE = 10;
         let offset = 0;
         let total  = 0;
         let cargando = false;

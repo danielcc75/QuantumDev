@@ -25,7 +25,19 @@ class PortafolioBuscadorService
 
         $total = (clone $base)->count('p.id_perfil');
 
+        // Subquery: cantidad de proyectos completados y publicados por perfil.
+        // Se usa para priorizar en el orden — perfiles con más proyectos terminados
+        // y visibles aparecen primero; los que tienen 0 quedan al final.
+        $subProyCompletados = "(SELECT COUNT(*) FROM proyectos pc
+            WHERE pc.id_perfil = p.id_perfil
+              AND pc.estado = 'completado'
+              AND pc.visible = true
+              AND pc.deleted_at IS NULL)";
+
         $filas = $base
+            ->addSelect(DB::raw($subProyCompletados . ' AS proy_completados'))
+            ->orderByDesc('proy_completados')
+            ->orderByDesc('p.updated_at')
             ->orderByDesc('p.id_perfil')
             ->offset($offset)
             ->limit($limit)
