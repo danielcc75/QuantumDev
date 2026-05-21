@@ -246,7 +246,13 @@
             btnVista.disabled = false;
             btnVista.innerHTML = textoOriginal;
             if (!res.ok || !res.portafolio) {
-                Swal.fire({ icon: 'error', title: 'No se pudo cargar la vista previa', text: res.message || '', confirmButtonColor: '#1e3a5f' });
+                window.confirmar({
+                    tipo: 'danger',
+                    titulo: 'No se pudo cargar la vista previa',
+                    mensaje: res.message || 'Ocurrió un error inesperado.',
+                    soloConfirmar: true,
+                    textoConfirmar: 'Entendido'
+                });
                 return;
             }
             if (typeof window.abrirModalPortafolio === 'function') {
@@ -256,7 +262,13 @@
         .catch(() => {
             btnVista.disabled = false;
             btnVista.innerHTML = textoOriginal;
-            Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'No se pudo obtener la vista previa.', confirmButtonColor: '#1e3a5f' });
+            window.confirmar({
+                tipo: 'danger',
+                titulo: 'Error de conexión',
+                mensaje: 'No se pudo obtener la vista previa.',
+                soloConfirmar: true,
+                textoConfirmar: 'Entendido'
+            });
         });
     });
 
@@ -301,36 +313,47 @@
                         aviso.classList.remove('flex');
                     }
                 }
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Portafolio publicado!',
-                    text: 'Tu perfil ahora es público con el contenido seleccionado.',
-                    confirmButtonColor: '#1e3a5f',
-                    timer: 2200,
-                    showConfirmButton: false
+                window.confirmar({
+                    tipo: 'success',
+                    titulo: '¡Portafolio publicado!',
+                    mensaje: 'Tu perfil ahora es público con el contenido seleccionado.',
+                    ocultarBotones: true,
+                    autoCerrarMs: 2200
                 });
             } else if (res.code === 'perfil_incompleto') {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Tu perfil aún está vacío',
-                    html: `
-                        <p class="text-sm text-gray-600 mb-2">Para publicar tu portafolio, primero debes registrar al menos una de estas cosas:</p>
-                        <ul class="text-sm text-gray-600 text-left inline-block mt-1 space-y-1">
+                window.confirmar({
+                    tipo: 'info',
+                    titulo: 'Tu perfil aún está vacío',
+                    mensajeHtml: `
+                        <p class="text-xs text-gray-500 leading-relaxed mb-2">Para publicar tu portafolio, primero debes registrar al menos una de estas cosas:</p>
+                        <ul class="text-xs text-gray-600 text-left inline-block mt-1 space-y-1">
                             <li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> Una <strong>biografía</strong></li>
                             <li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> Un <strong>proyecto</strong></li>
                             <li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> Una <strong>experiencia laboral</strong></li>
                         </ul>`,
-                    confirmButtonColor: '#1e3a5f',
-                    confirmButtonText: 'Entendido'
+                    soloConfirmar: true,
+                    textoConfirmar: 'Entendido'
                 });
             } else {
-                Swal.fire({ icon: 'error', title: 'Error', text: res.message ?? 'No se pudo publicar.', confirmButtonColor: '#1e3a5f' });
+                window.confirmar({
+                    tipo: 'danger',
+                    titulo: 'Error',
+                    mensaje: res.message ?? 'No se pudo publicar.',
+                    soloConfirmar: true,
+                    textoConfirmar: 'Entendido'
+                });
             }
         })
         .catch(() => {
             btnPublicar.disabled = false;
             btnPublicar.innerHTML = '<i class="fas fa-rocket text-xs"></i> Publicar';
-            Swal.fire({ icon: 'error', title: 'Error de conexión', confirmButtonColor: '#1e3a5f' });
+            window.confirmar({
+                tipo: 'danger',
+                titulo: 'Error de conexión',
+                mensaje: 'No se pudo conectar al servidor.',
+                soloConfirmar: true,
+                textoConfirmar: 'Entendido'
+            });
         });
     });
 })();

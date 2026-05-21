@@ -46,7 +46,7 @@
     const presets = {
         danger:  { header: 'bg-red-500',          iconBg: 'bg-red-50',          iconColor: 'text-red-500',          icon: 'fas fa-trash-alt',           btn: 'bg-red-500 hover:bg-red-600' },
         warning: { header: 'bg-yellow-500',       iconBg: 'bg-yellow-50',       iconColor: 'text-yellow-500',       icon: 'fas fa-exclamation-triangle',btn: 'bg-yellow-500 hover:bg-yellow-600' },
-        success: { header: 'bg-green-500',        iconBg: 'bg-green-50',        iconColor: 'text-green-500',        icon: 'fas fa-check-circle',        btn: 'bg-green-500 hover:bg-green-600' },
+        success: { header: 'bg-[#1e3a5f]',        iconBg: 'bg-[#1e3a5f]/10',    iconColor: 'text-[#1e3a5f]',        icon: 'fas fa-check-circle',        btn: 'bg-[#1e3a5f] hover:bg-[#1e3a5f]/90' },
         info:    { header: 'bg-blue-500',         iconBg: 'bg-blue-50',         iconColor: 'text-blue-500',         icon: 'fas fa-info-circle',         btn: 'bg-blue-500 hover:bg-blue-600' },
         primary: { header: 'bg-[#1e3a5f]',        iconBg: 'bg-[#1e3a5f]/10',    iconColor: 'text-[#1e3a5f]',        icon: 'fas fa-question-circle',     btn: 'bg-[#1e3a5f] hover:bg-[#1e3a5f]/90' },
     };
@@ -75,7 +75,13 @@
         document.getElementById('gcfIconWrap').className = 'w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 ' + iconBg;
         document.getElementById('gcfIcon').className     = 'text-2xl ' + icon + ' ' + iconColor;
         document.getElementById('gcfTitle').textContent  = cfg.titulo  || '¿Estás seguro?';
-        document.getElementById('gcfMessage').textContent= cfg.mensaje || 'Esta acción no se puede deshacer.';
+
+        const messageEl = document.getElementById('gcfMessage');
+        if (cfg.mensajeHtml) {
+            messageEl.innerHTML = cfg.mensajeHtml;
+        } else {
+            messageEl.textContent = cfg.mensaje || 'Esta acción no se puede deshacer.';
+        }
 
         const btnConfirm = document.getElementById('gcfBtnConfirm');
         btnConfirm.textContent = cfg.textoConfirmar || 'Confirmar';
@@ -84,6 +90,8 @@
         const btnCancel = document.getElementById('gcfBtnCancel');
         btnCancel.textContent = cfg.textoCancelar || 'Cancelar';
         btnCancel.style.display = cfg.soloConfirmar ? 'none' : '';
+        btnConfirm.style.display = cfg.ocultarBotones ? 'none' : '';
+        if (cfg.ocultarBotones) btnCancel.style.display = 'none';
 
         btnConfirm.onclick = function () {
             cerrarConfirmar();
@@ -97,9 +105,24 @@
 
         modal.classList.remove('hidden');
         modal.classList.add('flex');
+
+        if (window._gcfAutoCloseTimer) {
+            clearTimeout(window._gcfAutoCloseTimer);
+            window._gcfAutoCloseTimer = null;
+        }
+        if (cfg.autoCerrarMs && cfg.autoCerrarMs > 0) {
+            window._gcfAutoCloseTimer = setTimeout(function () {
+                cerrarConfirmar();
+                if (typeof cfg.onAutoCerrar === 'function') cfg.onAutoCerrar();
+            }, cfg.autoCerrarMs);
+        }
     };
 
     window.cerrarConfirmar = function () {
+        if (window._gcfAutoCloseTimer) {
+            clearTimeout(window._gcfAutoCloseTimer);
+            window._gcfAutoCloseTimer = null;
+        }
         modal.classList.add('hidden');
         modal.classList.remove('flex');
     };

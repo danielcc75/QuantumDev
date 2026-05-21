@@ -1,5 +1,5 @@
 {{-- resources/views/gestionarPortafolio/publicar.blade.php
-     Flujo completo de publicación del portafolio (migrado desde gestionarCuenta). --}}
+     Flujo completo de publicación del portafolio. --}}
 
 @php
     use Illuminate\Support\Facades\DB;
@@ -15,6 +15,7 @@
         $itemsSinPublicar += DB::table('formacion_academica')->where('id_perfil', $perfilIdPub)->where('publicado', false)->whereNull('deleted_at')->count();
         $itemsSinPublicar += DB::table('perfil_habilidad_blanda')->where('id_perfil', $perfilIdPub)->where('publicado', false)->count();
     }
+    $esPublico = $visibilidad === 'publico';
 @endphp
 
 <div class="w-full">
@@ -22,72 +23,112 @@
 
         {{-- Encabezado --}}
         <div class="mb-6 md:mb-8">
-            <h2 class="text-2xl md:text-3xl font-bold text-[#1e3a5f]">Publicar Portafolio</h2>
-            <p class="text-sm text-gray-500 mt-1">Controla la visibilidad de tu portafolio y publica el contenido que quieres mostrar</p>
-            <div class="mt-2 h-1 w-16 rounded-full bg-[#e11d48]"></div>
+            <h2 class="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-[#1e3a5f] to-[#e11d48] bg-clip-text text-transparent">
+                Publicar Portafolio
+            </h2>
+            <p class="text-sm text-gray-500 mt-2">Controla la visibilidad de tu portafolio y publica el contenido que quieres mostrar</p>
+            <div class="mt-3 h-1 w-20 rounded-full bg-gradient-to-r from-[#1e3a5f] to-[#e11d48]"></div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
+        {{-- Aviso de elementos sin publicar --}}
+        <div id="aviso-sin-publicar"
+             class="{{ ($esPublico && $itemsSinPublicar > 0) ? 'flex' : 'hidden' }} items-center gap-4 bg-white border-2 border-amber-300 rounded-2xl px-5 py-4 mb-5 shadow-sm">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#e11d48] to-[#1e3a5f] flex items-center justify-center flex-shrink-0 shadow-md">
+                <i class="fas fa-bolt text-white text-sm"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+                <p class="text-sm font-semibold text-gray-800">
+                    Tienes <span id="aviso-sin-publicar-count">{{ $itemsSinPublicar }}</span> elemento(s) sin publicar
+                </p>
+                <p class="text-xs text-gray-500 mt-0.5">Actualiza tu publicación para mostrarlos en tu portafolio público.</p>
+                <button type="button" onclick="editarPublicacion()"
+                    class="mt-2 inline-flex items-center gap-2 bg-gradient-to-r from-[#1e3a5f] to-[#e11d48] hover:opacity-90 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow">
+                    Actualizar ahora
+                </button>
+            </div>
+        </div>
 
-            {{-- ── Visibilidad del perfil ───────────────────────────────────── --}}
-            <div class="border border-gray-100 rounded-xl p-5">
-                <div class="flex items-center gap-3 mb-4 pb-3 border-b border-gray-100">
-                    <div class="w-8 h-8 rounded-lg bg-[#1e3a5f]/10 flex items-center justify-center flex-shrink-0">
-                        <i class="fas fa-eye text-[#1e3a5f] text-sm"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold text-gray-800 text-sm">Visibilidad del perfil</h3>
-                        <p class="text-xs text-gray-400">Controla quién puede ver tu portafolio</p>
-                    </div>
+        {{-- Tarjeta principal --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6">
+
+            {{-- Encabezado de la tarjeta --}}
+            <div class="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100">
+                <div class="w-10 h-10 rounded-xl bg-[#1e3a5f]/10 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-eye text-[#1e3a5f]"></i>
                 </div>
-                <div class="flex items-center justify-between gap-4">
-                    <div>
-                        <p class="text-sm font-medium text-gray-700" id="label-visibilidad">
-                            {{ $visibilidad === 'publico' ? 'Perfil público' : 'Perfil privado' }}
-                        </p>
-                        <p class="text-xs text-gray-400 mt-0.5" id="desc-visibilidad">
-                            {{ $visibilidad === 'publico'
-                                ? 'Cualquier persona puede ver tu portafolio'
-                                : 'Solo tú puedes ver tu portafolio' }}
-                        </p>
-                    </div>
-                    <button type="button" id="btn-visibilidad"
-                        onclick="confirmarCambiarVisibilidad()"
-                        data-actual="{{ $visibilidad }}"
-                        class="relative inline-flex h-7 w-14 flex-shrink-0 items-center rounded-full transition-colors duration-300
-                               {{ $visibilidad === 'publico' ? 'bg-[#1e3a5f]' : 'bg-gray-300' }}">
-                        <span id="toggle-dot"
-                            class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-300
-                                   {{ $visibilidad === 'publico' ? 'translate-x-8' : 'translate-x-1' }}">
-                        </span>
-                    </button>
+                <div>
+                    <h3 class="font-bold text-gray-800 text-base">Visibilidad del perfil</h3>
+                    <p class="text-xs text-gray-500">Controla quién puede ver tu portafolio</p>
                 </div>
-                <div class="mt-3">
-                    <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full
-                        {{ $visibilidad === 'publico' ? 'bg-[#1e3a5f]/10 text-[#1e3a5f]' : 'bg-gray-100 text-gray-500' }}"
-                        id="badge-visibilidad">
-                        <i class="fas {{ $visibilidad === 'publico' ? 'fa-globe' : 'fa-lock' }} text-[10px]"></i>
-                        {{ $visibilidad === 'publico' ? 'Público' : 'Privado' }}
+            </div>
+
+            {{-- Estado actual --}}
+            <div id="estado-visibilidad"
+                 class="flex items-center gap-4 rounded-xl px-4 py-4 mb-5 border
+                        {{ $esPublico ? 'bg-[#1e3a5f]/5 border-[#1e3a5f]/20' : 'bg-gray-50 border-gray-200' }}">
+                <div id="estado-icono-wrap"
+                     class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0
+                            {{ $esPublico ? 'bg-[#1e3a5f]' : 'bg-gray-400' }}">
+                    <i id="estado-icono" class="fas {{ $esPublico ? 'fa-globe' : 'fa-lock' }} text-white"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p id="label-visibilidad" class="text-sm font-bold text-gray-800">
+                        {{ $esPublico ? 'Perfil público' : 'Perfil privado' }}
+                    </p>
+                    <p id="desc-visibilidad" class="text-xs text-gray-500 mt-0.5">
+                        {{ $esPublico ? 'Cualquier persona puede ver tu portafolio' : 'Solo tú puedes ver tu portafolio' }}
+                    </p>
+                    <span id="badge-visibilidad"
+                          class="inline-flex items-center gap-1.5 mt-2 text-xs font-semibold px-2.5 py-1 rounded-full
+                                 {{ $esPublico ? 'bg-[#1e3a5f]/10 text-[#1e3a5f]' : 'bg-gray-200 text-gray-600' }}">
+                        <span class="w-1.5 h-1.5 rounded-full {{ $esPublico ? 'bg-[#1e3a5f]' : 'bg-gray-500' }}"></span>
+                        {{ $esPublico ? 'Público' : 'Privado' }}
                     </span>
                 </div>
+            </div>
 
-                {{-- Aviso de elementos sin publicar --}}
-                <div id="aviso-sin-publicar"
-                     class="{{ ($visibilidad === 'publico' && $itemsSinPublicar > 0) ? 'flex' : 'hidden' }} mt-4 items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-                    <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
-                        <i class="fas fa-circle-info text-amber-600 text-sm"></i>
+            {{-- Acciones: Publicar / Actualizar / Ocultar --}}
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+
+                {{-- Publicar (privado → público) --}}
+                <button type="button" id="card-publicar" onclick="accionPublicar()"
+                        data-disabled="{{ $esPublico ? '1' : '0' }}"
+                        class="group relative overflow-hidden rounded-2xl p-5 text-center text-white transition-all duration-200
+                               bg-[#1e3a5f] hover:bg-[#16314f] shadow-md hover:shadow-lg
+                               {{ $esPublico ? 'opacity-40 cursor-not-allowed pointer-events-none' : '' }}">
+                    <div class="w-11 h-11 mx-auto rounded-xl bg-white/15 flex items-center justify-center mb-3">
+                        <i class="fas fa-upload"></i>
                     </div>
-                    <div class="min-w-0 flex-1">
-                        <p class="text-sm font-medium text-amber-900">
-                            Tienes <span id="aviso-sin-publicar-count">{{ $itemsSinPublicar }}</span> elemento(s) sin publicar
-                        </p>
-                        <p class="text-xs text-amber-700 mt-0.5">Actualiza tu publicación para mostrarlos en tu portafolio público.</p>
+                    <p class="font-bold text-sm">Publicar</p>
+                    <p class="text-[11px] text-white/70 mt-0.5">Hacer visible</p>
+                </button>
+
+                {{-- Actualizar (re-abrir modal) --}}
+                <button type="button" id="card-actualizar" onclick="accionActualizar()"
+                        data-disabled="{{ $esPublico ? '0' : '1' }}"
+                        class="group relative overflow-hidden rounded-2xl p-5 text-center text-white transition-all duration-200
+                               bg-gradient-to-br from-[#1e3a5f] to-[#e11d48] hover:opacity-95 shadow-md hover:shadow-lg
+                               {{ !$esPublico ? 'opacity-40 cursor-not-allowed pointer-events-none' : '' }}">
+                    <div class="w-11 h-11 mx-auto rounded-xl bg-white/20 flex items-center justify-center mb-3">
+                        <i class="fas fa-arrows-rotate"></i>
                     </div>
-                    <button type="button" onclick="editarPublicacion()"
-                        class="text-xs font-semibold text-amber-900 hover:text-amber-700 underline flex-shrink-0">
-                        Actualizar publicación
-                    </button>
-                </div>
+                    <p class="font-bold text-sm">Actualizar</p>
+                    <p class="text-[11px] text-white/80 mt-0.5">Sincronizar</p>
+                </button>
+
+                {{-- Ocultar (público → privado) --}}
+                <button type="button" id="card-ocultar" onclick="accionOcultar()"
+                        data-disabled="{{ $esPublico ? '0' : '1' }}"
+                        class="group relative overflow-hidden rounded-2xl p-5 text-center text-white transition-all duration-200
+                               bg-gray-800 hover:bg-gray-900 shadow-md hover:shadow-lg
+                               {{ !$esPublico ? 'opacity-40 cursor-not-allowed pointer-events-none' : '' }}">
+                    <div class="w-11 h-11 mx-auto rounded-xl bg-white/15 flex items-center justify-center mb-3">
+                        <i class="fas fa-eye-slash"></i>
+                    </div>
+                    <p class="font-bold text-sm">Ocultar</p>
+                    <p class="text-[11px] text-white/70 mt-0.5">Privado</p>
+                </button>
+
             </div>
 
         </div>
@@ -98,106 +139,126 @@
 (function () {
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
-    // ── Aplicar UI público ─────────────────────────────────────────────────
-    window.aplicarVisibilidadPublica = function () {
-        const btn   = document.getElementById('btn-visibilidad');
-        const dot   = document.getElementById('toggle-dot');
-        const label = document.getElementById('label-visibilidad');
-        const desc  = document.getElementById('desc-visibilidad');
-        const badge = document.getElementById('badge-visibilidad');
-        btn.dataset.actual = 'publico';
-        btn.classList.replace('bg-gray-300', 'bg-[#1e3a5f]');
-        dot.classList.replace('translate-x-1', 'translate-x-8');
-        label.textContent = 'Perfil público';
-        desc.textContent  = 'Cualquier persona puede ver tu portafolio';
-        badge.className   = 'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-[#1e3a5f]/10 text-[#1e3a5f]';
-        badge.innerHTML   = '<i class="fas fa-globe text-[10px]"></i> Público';
-        window.PERFIL_VISIBILIDAD = 'publico';
-    };
+    // ── Refrescar UI de estado y acciones según visibilidad ────────────────
+    function actualizarUIVisibilidad(estado) {
+        const esPublico = estado === 'publico';
+        const wrap   = document.getElementById('estado-visibilidad');
+        const iconWrap = document.getElementById('estado-icono-wrap');
+        const icon   = document.getElementById('estado-icono');
+        const label  = document.getElementById('label-visibilidad');
+        const desc   = document.getElementById('desc-visibilidad');
+        const badge  = document.getElementById('badge-visibilidad');
+        const publi  = document.getElementById('card-publicar');
+        const actu   = document.getElementById('card-actualizar');
+        const ocul   = document.getElementById('card-ocultar');
 
-    // ── Editar publicación (re-abrir modal cuando ya está público) ─────────
-    window.editarPublicacion = function () {
-        if (typeof window.abrirModalPublicar === 'function') {
-            window.abrirModalPublicar();
+        if (wrap) {
+            wrap.className = 'flex items-center gap-4 rounded-xl px-4 py-4 mb-5 border ' +
+                (esPublico ? 'bg-[#1e3a5f]/5 border-[#1e3a5f]/20' : 'bg-gray-50 border-gray-200');
         }
-    };
-
-    // ── Visibilidad ────────────────────────────────────────────────────────
-    window.confirmarCambiarVisibilidad = function () {
-        const btn    = document.getElementById('btn-visibilidad');
-        const actual = btn.dataset.actual;
-
-        if (actual === 'publico') {
-            Swal.fire({
-                title: 'Tu portafolio está público',
-                text:  '¿Qué deseas hacer?',
-                icon:  'question',
-                showCancelButton: true,
-                showDenyButton:   true,
-                confirmButtonColor: '#1e3a5f',
-                denyButtonColor:    '#e11d48',
-                cancelButtonColor:  '#6b7280',
-                confirmButtonText:  'Editar publicación',
-                denyButtonText:     'Hacer privado',
-                cancelButtonText:   'Cancelar'
-            }).then(result => {
-                if (result.isConfirmed) {
-                    window.editarPublicacion();
-                } else if (result.isDenied) {
-                    cambiarVisibilidadAPrivado();
-                }
-            });
-            return;
+        if (iconWrap) {
+            iconWrap.className = 'w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ' +
+                (esPublico ? 'bg-[#1e3a5f]' : 'bg-gray-400');
+        }
+        if (icon) {
+            icon.className = 'fas text-white ' + (esPublico ? 'fa-globe' : 'fa-lock');
+        }
+        if (label) label.textContent = esPublico ? 'Perfil público' : 'Perfil privado';
+        if (desc)  desc.textContent  = esPublico ? 'Cualquier persona puede ver tu portafolio' : 'Solo tú puedes ver tu portafolio';
+        if (badge) {
+            badge.className = 'inline-flex items-center gap-1.5 mt-2 text-xs font-semibold px-2.5 py-1 rounded-full ' +
+                (esPublico ? 'bg-[#1e3a5f]/10 text-[#1e3a5f]' : 'bg-gray-200 text-gray-600');
+            badge.innerHTML =
+                '<span class="w-1.5 h-1.5 rounded-full ' + (esPublico ? 'bg-[#1e3a5f]' : 'bg-gray-500') + '"></span>' +
+                (esPublico ? 'Público' : 'Privado');
         }
 
-        if (typeof window.abrirModalPublicar === 'function') {
-            window.abrirModalPublicar();
+        const setEnabled = (btn, enabled) => {
+            if (!btn) return;
+            btn.dataset.disabled = enabled ? '0' : '1';
+            btn.classList.toggle('opacity-40', !enabled);
+            btn.classList.toggle('cursor-not-allowed', !enabled);
+            btn.classList.toggle('pointer-events-none', !enabled);
+        };
+        setEnabled(publi, !esPublico);
+        setEnabled(actu,   esPublico);
+        setEnabled(ocul,   esPublico);
+
+        // El aviso de "elementos sin publicar" solo tiene sentido en público.
+        // (En público, modal_publicar_scripts decide si mostrarlo según el conteo.)
+        if (!esPublico) {
+            const aviso = document.getElementById('aviso-sin-publicar');
+            if (aviso) {
+                aviso.classList.add('hidden');
+                aviso.classList.remove('flex');
+            }
         }
-    };
 
-    function cambiarVisibilidadAPrivado() {
-        const btn = document.getElementById('btn-visibilidad');
-        Swal.fire({
-            title: '¿Hacer perfil privado?',
-            text: 'Solo tú podrás ver tu portafolio.',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#1e3a5f',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Sí, hacer privado',
-            cancelButtonText: 'Cancelar'
-        }).then(result => {
-            if (!result.isConfirmed) return;
-
-            fetch('{{ route("cuenta.visibilidad") }}', {
-                method: 'PUT',
-                headers: { 'X-CSRF-TOKEN': csrf, 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({ visibilidad: 'privado' })
-            })
-            .then(r => r.json())
-            .then(res => {
-                if (res.ok) {
-                    const dot   = document.getElementById('toggle-dot');
-                    const label = document.getElementById('label-visibilidad');
-                    const desc  = document.getElementById('desc-visibilidad');
-                    const badge = document.getElementById('badge-visibilidad');
-                    btn.dataset.actual = 'privado';
-                    btn.classList.replace('bg-[#1e3a5f]', 'bg-gray-300');
-                    dot.classList.replace('translate-x-8', 'translate-x-1');
-                    label.textContent = 'Perfil privado';
-                    desc.textContent  = 'Solo tú puedes ver tu portafolio';
-                    badge.className   = 'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 text-gray-500';
-                    badge.innerHTML   = '<i class="fas fa-lock text-[10px]"></i> Privado';
-                    window.PERFIL_VISIBILIDAD = 'privado';
-
-                    Swal.fire({ icon: 'success', title: '¡Listo!', text: 'Tu perfil ahora es privado.', confirmButtonColor: '#1e3a5f', timer: 2000, showConfirmButton: false });
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Error', text: res.message ?? 'No se pudo cambiar la visibilidad.', confirmButtonColor: '#1e3a5f' });
-                }
-            })
-            .catch(() => Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'No se pudo conectar al servidor.', confirmButtonColor: '#1e3a5f' }));
-        });
+        window.PERFIL_VISIBILIDAD = estado;
     }
+
+    // ── Mantener compatibilidad con _modal_publicar_scripts ───────────────
+    window.aplicarVisibilidadPublica = function () {
+        actualizarUIVisibilidad('publico');
+    };
+
+    // ── Acciones ──────────────────────────────────────────────────────────
+    window.editarPublicacion = function () {
+        if (typeof window.abrirModalPublicar === 'function') window.abrirModalPublicar();
+    };
+
+    window.accionPublicar = function () {
+        if (typeof window.abrirModalPublicar === 'function') window.abrirModalPublicar();
+    };
+
+    window.accionActualizar = function () {
+        if (typeof window.abrirModalPublicar === 'function') window.abrirModalPublicar();
+    };
+
+    window.accionOcultar = function () {
+        window.confirmar({
+            tipo: 'primary',
+            titulo: '¿Ocultar tu portafolio?',
+            mensaje: 'Tu portafolio dejará de ser visible para otros usuarios.',
+            textoConfirmar: 'Sí, ocultar',
+            textoCancelar: 'Cancelar',
+            onConfirm: function () {
+                fetch('{{ route("cuenta.visibilidad") }}', {
+                    method: 'PUT',
+                    headers: { 'X-CSRF-TOKEN': csrf, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({ visibilidad: 'privado' })
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.ok) {
+                        actualizarUIVisibilidad('privado');
+                        window.confirmar({
+                            tipo: 'success',
+                            titulo: '¡Listo!',
+                            mensaje: 'Tu portafolio ahora es privado.',
+                            ocultarBotones: true,
+                            autoCerrarMs: 2000
+                        });
+                    } else {
+                        window.confirmar({
+                            tipo: 'danger',
+                            titulo: 'Error',
+                            mensaje: res.message ?? 'No se pudo cambiar la visibilidad.',
+                            soloConfirmar: true,
+                            textoConfirmar: 'Entendido'
+                        });
+                    }
+                })
+                .catch(() => window.confirmar({
+                    tipo: 'danger',
+                    titulo: 'Error de conexión',
+                    mensaje: 'No se pudo conectar al servidor.',
+                    soloConfirmar: true,
+                    textoConfirmar: 'Entendido'
+                }));
+            }
+        });
+    };
 })();
 </script>
 
