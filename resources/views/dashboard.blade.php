@@ -110,6 +110,11 @@
                     <span class="font-medium">Mis Proyectos</span>
                 </a>
 
+                <a href="#" data-seccion="publicar" class="seccion-link flex items-center px-6 py-3 text-gray-700 transition-all">
+                    <i class="fas fa-globe w-5 h-5 mr-3 text-gray-500"></i>
+                    <span class="font-medium">Publicar Portafolio</span>
+                </a>
+
             </nav>
         </aside>
 
@@ -151,6 +156,12 @@
                 @include('gestionarPerfil.proyectos', [
                     'userId' => $usuario->id_usuario,
                     'nombreUsuario' => $nombreUsuario
+                ])
+            </section>
+
+            <section id="seccion-publicar" class="seccion-contenido">
+                @include('gestionarPortafolio.publicar', [
+                    'userId' => $usuario->id_usuario
                 ])
             </section>
 

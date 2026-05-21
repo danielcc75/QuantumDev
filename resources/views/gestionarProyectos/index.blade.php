@@ -24,7 +24,7 @@
         {{-- Encabezado --}}
         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6 md:mb-8">
             <div>
-                <h2 class="text-2xl md:text-3xl font-bold text-[#1e3a5f]">Gestión de Portafolio</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-[#1e3a5f]">Gestión de Proyectos</h2>
                 <p class="text-sm text-gray-500 mt-1">Administra tus proyectos personales y controla lo que muestras al mundo</p>
                 <div class="mt-2 h-1 w-16 rounded-full bg-[#e11d48]"></div>
             </div>
