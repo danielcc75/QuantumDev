@@ -25,9 +25,25 @@ class PortafolioBuscadorService
 
         $total = (clone $base)->count('p.id_perfil');
 
-        // Subquery: cantidad de proyectos completados y publicados por perfil.
-        // Se usa para priorizar en el orden — perfiles con más proyectos terminados
-        // y visibles aparecen primero; los que tienen 0 quedan al final.
+        // Score de completitud del perfil (0..8): suma una unidad por cada sección llena.
+        // Define el orden principal — los perfiles más completos aparecen primero.
+        $subCompletitud = "(
+            (CASE WHEN p.biografia IS NOT NULL AND p.biografia <> '' THEN 1 ELSE 0 END) +
+            (CASE WHEN p.foto_perfil IS NOT NULL AND p.foto_perfil <> '' THEN 1 ELSE 0 END) +
+            (CASE WHEN p.ubicacion IS NOT NULL AND p.ubicacion <> '' THEN 1 ELSE 0 END) +
+            (CASE WHEN EXISTS(SELECT 1 FROM experiencia_laboral e
+                WHERE e.id_perfil = p.id_perfil AND e.publicado = true AND e.deleted_at IS NULL) THEN 1 ELSE 0 END) +
+            (CASE WHEN EXISTS(SELECT 1 FROM habilidades h
+                WHERE h.id_perfil = p.id_perfil AND h.publicado = true AND h.deleted_at IS NULL) THEN 1 ELSE 0 END) +
+            (CASE WHEN EXISTS(SELECT 1 FROM formacion_academica fa
+                WHERE fa.id_perfil = p.id_perfil AND fa.publicado = true AND fa.deleted_at IS NULL) THEN 1 ELSE 0 END) +
+            (CASE WHEN EXISTS(SELECT 1 FROM perfil_links pl
+                WHERE pl.id_perfil = p.id_perfil) THEN 1 ELSE 0 END) +
+            (CASE WHEN EXISTS(SELECT 1 FROM proyectos pr
+                WHERE pr.id_perfil = p.id_perfil AND pr.visible = true AND pr.deleted_at IS NULL) THEN 1 ELSE 0 END)
+        )";
+
+        // Desempate: cantidad de proyectos completados y publicados por perfil.
         $subProyCompletados = "(SELECT COUNT(*) FROM proyectos pc
             WHERE pc.id_perfil = p.id_perfil
               AND pc.estado = 'completado'
@@ -35,7 +51,9 @@ class PortafolioBuscadorService
               AND pc.deleted_at IS NULL)";
 
         $filas = $base
+            ->addSelect(DB::raw($subCompletitud . ' AS completitud'))
             ->addSelect(DB::raw($subProyCompletados . ' AS proy_completados'))
+            ->orderByDesc('completitud')
             ->orderByDesc('proy_completados')
             ->orderByDesc('p.updated_at')
             ->orderByDesc('p.id_perfil')
