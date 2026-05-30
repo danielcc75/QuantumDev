@@ -159,15 +159,6 @@
                     Continuar con Google
                 </a>
 
-                <!-- linkedin -->
-                <button type="button"
-                    class="w-full flex items-center justify-center gap-3 border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 py-3 rounded-md font-medium transition">
-
-                    <i class="fab fa-linkedin text-xl text-blue-600"></i>
-                    Continuar con LinkedIn
-                    <span class="text-xs text-gray-400">(Próximamente)</span>
-                </button>
-
             </div>
 
             <p class="text-sm text-center mt-4 text-gray-600">
