@@ -89,6 +89,8 @@
                             <option value="Data Science & ML">Data Science &amp; ML</option>
                             <option value="Diseño & Prototipado">Diseño &amp; Prototipado</option>
                             <option value="Gestión de Proyectos">Gestión de Proyectos</option>
+                            <option disabled>──────────</option>
+                            <option value="sugerir" class="font-semibold text-blue-600 bg-blue-50">+ Sugerir tecnología...</option>
                         </select>
                         <i class="fas fa-chevron-down text-gray-400 text-xs absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
                     </div>

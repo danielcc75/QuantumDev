@@ -665,3 +665,113 @@ function actualizarResumenProyectos(proyecto, accion) {
 }
 
 </script>
+
+{{-- Modal Sugerir Tec --}}
+<div id="modal-sugerir-tecnologia" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[70] p-4" onclick="cerrarModalSugerirTecnologiaFondo(event)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md" onclick="event.stopPropagation()">
+        <div class="bg-[#1e3a5f] text-white px-6 py-4 flex items-center justify-between rounded-t-2xl">
+            <div>
+                <h3 class="text-lg font-bold">Sugerir Tecnología</h3>
+            </div>
+            <button type="button" onclick="cerrarModalSugerirTecnologia()" class="text-white hover:text-blue-200 transition">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <form id="formSugerirTecnologia">
+                <div class="mb-4">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Título de la tecnología <span class="text-red-500">*</span></label>
+                    <input type="text" id="sugerir_titulo_tech" name="titulo" placeholder="Ej: Next.js" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Descripción corta <span class="text-red-500">*</span></label>
+                    <textarea id="sugerir_descripcion_tech" name="descripcion" rows="3" placeholder="Por qué deberíamos agregar esta tecnología..." class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"></textarea>
+                </div>
+                <div class="flex gap-3 pt-4 border-t border-gray-100">
+                    <button type="button" onclick="cerrarModalSugerirTecnologia()" class="flex-1 px-4 py-2 text-sm border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition">Cancelar</button>
+                    <button type="button" onclick="enviarSugerenciaTecnologia()" class="flex-1 px-4 py-2 text-sm bg-[#1e3a5f] hover:bg-[#e11d48] text-white rounded-lg font-medium transition">
+                        <i class="fas fa-paper-plane text-xs mr-1"></i> Enviar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const selectTech = document.getElementById("proj_categoria_select");
+        if (selectTech) {
+            let prevValueTech = "";
+            selectTech.addEventListener("focus", function () { prevValueTech = this.value; });
+            selectTech.addEventListener("change", function () {
+                if (this.value === "sugerir") {
+                    this.value = prevValueTech;
+                    filtrarTecnologias(); // Refresh chips since inline onchange saw "sugerir"
+                    abrirModalSugerirTecnologia();
+                } else {
+                    prevValueTech = this.value;
+                }
+            });
+        }
+    });
+    window.abrirModalSugerirTecnologia = function () {
+        const form = document.getElementById("formSugerirTecnologia");
+        if(form) form.reset();
+        const modal = document.getElementById("modal-sugerir-tecnologia");
+        if(modal) { modal.classList.remove("hidden"); modal.classList.add("flex"); }
+    };
+    window.cerrarModalSugerirTecnologia = function () {
+        const modal = document.getElementById("modal-sugerir-tecnologia");
+        if(modal) { modal.classList.add("hidden"); modal.classList.remove("flex"); }
+    };
+    window.cerrarModalSugerirTecnologiaFondo = function (event) {
+        if (event.target.id === "modal-sugerir-tecnologia") { cerrarModalSugerirTecnologia(); }
+    };
+    window.enviarSugerenciaTecnologia = async function () {
+        const tituloEl = document.getElementById("sugerir_titulo_tech");
+        const descripcionEl = document.getElementById("sugerir_descripcion_tech");
+        const titulo = tituloEl ? tituloEl.value.trim() : "";
+        const descripcion = descripcionEl ? descripcionEl.value.trim() : "";
+        if (!titulo) { alert("El título es obligatorio."); return; }
+        if (!descripcion) { alert("La descripción es obligatoria."); return; }
+        
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const resp = await fetch('/sugerencias', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ tipo: 'tecnologia', titulo, descripcion })
+            });
+            const data = await resp.json();
+            if(resp.ok) {
+                cerrarModalSugerirTecnologia();
+                if (typeof window.confirmar === 'function') {
+                    window.confirmar({
+                        tipo:           'success',
+                        titulo:         '¡Sugerencia Enviada!',
+                        mensaje:        data.message || 'Tu sugerencia se ha enviado correctamente. ¡Gracias!',
+                        icon:           'fas fa-check-circle',
+                        iconBg:         'bg-green-50',
+                        iconColor:      'text-green-500',
+                        btnClass:       'bg-green-500 hover:bg-green-600',
+                        textoConfirmar: 'OK',
+                        soloConfirmar:  true,
+                    });
+                    setTimeout(() => { if(typeof window.cerrarConfirmar === 'function') window.cerrarConfirmar(); }, 2500);
+                } else if (typeof window.Toastify === "function") {
+                    window.Toastify({ text: data.message || "Sugerencia enviada correctamente. ¡Gracias!", duration: 3000, close: true, gravity: "top", position: "right", style: { background: "#4caf50" } }).showToast();
+                } else {
+                    alert(data.message || "Sugerencia enviada correctamente. ¡Gracias!");
+                }
+            } else {
+                alert(data.error || 'Ocurrió un error al enviar la sugerencia.');
+            }
+        } catch (error) {
+            alert('Error de conexión al enviar la sugerencia.');
+        }
+    };
+</script>

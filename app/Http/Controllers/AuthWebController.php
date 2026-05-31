@@ -13,6 +13,7 @@ use App\Services\NovedadesService;
 use App\Traits\LogsActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 
@@ -197,5 +198,41 @@ class AuthWebController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    /**
+     * Centraliza la recepción de sugerencias de los usuarios (habilidades, tecnologías, etc).
+     */
+    public function sugerir(Request $request)
+    {
+        $validated = $request->validate([
+            'tipo' => 'required|string|in:habilidad_tecnica,habilidad_blanda,tecnologia',
+            'nombre' => 'required|string|max:100',
+            'categoria' => 'nullable|string|max:100', // Requerido para sugerir tecnologías
+        ]);
+
+        $usuario = Usuario::find(session('usuario_id'));
+        $logMessage = "Sugerencia de {$validated['tipo']}: '{$validated['nombre']}'";
+
+        if (!empty($validated['categoria'])) {
+            $logMessage .= " (Categoría: {$validated['categoria']})";
+        }
+
+        if ($usuario) {
+            $logMessage .= " por usuario ID: {$usuario->id_usuario} ({$usuario->correo_electronico})";
+        }
+
+        // En lugar de crear una tabla en la BD, registramos la sugerencia en un log
+        // para que el administrador pueda revisarla.
+        Log::channel('sugerencias')->info($logMessage);
+
+        // Este es el mensaje de éxito unificado y amigable que querías mostrar.
+        $mensaje = '¡Gracias! Tu sugerencia ha sido enviada y la revisaremos pronto.';
+
+        if ($request->expectsJson()) {
+            return response()->json(['ok' => true, 'message' => $mensaje]);
+        }
+
+        return back()->with('success', $mensaje);
     }
 }

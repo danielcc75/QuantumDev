@@ -90,6 +90,44 @@
             <!-- derecha -->
             <div class="flex items-center space-x-3 md:space-x-6 flex-shrink-0">
 
+                @if($esAdmin)
+                <!-- campana -->
+                <div class="relative dropdown">
+                    <button class="text-gray-500 hover:text-[#1e3a5f] focus:outline-none transition-colors relative flex items-center justify-center pt-1">
+                        <i class="fas fa-bell text-xl"></i>
+                        @if(isset($sugerenciasSinLeer) && $sugerenciasSinLeer->count() > 0)
+                            <span id="badge-notificaciones-admin" class="absolute -top-1 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 bg-[#e11d48] text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sugerenciasSinLeer->count() > 9 ? '9+' : $sugerenciasSinLeer->count() }}</span>
+                        @else
+                            <span id="badge-notificaciones-admin" class="hidden absolute -top-1 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 bg-[#e11d48] text-white text-[10px] font-bold rounded-full items-center justify-center">0</span>
+                        @endif
+                    </button>
+                    <div class="dropdown-menu hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-100 z-30">
+                        <div class="p-3 border-b border-gray-100 flex items-center justify-between">
+                            <p class="font-semibold text-[#1e3a5f]">Notificaciones</p>
+                        </div>
+                        <div class="max-h-96 overflow-y-auto" id="contenedor-notificaciones-admin">
+                            @if(isset($sugerenciasSinLeer) && $sugerenciasSinLeer->count() > 0)
+                                @foreach($sugerenciasSinLeer as $sugerencia)
+                                    @php
+                                        $urlRedirect = route('admin.sugerencias.ver', ['tipo' => $sugerencia->tipo]);
+                                    @endphp
+                                    <a href="{{ $urlRedirect }}" class="block p-3 hover:bg-gray-50 border-b border-gray-100">
+                                        <p class="text-sm font-medium text-gray-800">
+                                            <i class="fas fa-lightbulb text-[#e11d48] mr-1 text-xs"></i>
+                                            Nueva sugerencia de {{ $sugerencia->tipo == 'habilidad_blanda' ? 'habilidad blanda' : $sugerencia->tipo }}
+                                        </p>
+                                        <p class="text-xs text-gray-600 mt-0.5 truncate">{{ $sugerencia->titulo }}</p>
+                                        <p class="text-[10px] text-gray-400 mt-1">{{ \Carbon\Carbon::parse($sugerencia->created_at)->diffForHumans() }} por {{ $sugerencia->usuario->nombre ?? 'Usuario' }}</p>
+                                    </a>
+                                @endforeach
+                            @else
+                                <p class="p-4 text-xs text-gray-500 italic text-center">Sin notificaciones</p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 <!-- usuario -->
                 <div class="relative dropdown">
                     <button class="flex items-center space-x-2 focus:outline-none">

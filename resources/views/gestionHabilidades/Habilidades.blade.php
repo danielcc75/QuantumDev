@@ -37,6 +37,8 @@
                     {{ $categoria->nombre }}
                 </option>
             @endforeach
+            <option disabled>──────────</option>
+            <option value="sugerir" class="font-semibold text-blue-600 bg-blue-50">+ Sugerir categoría...</option>
 
         </select>
     </div>

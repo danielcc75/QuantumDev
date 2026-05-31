@@ -48,8 +48,10 @@ class TecnologiaAdminController extends Controller
             ->orderBy('categoria')
             ->pluck('categoria');
 
+        $sugerenciasTecnologia = \App\Models\Sugerencia::with('usuario')->where('tipo', 'tecnologia')->orderBy('created_at', 'desc')->get();
+
         return view('admin.tecnologias.index', compact(
-            'tecnologias', 'categorias', 'search', 'categoria', 'sort', 'dir', 'periodo'
+            'tecnologias', 'categorias', 'search', 'categoria', 'sort', 'dir', 'periodo', 'sugerenciasTecnologia'
         ));
     }
 
