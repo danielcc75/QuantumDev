@@ -69,7 +69,13 @@
                 <span id="contador-habilidades">{{ count($habilidadesBlandasSeleccionadas) }}</span> / 6
             </div>
 
-            {{-- MENSAJE LIMITE --}}
+            <div class="mt-4 pt-4 border-t border-gray-100">
+    <button type="button" onclick="abrirModalSugerirHBlanda()" class="text-sm text-[#1e3a5f] font-semibold hover:text-[#e11d48] flex items-center gap-1 transition">
+        <i class="fas fa-lightbulb"></i> Sugerir habilidad blanda
+    </button>
+</div>
+
+{{-- MENSAJE LIMITE --}}
             <div id="mensaje-limite" class="text-xs text-red-500 mt-1 hidden">
                 solo puedes seleccionar hasta 6 habilidades
             </div>
@@ -208,4 +214,64 @@
     }
 
     document.getElementById('abrir-modal-habilidades-blandas')?.addEventListener('click', abrirModalHabilidadesBlandas);
+</script>
+{{-- Modal Sugerir HBlanda --}}
+<div id="modal-sugerir-hblanda" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[70] p-4" onclick="cerrarModalSugerirHBlandaFondo(event)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md" onclick="event.stopPropagation()">
+        <div class="bg-[#1e3a5f] text-white px-6 py-4 flex items-center justify-between rounded-t-2xl">
+            <div>
+                <h3 class="text-lg font-bold">Sugerir Habilidad Blanda</h3>
+            </div>
+            <button type="button" onclick="cerrarModalSugerirHBlanda()" class="text-white hover:text-blue-200 transition">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <form id="formSugerirHBlanda">
+                <div class="mb-4">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Título de la habilidad <span class="text-red-500">*</span></label>
+                    <input type="text" id="sugerir_titulo_hblanda" name="titulo" placeholder="Ej: Liderazgo" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Descripción corta <span class="text-red-500">*</span></label>
+                    <textarea id="sugerir_descripcion_hblanda" name="descripcion" rows="3" placeholder="Por qué deberíamos agregar esta habilidad..." class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"></textarea>
+                </div>
+                <div class="flex gap-3 pt-4 border-t border-gray-100">
+                    <button type="button" onclick="cerrarModalSugerirHBlanda()" class="flex-1 px-4 py-2 text-sm border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition">Cancelar</button>
+                    <button type="button" onclick="enviarSugerenciaHBlanda()" class="flex-1 px-4 py-2 text-sm bg-[#1e3a5f] hover:bg-[#e11d48] text-white rounded-lg font-medium transition">
+                        <i class="fas fa-paper-plane text-xs mr-1"></i> Enviar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    window.abrirModalSugerirHBlanda = function () {
+        const form = document.getElementById("formSugerirHBlanda");
+        if(form) form.reset();
+        const modal = document.getElementById("modal-sugerir-hblanda");
+        if(modal) { modal.classList.remove("hidden"); modal.classList.add("flex"); }
+    };
+    window.cerrarModalSugerirHBlanda = function () {
+        const modal = document.getElementById("modal-sugerir-hblanda");
+        if(modal) { modal.classList.add("hidden"); modal.classList.remove("flex"); }
+    };
+    window.cerrarModalSugerirHBlandaFondo = function (event) {
+        if (event.target.id === "modal-sugerir-hblanda") { cerrarModalSugerirHBlanda(); }
+    };
+    window.enviarSugerenciaHBlanda = function () {
+        const tituloEl = document.getElementById("sugerir_titulo_hblanda");
+        const descripcionEl = document.getElementById("sugerir_descripcion_hblanda");
+        const titulo = tituloEl ? tituloEl.value.trim() : "";
+        const descripcion = descripcionEl ? descripcionEl.value.trim() : "";
+        if (!titulo) { alert("El título es obligatorio."); return; }
+        if (!descripcion) { alert("La descripción es obligatoria."); return; }
+        cerrarModalSugerirHBlanda();
+        if (typeof window.Toastify === "function") {
+            window.Toastify({ text: "Sugerencia enviada correctamente. ¡Gracias!", duration: 3000, close: true, gravity: "top", position: "right", style: { background: "#4caf50" } }).showToast();
+        } else {
+            alert("Sugerencia enviada correctamente. ¡Gracias!");
+        }
+    };
 </script>

@@ -90,6 +90,24 @@
             <!-- derecha -->
             <div class="flex items-center space-x-3 md:space-x-6 flex-shrink-0">
 
+                @if($esAdmin)
+                <!-- campana (frontend) -->
+                <div class="relative dropdown">
+                    <button class="text-gray-500 hover:text-[#1e3a5f] focus:outline-none transition-colors relative flex items-center justify-center pt-1">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span id="badge-notificaciones-admin" class="hidden absolute -top-1 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 bg-[#e11d48] text-white text-[10px] font-bold rounded-full items-center justify-center">0</span>
+                    </button>
+                    <div class="dropdown-menu hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-100 z-30">
+                        <div class="p-3 border-b border-gray-100 flex items-center justify-between">
+                            <p class="font-semibold text-[#1e3a5f]">Notificaciones</p>
+                        </div>
+                        <div class="max-h-96 overflow-y-auto" id="contenedor-notificaciones-admin">
+                            <p class="p-4 text-xs text-gray-500 italic text-center">Sin notificaciones</p>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 <!-- usuario -->
                 <div class="relative dropdown">
                     <button class="flex items-center space-x-2 focus:outline-none">

@@ -27,8 +27,11 @@
                     <input type="url" name="imagen" required maxlength="250" placeholder="URL de imagen (https://...)"
                         value="{{ old('imagen') }}"
                         class="flex-1 min-w-[220px] px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#1e3a5f]">
-                    <button type="submit" class="bg-[#1e3a5f] text-white px-4 py-2 rounded-lg">
+                    <button type="submit" class="bg-[#1e3a5f] text-white px-4 py-2 rounded-lg hover:bg-[#152c47] transition">
                         <i class="fas fa-plus mr-1"></i> Agregar
+                    </button>
+                    <button type="button" onclick="abrirModalSugerenciasCategoria()" class="bg-[#e11d48] text-white px-4 py-2 rounded-lg hover:bg-red-600 transition shadow-sm font-medium">
+                        <i class="fas fa-lightbulb mr-1"></i> Sugerencias
                     </button>
                 </form>
 
@@ -139,4 +142,41 @@
                 </div>
             </div>
         </div>
+
+{{-- Modal Sugerencias de Categorías (Frontend) --}}
+<div id="modal-sugerencias-categoria" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[70] p-4" onclick="cerrarModalSugerenciasCategoriaFondo(event)">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md flex flex-col">
+        <div class="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50 rounded-t-xl">
+            <h3 class="text-lg font-bold text-[#1e3a5f]"><i class="fas fa-lightbulb text-[#e11d48] mr-2"></i>Sugerencias de Usuarios</h3>
+            <button type="button" onclick="cerrarModalSugerenciasCategoria()" class="text-gray-400 hover:text-gray-600 transition">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+        <div class="p-4 max-h-96 overflow-y-auto">
+            <div class="flex flex-col items-center justify-center py-8">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                    <i class="fas fa-inbox text-2xl text-gray-400"></i>
+                </div>
+                <p class="text-sm text-gray-500 text-center">No hay nuevas sugerencias por el momento.</p>
+            </div>
+        </div>
+        <div class="p-4 border-t border-gray-100 flex justify-end bg-gray-50 rounded-b-xl">
+            <button type="button" onclick="cerrarModalSugerenciasCategoria()" class="px-5 py-2 text-sm bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.abrirModalSugerenciasCategoria = function() {
+        const modal = document.getElementById("modal-sugerencias-categoria");
+        if(modal) { modal.classList.remove("hidden"); modal.classList.add("flex"); }
+    };
+    window.cerrarModalSugerenciasCategoria = function() {
+        const modal = document.getElementById("modal-sugerencias-categoria");
+        if(modal) { modal.classList.add("hidden"); modal.classList.remove("flex"); }
+    };
+    window.cerrarModalSugerenciasCategoriaFondo = function(event) {
+        if (event.target.id === "modal-sugerencias-categoria") { cerrarModalSugerenciasCategoria(); }
+    };
+</script>
 

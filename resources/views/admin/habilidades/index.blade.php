@@ -49,15 +49,20 @@
             <!-- Crear nueva blanda -->
             <div class="bg-gray-50 rounded-xl p-4">
                 <h3 class="font-semibold text-gray-700 mb-3">Registrar nueva habilidad blanda</h3>
-                <form action="{{ route('habilidades-blandas.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <form action="{{ route('habilidades-blandas.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-3">
                     @csrf
                     <input type="text" name="nombre" required maxlength="100" placeholder="Nombre"
-                        class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#1e3a5f]">
-                    <input type="text" name="descripcion" maxlength="500" placeholder="Descripción (opcional)"
                         class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#1e3a5f] md:col-span-1">
-                    <button type="submit" class="bg-[#1e3a5f] text-white px-4 py-2 rounded-lg">
-                        <i class="fas fa-plus mr-1"></i> Registrar
-                    </button>
+                    <input type="text" name="descripcion" maxlength="500" placeholder="Descripción (opcional)"
+                        class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#1e3a5f] md:col-span-2">
+                    <div class="flex gap-2">
+                        <button type="submit" class="bg-[#1e3a5f] text-white px-4 py-2 rounded-lg hover:bg-[#152c47] transition flex-1">
+                            <i class="fas fa-plus mr-1"></i> Registrar
+                        </button>
+                        <button type="button" onclick="abrirModalSugerenciasBlanda()" class="bg-[#e11d48] text-white px-4 py-2 rounded-lg hover:bg-red-600 transition shadow-sm font-medium flex-1">
+                            <i class="fas fa-lightbulb mr-1"></i> Sugerencias
+                        </button>
+                    </div>
                 </form>
             </div>
 
@@ -279,6 +284,46 @@
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && !__modalOcultarHab.classList.contains('hidden')) {
             cerrarModalOcultarHabilidad();
+        }
+    });
+</script>
+
+{{-- Modal Sugerencias de Habilidades Blandas (Frontend) --}}
+<div id="modal-sugerencias-blanda" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[70] p-4" onclick="cerrarModalSugerenciasBlandaFondo(event)">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md flex flex-col">
+        <div class="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50 rounded-t-xl">
+            <h3 class="text-lg font-bold text-[#1e3a5f]"><i class="fas fa-lightbulb text-[#e11d48] mr-2"></i>Sugerencias de Usuarios</h3>
+            <button type="button" onclick="cerrarModalSugerenciasBlanda()" class="text-gray-400 hover:text-gray-600 transition">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+        <div class="p-4 max-h-96 overflow-y-auto">
+            <div class="flex flex-col items-center justify-center py-8">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                    <i class="fas fa-inbox text-2xl text-gray-400"></i>
+                </div>
+                <p class="text-sm text-gray-500 text-center">No hay nuevas sugerencias por el momento.</p>
+            </div>
+        </div>
+        <div class="p-4 border-t border-gray-100 flex justify-end bg-gray-50 rounded-b-xl">
+            <button type="button" onclick="cerrarModalSugerenciasBlanda()" class="px-5 py-2 text-sm bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.abrirModalSugerenciasBlanda = function() {
+        const modal = document.getElementById("modal-sugerencias-blanda");
+        if(modal) { modal.classList.remove("hidden"); modal.classList.add("flex"); }
+    };
+    window.cerrarModalSugerenciasBlanda = function() {
+        const modal = document.getElementById("modal-sugerencias-blanda");
+        if(modal) { modal.classList.add("hidden"); modal.classList.remove("flex"); }
+    };
+    window.cerrarModalSugerenciasBlandaFondo = function(event) {
+        if (event.target.id === "modal-sugerencias-blanda") { cerrarModalSugerenciasBlanda(); }
+    };
+</script>
         }
     });
 </script>

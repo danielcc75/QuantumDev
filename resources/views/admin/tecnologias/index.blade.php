@@ -10,10 +10,16 @@
             </h3>
             <p class="text-sm text-gray-600 mt-1">Administra el catálogo de tecnologías</p>
         </div>
-        <button onclick="abrirModalCrear()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition transform hover:scale-105 inline-flex items-center">
-            <i class="fas fa-plus mr-2"></i>
-            Nueva Tecnología
-        </button>
+        <div class="flex gap-2">
+            <button type="button" onclick="abrirModalSugerenciasTecnologia()" class="bg-[#e11d48] hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition transform hover:scale-105 inline-flex items-center shadow-sm">
+                <i class="fas fa-lightbulb mr-2"></i>
+                Sugerencias
+            </button>
+            <button onclick="abrirModalCrear()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition transform hover:scale-105 inline-flex items-center">
+                <i class="fas fa-plus mr-2"></i>
+                Nueva Tecnología
+            </button>
+        </div>
     </div>
     
     <form method="GET" action="{{ route('admin.tecnologias') }}"
@@ -261,5 +267,42 @@
     document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') cerrarModal();
     });
+</script>
+
+{{-- Modal Sugerencias de Tecnologías (Frontend) --}}
+<div id="modal-sugerencias-tecnologia" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[70] p-4" onclick="cerrarModalSugerenciasTecnologiaFondo(event)">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md flex flex-col">
+        <div class="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50 rounded-t-xl">
+            <h3 class="text-lg font-bold text-[#1e3a5f]"><i class="fas fa-lightbulb text-[#e11d48] mr-2"></i>Sugerencias de Usuarios</h3>
+            <button type="button" onclick="cerrarModalSugerenciasTecnologia()" class="text-gray-400 hover:text-gray-600 transition">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+        <div class="p-4 max-h-96 overflow-y-auto">
+            <div class="flex flex-col items-center justify-center py-8">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                    <i class="fas fa-inbox text-2xl text-gray-400"></i>
+                </div>
+                <p class="text-sm text-gray-500 text-center">No hay nuevas sugerencias por el momento.</p>
+            </div>
+        </div>
+        <div class="p-4 border-t border-gray-100 flex justify-end bg-gray-50 rounded-b-xl">
+            <button type="button" onclick="cerrarModalSugerenciasTecnologia()" class="px-5 py-2 text-sm bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.abrirModalSugerenciasTecnologia = function() {
+        const modal = document.getElementById("modal-sugerencias-tecnologia");
+        if(modal) { modal.classList.remove("hidden"); modal.classList.add("flex"); }
+    };
+    window.cerrarModalSugerenciasTecnologia = function() {
+        const modal = document.getElementById("modal-sugerencias-tecnologia");
+        if(modal) { modal.classList.add("hidden"); modal.classList.remove("flex"); }
+    };
+    window.cerrarModalSugerenciasTecnologiaFondo = function(event) {
+        if (event.target.id === "modal-sugerencias-tecnologia") { cerrarModalSugerenciasTecnologia(); }
+    };
 </script>
 @endsection
