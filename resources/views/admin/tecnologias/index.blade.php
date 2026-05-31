@@ -279,12 +279,27 @@
             </button>
         </div>
         <div class="p-4 max-h-96 overflow-y-auto">
-            <div class="flex flex-col items-center justify-center py-8">
-                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
-                    <i class="fas fa-inbox text-2xl text-gray-400"></i>
+            @if(isset($sugerenciasTecnologia) && $sugerenciasTecnologia->count() > 0)
+                <div class="space-y-3">
+                    @foreach($sugerenciasTecnologia as $sug)
+                        <div class="p-3 border border-gray-100 rounded-lg bg-gray-50">
+                            <h4 class="font-bold text-[#1e3a5f] text-sm">{{ $sug->titulo }}</h4>
+                            <p class="text-xs text-gray-600 mt-1">{{ $sug->descripcion }}</p>
+                            <div class="text-[10px] text-gray-400 mt-2 flex justify-between">
+                                <span>Por: {{ $sug->usuario->nombre ?? 'Anónimo' }}</span>
+                                <span>{{ \Carbon\Carbon::parse($sug->created_at)->diffForHumans() }}</span>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
-                <p class="text-sm text-gray-500 text-center">No hay nuevas sugerencias por el momento.</p>
-            </div>
+            @else
+                <div class="flex flex-col items-center justify-center py-8">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                        <i class="fas fa-inbox text-2xl text-gray-400"></i>
+                    </div>
+                    <p class="text-sm text-gray-500 text-center">No hay nuevas sugerencias por el momento.</p>
+                </div>
+            @endif
         </div>
         <div class="p-4 border-t border-gray-100 flex justify-end bg-gray-50 rounded-b-xl">
             <button type="button" onclick="cerrarModalSugerenciasTecnologia()" class="px-5 py-2 text-sm bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">Cerrar</button>
@@ -304,5 +319,12 @@
     window.cerrarModalSugerenciasTecnologiaFondo = function(event) {
         if (event.target.id === "modal-sugerencias-tecnologia") { cerrarModalSugerenciasTecnologia(); }
     };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('sugerencia') === 'tecnologia') {
+            abrirModalSugerenciasTecnologia();
+        }
+    });
 </script>
 @endsection

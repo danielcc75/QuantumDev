@@ -39,7 +39,10 @@ class HabilidadAdminController extends Controller
         
         $habilidadesBlandas = HabilidadBlanda::orderBy('nombre')->get();
 
-        return view('admin.habilidades.index', compact('habilidades', 'categorias', 'habilidadPopular', 'habilidadesBlandas'));
+        $sugerenciasCategoria = \App\Models\Sugerencia::with('usuario')->where('tipo', 'categoria')->orderBy('created_at', 'desc')->get();
+        $sugerenciasHabilidadBlanda = \App\Models\Sugerencia::with('usuario')->where('tipo', 'habilidad_blanda')->orderBy('created_at', 'desc')->get();
+
+        return view('admin.habilidades.index', compact('habilidades', 'categorias', 'habilidadPopular', 'habilidadesBlandas', 'sugerenciasCategoria', 'sugerenciasHabilidadBlanda'));
     }
         
     // Ver detalle de una habilidad técnica

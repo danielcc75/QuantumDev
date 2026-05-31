@@ -285,15 +285,52 @@ document.addEventListener('DOMContentLoaded', function() {
     window.cerrarModalSugerirCategoriaFondo = function (event) {
         if (event.target.id === 'modal-sugerir-categoria') { cerrarModalSugerirCategoria(); }
     };
-    window.enviarSugerenciaCategoria = function () {
+    window.enviarSugerenciaCategoria = async function () {
         const tituloEl = document.getElementById('sugerir_titulo');
         const descripcionEl = document.getElementById('sugerir_descripcion');
         const titulo = tituloEl ? tituloEl.value.trim() : '';
         const descripcion = descripcionEl ? descripcionEl.value.trim() : '';
         if (!titulo) { alert('El título es obligatorio.'); return; }
         if (!descripcion) { alert('La descripción es obligatoria.'); return; }
-        cerrarModalSugerirCategoria();
-        alert('Sugerencia enviada correctamente. ¡Gracias!');
+        
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const resp = await fetch('/sugerencias', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ tipo: 'categoria', titulo, descripcion })
+            });
+            const data = await resp.json();
+            if(resp.ok) {
+                cerrarModalSugerirCategoria();
+                if (typeof window.confirmar === 'function') {
+                    window.confirmar({
+                        tipo:           'success',
+                        titulo:         '¡Sugerencia Enviada!',
+                        mensaje:        data.message || 'Tu sugerencia se ha enviado correctamente. ¡Gracias!',
+                        icon:           'fas fa-check-circle',
+                        iconBg:         'bg-green-50',
+                        iconColor:      'text-green-500',
+                        btnClass:       'bg-green-500 hover:bg-green-600',
+                        textoConfirmar: 'OK',
+                        soloConfirmar:  true,
+                    });
+                    setTimeout(() => { if(typeof window.cerrarConfirmar === 'function') window.cerrarConfirmar(); }, 2500);
+                } else if (typeof window.Toastify === 'function') {
+                    window.Toastify({ text: data.message || "Sugerencia enviada correctamente. ¡Gracias!", duration: 3000, close: true, gravity: "top", position: "right", style: { background: "#4caf50" } }).showToast();
+                } else {
+                    alert(data.message || 'Sugerencia enviada correctamente. ¡Gracias!');
+                }
+            } else {
+                alert(data.error || 'Ocurrió un error al enviar la sugerencia.');
+            }
+        } catch (error) {
+            alert('Error de conexión al enviar la sugerencia.');
+        }
     };
 });
 </script>

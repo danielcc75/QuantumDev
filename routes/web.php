@@ -118,6 +118,11 @@ Route::put('/cuenta/portafolio/publicar', [PortafolioController::class, 'publica
 Route::post('/cuenta/portafolio/preview', [PortafolioController::class, 'preview'])->name('cuenta.portafolio.preview');
 Route::put('/cuenta/desactivar',  [CuentaController::class, 'desactivar'])->name('cuenta.desactivar');
 
+// =========================
+// SUGERENCIAS
+// =========================
+Route::post('/sugerencias', [\App\Http\Controllers\SugerenciaController::class, 'store'])->name('sugerencias.store');
+
 // ============================================================
 // PANEL DE ADMINISTRADOR (todas las funcionalidades)
 // ============================================================
@@ -137,6 +142,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     
     // Dashboard principal
     Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/sugerencias/{tipo}', [\App\Http\Controllers\SugerenciaController::class, 'verSugerenciasAdmin'])->name('admin.sugerencias.ver');
     
     // ========================================
     // 1. GESTIÓN DE USUARIOS

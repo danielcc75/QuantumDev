@@ -15,13 +15,19 @@ class ViewComposerServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
             $esAdmin = false;
             $usuarioId = session('usuario_id');
+            $sugerenciasSinLeer = collect();
 
             if ($usuarioId) {
                 $usuario = Usuario::find($usuarioId);
                 $esAdmin = $usuario && $usuario->is_admin;
+                
+                if ($esAdmin && Schema::hasTable('sugerencias')) {
+                    $sugerenciasSinLeer = \App\Models\Sugerencia::with('usuario')->where('leida', false)->orderBy('created_at', 'desc')->get();
+                }
             }
 
             $view->with('esAdmin', $esAdmin);
+            $view->with('sugerenciasSinLeer', $sugerenciasSinLeer);
 
             $configSitio = null;
             if (Schema::hasTable('configuracion_sitio')) {
