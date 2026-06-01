@@ -8,7 +8,7 @@ use App\Models\PerfilLink;
 use App\Models\Educacion;
 use App\Models\ExperienciaLaboral;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Storage;
 class PerfilWebController extends Controller
 {
     public function ver()
@@ -167,5 +167,67 @@ class PerfilWebController extends Controller
         ]);
 
         return response()->json(['success' => true, 'message' => 'Perfil actualizado correctamente']);
+    }
+    public function actualizarFoto(Request $request)
+    {
+        try {
+            if (!session('usuario_id')) {
+                return response()->json(['success' => false, 'message' => 'No autenticado'], 401);
+            }
+
+            $request->validate([
+                'foto' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+            ]);
+            
+            $usuario = Usuario::find(session('usuario_id'));
+            $perfil = $usuario->perfil;
+            
+            if (!$perfil) {
+                $perfil = Perfil::create(['id_usuario' => $usuario->id_usuario]);
+            }
+            
+            if ($request->hasFile('foto')) {
+                $file = $request->file('foto');
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                
+                // Guardar directamente en public/perfil-fotos
+                $destinationPath = public_path('perfil-fotos');
+                
+                // Crear carpeta si no existe
+                if (!file_exists($destinationPath)) {
+                    mkdir($destinationPath, 0777, true);
+                }
+                
+                $file->move($destinationPath, $filename);
+                
+                // Eliminar foto anterior si existe
+                if ($perfil->foto_perfil) {
+                    $oldPath = public_path(str_replace('/storage/', '', str_replace('/perfil-fotos/', 'perfil-fotos/', $perfil->foto_perfil)));
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
+                }
+                
+                $perfil->foto_perfil = asset('perfil-fotos/' . $filename);
+                $perfil->save();
+                
+                return response()->json([
+                    'success' => true,
+                    'foto_url' => $perfil->foto_perfil,
+                    'message' => 'Foto actualizada correctamente'
+                ]);
+            }
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'No se recibió ninguna imagen'
+            ], 400);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

@@ -52,96 +52,29 @@
                 </button>
 
 
-                <!-- campana -->
-                @php
-                    $novedadesHeader        = $novedades ?? collect();
-                    $perfilHeader           = $usuario->perfil ?? null;
-                    $portafolioOcultoHdr    = $perfilHeader && !$perfilHeader->visible;
-                    $notaModeracionHdr      = $perfilHeader->moderation_note ?? null;
-                    $proyectosOcultosModHdr = $proyectosOcultosMod ?? collect();
-                    $habilidadesOcultasModHdr = $habilidadesOcultasMod ?? collect();
-                    $avisoModeracionHdr     = $portafolioOcultoHdr || $notaModeracionHdr;
-                    $hayAvisosHdr           = $avisoModeracionHdr || $proyectosOcultosModHdr->isNotEmpty() || $habilidadesOcultasModHdr->isNotEmpty();
-                    $totalNotificaciones    = $novedadesHeader->count()
-                                            + ($avisoModeracionHdr ? 1 : 0)
-                                            + $proyectosOcultosModHdr->count()
-                                            + $habilidadesOcultasModHdr->count();
-                @endphp
-                <div class="relative dropdown">
-                    <button class="text-gray-500 hover:text-[#1e3a5f] focus:outline-none transition-colors relative">
+                <!-- Campana de notificaciones con dropdown -->
+<div class="relative" id="notificaciones-dropdown">
+    <button id="btn-notificaciones" class="text-gray-500 hover:text-[#1e3a5f] relative focus:outline-none">
                         <i class="fas fa-bell text-xl"></i>
-                        @if($totalNotificaciones > 0)
-                            <span id="badge-notificaciones"
-                                  class="absolute -top-1 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 bg-[#e11d48] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                                {{ $totalNotificaciones > 9 ? '9+' : $totalNotificaciones }}
-                            </span>
-                        @else
-                            <span id="badge-notificaciones" class="hidden"></span>
-                        @endif
-                    </button>
-                    <div class="dropdown-menu hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-100 z-30">
-                        <div class="p-3 border-b border-gray-100 flex items-center justify-between">
-                            <p class="font-semibold text-[#1e3a5f]">Notificaciones</p>
-                            @if($novedadesHeader->isNotEmpty())
-                                <button type="button"
-                                        id="btn-marcar-novedades-vistas-header"
-                                        class="text-xs text-blue-600 hover:underline">
-                                    Marcar leídas
+        <span id="notificaciones-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 hidden">0</span>
                                 </button>
-                            @endif
-                        </div>
-                        <div class="max-h-96 overflow-y-auto" id="contenedor-notificaciones-header">
-                            @if($portafolioOcultoHdr)
-                                <div class="p-3 bg-red-50 border-b border-gray-100">
-                                    <p class="text-sm font-medium text-red-800">
-                                        <i class="fas fa-eye-slash mr-1"></i> Tu portafolio fue ocultado
-                                    </p>
-                                    @if($notaModeracionHdr)
-                                        <p class="text-xs text-red-700 mt-1">{{ $notaModeracionHdr }}</p>
-                                    @endif
+    
+    <!-- Dropdown -->
+    <div id="notificaciones-menu" 
+         class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 hidden overflow-hidden">
+        
+        <div class="bg-[#1e3a5f] text-white px-4 py-3 flex justify-between items-center">
+            <h3 class="font-semibold">Notificaciones</h3>
+            <a href="{{ route('notifications.index') }}" class="text-xs text-blue-200 hover:text-white">
+                Ver todas
+            </a>
                                 </div>
-                            @elseif($notaModeracionHdr)
-                                <div class="p-3 bg-yellow-50 border-b border-gray-100">
-                                    <p class="text-sm font-medium text-yellow-800">
-                                        <i class="fas fa-exclamation-triangle mr-1"></i> Aviso del administrador
-                                    </p>
-                                    <p class="text-xs text-yellow-700 mt-1">{{ $notaModeracionHdr }}</p>
+        
+        <div id="notificaciones-lista" class="max-h-96 overflow-y-auto">
+            <div class="p-6 text-center">
+                <i class="fas fa-spinner fa-spin text-gray-400 text-2xl"></i>
+                <p class="text-gray-500 text-sm mt-2">Cargando...</p>
                                 </div>
-                            @endif
-
-                            @foreach($proyectosOcultosModHdr as $proyOcultoH)
-                                <div class="p-3 bg-orange-50 border-b border-gray-100">
-                                    <p class="text-sm font-medium text-orange-800">
-                                        <i class="fas fa-folder-minus mr-1"></i> Proyecto oculto: «{{ $proyOcultoH->nombre }}»
-                                    </p>
-                                    <p class="text-xs text-orange-700 mt-1"><span class="font-semibold">Motivo:</span> {{ $proyOcultoH->moderation_note }}</p>
-                                </div>
-                            @endforeach
-
-                            @foreach($habilidadesOcultasModHdr as $habOcultaH)
-                                <div class="p-3 bg-orange-50 border-b border-gray-100">
-                                    <p class="text-sm font-medium text-orange-800">
-                                        <i class="fas fa-code mr-1"></i> Habilidad oculta: «{{ $habOcultaH->nombre }}»
-                                    </p>
-                                    <p class="text-xs text-orange-700 mt-1"><span class="font-semibold">Motivo:</span> {{ $habOcultaH->moderation_note }}</p>
-                                </div>
-                            @endforeach
-
-                            @forelse($novedadesHeader as $novedad)
-                                <div class="p-3 hover:bg-gray-50 border-b border-gray-100 novedad-item-header"
-                                     data-tipo="{{ $novedad['tipo'] }}"
-                                     data-id="{{ $novedad['id_entidad'] }}">
-                                    <p class="text-sm text-gray-800">
-                                        <i class="{{ $novedad['icono'] }} {{ $novedad['color'] }} mr-1 text-xs"></i>
-                                        {{ $novedad['titulo'] }}
-                                    </p>
-                                    <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($novedad['created_at'])->diffForHumans() }}</p>
-                                </div>
-                            @empty
-                                @unless($hayAvisosHdr)
-                                    <p class="p-4 text-xs text-gray-500 italic text-center">Sin notificaciones</p>
-                                @endunless
-                            @endforelse
                         </div>
                     </div>
                 </div>

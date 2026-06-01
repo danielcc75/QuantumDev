@@ -1,10 +1,29 @@
-@extends('layouts.app')
-
-@section('content')
-<div class="max-w-4xl mx-auto">
+<!-- ======================================== -->
+<!-- MODAL PARA EDITAR USUARIO (edit.blade.php) -->
+<!-- ======================================== -->
+<div id="modalEditarUsuario" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh] overflow-y-auto">
+        
+        <!-- Header del modal -->
+        <div class="bg-[#1e3a5f] px-6 py-4 rounded-t-2xl sticky top-0 z-10">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-bold text-white">
+                        <i class="fas fa-edit mr-2"></i> Editar Usuario
+                    </h2>
+                    <p class="text-blue-200 text-sm">Modifica la información del usuario</p>
+                </div>
+                <button type="button" onclick="cerrarModalEditarUsuario()" class="text-white hover:text-gray-200 transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Contenido del modal -->
+        <div class="p-6">
     
-    <!-- Botón volver -->
-    <div class="mb-4">
+            <!-- Botón volver (oculto en el modal) -->
+            <div class="mb-4 hidden">
         <a href="{{ route('admin.usuarios') }}" class="text-[#1e3a5f] hover:text-[#152c47] inline-flex items-center gap-2">
             <i class="fas fa-arrow-left"></i>
             <span>Volver a usuarios</span>
@@ -15,7 +34,7 @@
     <h1 class="text-2xl font-bold text-gray-800 mb-6">Editar Usuario</h1>
 
     <!-- Formulario principal -->
-    <form action="{{ route('admin.usuarios.update', $usuario->id_usuario) }}" method="POST">
+            <form id="formEditarUsuario" action="{{ route('admin.usuarios.update', $usuario->id_usuario) }}" method="POST">
         @csrf
         @method('PUT')
 
@@ -107,7 +126,7 @@
                         <input type="password" name="contrasenia"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
                             placeholder="Dejar en blanco para mantener la actual">
-                        <p class="text-xs text-gray-400 mt-1">Mínimo 8 caracteres, una mayúscula, un número</p>
+                                <p class="text-xs text-gray-400 mt-1">Mínimo 6 caracteres</p>
                     </div>
                 </div>
 
@@ -142,10 +161,10 @@
 
         <!-- Botones de acción -->
         <div class="mt-6 flex justify-end gap-3">
-            <a href="{{ route('admin.usuarios') }}" 
+                    <button type="button" onclick="cerrarModalEditarUsuario()" 
                 class="px-5 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition">
                 Cancelar
-            </a>
+                    </button>
             <button type="submit" 
                 class="px-5 py-2 bg-[#1e3a5f] hover:bg-[#152c47] text-white rounded-lg transition flex items-center gap-2">
                 <i class="fas fa-save"></i>
@@ -153,5 +172,7 @@
             </button>
         </div>
     </form>
+            
+        </div>
+    </div>
 </div>
-@endsection

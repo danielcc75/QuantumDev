@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Traits\LogsActivity;
 use App\Models\Tecnologia;
 use Illuminate\Http\Request;
+use App\Models\Notification;
+use App\Models\Usuario;
 
 class TecnologiaAdminController extends Controller
 {
@@ -68,6 +70,18 @@ class TecnologiaAdminController extends Controller
         ]);
 
         $this->logAdminAction('tecnologia_creada', "Tecnología: «{$tecnologia->nombre}» | Categoría: {$tecnologia->categoria}");
+        $usuarios = Usuario::all();
+        foreach ($usuarios as $usuario) {
+            Notification::create([
+                'id_usuario' => $usuario->id_usuario,
+                'titulo' => 'Nueva tecnología disponible',
+                'mensaje' => "Se ha agregado una nueva tecnología: {$tecnologia->nombre} ({$tecnologia->categoria})",
+                'tipo' => 'info',
+                'icono' => 'fa-microchip',
+                'url' => route('dashboard') . '?seccion=proyectos',
+                'leido' => false
+            ]);
+        }
         return back()->with('success', 'Tecnología creada correctamente');
     }
 

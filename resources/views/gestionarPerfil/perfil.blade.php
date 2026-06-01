@@ -25,8 +25,11 @@
             <!-- Cabecera del perfil -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 md:p-8 mb-6">
                 <div class="flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-6">
+                    
+                    <!-- Foto con botón de cambio (como Facebook) -->
+                    <div class="flex-shrink-0 relative group">
                     <!-- Foto -->
-                    <div id="perfil-foto-container" class="flex-shrink-0">
+                        <div id="perfil-foto-container">
                         @if($fotoUrl)
                             <img src="{{ $fotoUrl }}" alt="Foto de perfil" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-blue-100">
                         @else
@@ -34,6 +37,18 @@
                                 <span class="text-white text-3xl sm:text-4xl font-bold">{{ substr($usuario->nombre ?? 'U', 0, 1) }}{{ substr($usuario->apellido ?? 'S', 0, 1) }}</span>
                             </div>
                         @endif
+                    </div>
+
+                        <!-- Botón de cámara que aparece al hacer hover (como Facebook) -->
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            <button type="button" onclick="document.getElementById('input-foto-perfil').click()" 
+                                class="bg-black/60 hover:bg-black/80 text-white rounded-full p-2 sm:p-3 transition-colors backdrop-blur-sm">
+                                <i class="fas fa-camera text-sm sm:text-base"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Input oculto para seleccionar archivo -->
+                        <input type="file" id="input-foto-perfil" accept="image/*" class="hidden" onchange="subirFotoPerfil(this)">
                     </div>
 
                     <!-- Información principal -->
@@ -91,9 +106,17 @@
                     </div>
                 </div>
                 
+                <!-- Barra de progreso para la foto -->
+                <div id="progress-foto-container" class="hidden mt-4">
+                    <div class="bg-gray-200 rounded-full h-1.5 w-full max-w-md mx-auto">
+                        <div id="progress-foto-bar" class="bg-[#1e3a5f] h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 text-center mt-1">Subiendo foto...</p>
+                </div>
+                
                 <!-- Botón Editar Perfil -->
                 <div class="flex justify-end mt-6 pt-4 border-t border-gray-100">
-                    <button onclick="abrirModalPerfil()" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg shadow hover:shadow-lg transition-all flex items-center space-x-2">
+                    <button onclick="abrirModalPerfil()" class="px-4 py-2 bg-[#1e3a5f] text-white rounded-lg hover:bg-[#152c47] transition-colors">
                         <i class="fas fa-edit"></i>
                         <span>Editar Perfil</span>
                     </button>
@@ -271,6 +294,131 @@
                 seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
+        
+        // Función para subir foto de perfil (como Facebook)
+        function subirFotoPerfil(input) {
+        if (!input.files || !input.files[0]) return;
+        
+        const file = input.files[0];
+        
+        // Validar tipo de archivo
+        if (!file.type.startsWith('image/')) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Por favor, selecciona una imagen válida (JPG, PNG, GIF)',
+                confirmButtonColor: '#1e3a5f'
+            });
+            input.value = '';
+            return;
+        }
+        
+        // Validar tamaño (máximo 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'La imagen no debe superar los 2MB',
+                confirmButtonColor: '#1e3a5f'
+            });
+            input.value = '';
+            return;
+        }
+        
+        // Mostrar preview temporal
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const fotoContainer = document.getElementById('perfil-foto-container');
+            fotoContainer.innerHTML = `<img src="${e.target.result}" alt="Foto de perfil" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-blue-100">`;
+        };
+        reader.readAsDataURL(file);
+        
+        // Mostrar barra de progreso
+        const progressContainer = document.getElementById('progress-foto-container');
+        const progressBar = document.getElementById('progress-foto-bar');
+        progressContainer.classList.remove('hidden');
+        progressBar.style.width = '0%';
+        
+        // Simular progreso
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 10;
+            if (progress <= 90) {
+                progressBar.style.width = progress + '%';
+            }
+        }, 100);
+        
+        // Subir al servidor
+        const formData = new FormData();
+        formData.append('foto', file);
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+        
+        fetch('/perfil/actualizar-foto', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            clearInterval(interval);
+            progressBar.style.width = '100%';
+            
+            if (data.success) {
+                // 1. Actualizar foto en el contenido principal (perfil)
+                const fotoContainer = document.getElementById('perfil-foto-container');
+                fotoContainer.innerHTML = `<img src="${data.foto_url}?t=${Date.now()}" alt="Foto de perfil" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-blue-100">`;
+                
+                // 2. Actualizar avatar en el HEADER (nuevo)
+                const headerAvatar = document.getElementById('header-avatar');
+                if (headerAvatar) {
+                    let img = headerAvatar.querySelector('img');
+                    if (img) {
+                        // Ya existe imagen, solo cambiar src
+                        img.src = data.foto_url + '?t=' + Date.now();
+                    } else {
+                        // Era el span con iniciales, reemplazar por imagen
+                        headerAvatar.innerHTML = `<img src="${data.foto_url}?t=${Date.now()}" alt="Foto perfil" class="w-10 h-10 rounded-full object-cover shadow-md">`;
+                    }
+                }
+                
+                // 3. Actualizar foto en el modal de edición si existe
+                const modalFoto = document.querySelector('#modal-editar-perfil #foto-perfil-actual');
+                if (modalFoto) {
+                    modalFoto.innerHTML = `<img src="${data.foto_url}?t=${Date.now()}" alt="Foto de perfil" class="w-full h-full object-cover">`;
+                }
+                
+                setTimeout(() => {
+                    progressContainer.classList.add('hidden');
+                }, 1000);
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Foto actualizada!',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            } else {
+                throw new Error(data.message || 'Error al subir la foto');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            clearInterval(interval);
+            progressContainer.classList.add('hidden');
+            
+            // Recargar la foto original
+            location.reload();
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo subir la imagen. Intenta nuevamente.',
+                confirmButtonColor: '#d33'
+            });
+        });
+    }
         </script>
     </main>
 </div>

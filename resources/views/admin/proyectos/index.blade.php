@@ -111,20 +111,25 @@
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex space-x-2">
-                                <a href="{{ route('admin.proyectos.show', $proyecto->id_proyecto) }}"
-                                   class="text-blue-600 bg-blue-100 hover:bg-blue-200 p-2 rounded-lg">Ver</a>
+                                <!-- Ver - Abre el modal de ver proyecto -->
+                                <button type="button" onclick="abrirModalVerProyecto({{ $proyecto->id_proyecto }})" 
+                                    class="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 p-2 rounded-lg transition" 
+                                    title="Ver proyecto">
+                                    <i class="fas fa-eye"></i>
+                                </button>
 
+                                <!-- Ocultar/Mostrar - Abre modal para motivo (solo para ocultar) -->
                                 @if($proyecto->visible)
                                     <button type="button"
-                                        onclick="abrirModalOcultarProyecto({{ $proyecto->id_proyecto }}, {!! Js::from($proyecto->nombre) !!})"
+                                        onclick="abrirModalOcultarProyecto({{ $proyecto->id_proyecto }}, '{{ addslashes($proyecto->nombre) }}')"
                                         class="text-orange-600 bg-orange-100 hover:bg-orange-200 p-2 rounded-lg">
-                                        Ocultar
+                                        <i class="fas fa-eye-slash"></i>
                                     </button>
                                 @else
-                                    <form action="{{ route('admin.proyectos.toggle-visibilidad', $proyecto->id_proyecto) }}" method="POST">
+                                    <form action="{{ route('admin.proyectos.toggle-visibilidad', $proyecto->id_proyecto) }}" method="POST" class="inline">
                                         @csrf
-                                        <button type="submit" class="text-green-700 bg-green-100 hover:bg-green-200 p-2 rounded-lg">
-                                            Mostrar
+                                        <button type="submit" class="text-green-700 bg-green-100 hover:bg-green-200 p-2 rounded-lg" title="Mostrar proyecto">
+                                            <i class="fas fa-eye"></i>
                                         </button>
                                     </form>
                                 @endif
@@ -147,11 +152,13 @@
     </div>
 </div>
 
-{{-- Modal: motivo para ocultar proyecto --}}
-<div id="modalOcultarProyecto" class="fixed inset-0 z-[80] hidden bg-black/50 backdrop-blur-sm" onclick="cerrarModalOcultarProyectoFondo(event)">
-    <div class="min-h-full flex items-center justify-center p-4">
+<!-- Incluir el modal de ver proyecto -->
+@include('admin.proyectos.show')
+
+<!-- Modal: motivo para ocultar proyecto -->
+<div id="modalOcultarProyecto" class="fixed inset-0 z-[80] hidden bg-black/50 backdrop-blur-sm items-center justify-center" onclick="cerrarModalOcultarProyectoFondo(event)">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden" onclick="event.stopPropagation()">
-            <div class="bg-gradient-to-r from-[#1e3a5f] to-[#e11d48] px-6 py-4 flex items-center justify-between">
+        <div class="bg-gradient-to-r from-[#1e3a5f] to-[#1e3a5f] px-6 py-4 flex items-center justify-between">
                 <h3 class="text-white font-bold text-lg">
                     <i class="fas fa-eye-slash mr-2"></i> Ocultar proyecto
                 </h3>
@@ -196,6 +203,40 @@
 </div>
 
 <script>
+    // ========================================
+    // FUNCIONES PARA EL MODAL DE VER PROYECTO
+    // ========================================
+    
+    // Esta función necesita que cargues el proyecto específico
+    // Si ya tienes el proyecto en la variable $proyecto en el modal, usa esta versión:
+    function abrirModalVerProyecto(proyectoId) {
+        const modal = document.getElementById('modalVerProyecto');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+        
+        // Si necesitas cargar los datos vía AJAX, descomenta esto:
+        /*
+        fetch(`/admin/proyectos/${proyectoId}/json`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Actualizar el contenido del modal con los datos
+                actualizarModalProyecto(data.proyecto);
+            }
+        });
+        */
+    }
+    
+    // ========================================
+    // FUNCIONES PARA EL MODAL DE OCULTAR PROYECTO
+    // ========================================
+    
     const __modalOcultarProyecto = document.getElementById('modalOcultarProyecto');
     const __formOcultarProyecto  = document.getElementById('formOcultarProyecto');
     const __motivoProyectoInput  = document.getElementById('modalOcultarProyectoMotivo');
@@ -208,12 +249,14 @@
         __motivoProyectoError.classList.add('hidden');
         __motivoProyectoError.textContent = '';
         __modalOcultarProyecto.classList.remove('hidden');
+        __modalOcultarProyecto.style.display = 'flex';
         document.body.style.overflow = 'hidden';
         setTimeout(() => __motivoProyectoInput.focus(), 50);
     }
 
     function cerrarModalOcultarProyecto() {
         __modalOcultarProyecto.classList.add('hidden');
+        __modalOcultarProyecto.style.display = 'none';
         document.body.style.overflow = '';
     }
 
@@ -230,10 +273,23 @@
         }
     });
 
+    // Cerrar modales con ESC
     document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && !__modalOcultarProyecto.classList.contains('hidden')) {
+        if (e.key === 'Escape') {
+            if (!__modalOcultarProyecto.classList.contains('hidden')) {
             cerrarModalOcultarProyecto();
+            }
+            const modalProyecto = document.getElementById('modalVerProyecto');
+            if (modalProyecto && !modalProyecto.classList.contains('hidden')) {
+                cerrarModalVerProyecto();
+            }
         }
     });
 </script>
+
+<style>
+    #modalOcultarProyecto {
+        display: none;
+    }
+</style>
 @endsection

@@ -7,11 +7,13 @@ use App\Traits\LogsActivity;
 use App\Models\Proyecto;
 use App\Models\Usuario;
 use App\Models\Perfil;
+use App\Models\Notification; // Agrega esta línea
 use Illuminate\Http\Request;
 
 class ProyectoAdminController extends Controller
 {
     use LogsActivity;
+    
     // Listar todos los proyectos del sistema
     public function index(Request $request)
     {
@@ -62,32 +64,77 @@ class ProyectoAdminController extends Controller
         return view('admin.proyectos.show', compact('proyecto'));
     }
     
-    // Cambiar visibilidad (ocultar/mostrar)
     public function toggleVisibilidad(Request $request, $id)
     {
-        $proyecto = Proyecto::findOrFail($id);
-
-        // Si va a ocultar, exige un motivo y lo guarda
+        $proyecto = Proyecto::with('perfil.usuario')->findOrFail($id);
+        
+        // Ocultar proyecto (si está visible)
         if ($proyecto->visible) {
+            // Validar motivo
             $request->validate([
                 'motivo' => 'required|string|max:500',
             ], [
                 'motivo.required' => 'Debes indicar el motivo para ocultar el proyecto.',
             ]);
+            
+            // Guardar motivo y ocultar
             $proyecto->moderation_note = $request->motivo;
-        } else {
-            // Al volver a mostrarlo, limpiamos el motivo anterior
+            $proyecto->visible = false;
+            $proyecto->save();
+            
+            // Enviar notificación al usuario dueño del proyecto
+            $usuario = $proyecto->perfil->usuario;
+            if ($usuario) {
+                Notification::create([
+                    'id_usuario' => $usuario->id_usuario,  // ← CORREGIDO
+                    'tipo' => 'warning',
+                    'titulo' => 'Tu proyecto ha sido ocultado',
+                    'mensaje' => "Tu proyecto \"{$proyecto->nombre}\" ha sido ocultado por el administrador.\n\nMotivo: {$request->motivo}\n\nPor favor, revisa el contenido y realiza los ajustes necesarios para que pueda ser visible nuevamente.",
+                    'url' => route('proyectos.show', $proyecto->id_proyecto),
+                    'leido' => false
+                ]);
+            }
+            
+            $this->logAdminAction('proyecto_visibilidad_cambiada', "Proyecto «{$proyecto->nombre}» (ID {$proyecto->id_proyecto}) ocultado | Motivo: {$proyecto->moderation_note}");
+            
+            $mensaje = 'Proyecto ocultado correctamente. El usuario ha sido notificado.';
+        } 
+        // Mostrar proyecto (si está oculto)
+        else {
             $proyecto->moderation_note = null;
+            $proyecto->visible = true;
+            $proyecto->save();
+            
+            // Enviar notificación al usuario dueño del proyecto
+            $usuario = $proyecto->perfil->usuario;
+            if ($usuario) {
+                Notification::create([
+                    'id_usuario' => $usuario->id_usuario,  // ← CORREGIDO
+                    'tipo' => 'success',
+                    'titulo' => 'Tu proyecto ha sido restaurado',
+                    'mensaje' => "Tu proyecto \"{$proyecto->nombre}\" ha sido restaurado y ahora es visible públicamente nuevamente.",
+                    'url' => route('proyectos.show', $proyecto->id_proyecto),
+                    'leido' => false
+                ]);
+            }
+            
+            $this->logAdminAction('proyecto_visibilidad_cambiada', "Proyecto «{$proyecto->nombre}» (ID {$proyecto->id_proyecto}) visible nuevamente");
+            
+            $mensaje = 'Proyecto visible nuevamente. El usuario ha sido notificado.';
         }
-
-        $proyecto->visible = !$proyecto->visible;
-        $proyecto->save();
-
-        $estado = $proyecto->visible ? 'visible' : 'oculto';
-        $this->logAdminAction('proyecto_visibilidad_cambiada', "Proyecto «{$proyecto->nombre}» (ID {$proyecto->id_proyecto}) marcado como {$estado}" . (!$proyecto->visible && $proyecto->moderation_note ? " | Motivo: {$proyecto->moderation_note}" : ''));
-        return back()->with('success', "Proyecto ahora está {$estado} al público");
+        
+        // Si es una petición AJAX (desde el modal)
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $mensaje,
+                'visible' => $proyecto->visible
+            ]);
+        }
+        
+        return redirect()->route('admin.proyectos')->with('success', $mensaje);
     }
-    
+        
     // Eliminar proyecto (deshabilitado)
     public function destroy($id)
     {

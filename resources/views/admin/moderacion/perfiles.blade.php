@@ -20,7 +20,7 @@
                 <option value="visible" {{ request('visible') == 'visible' ? 'selected' : '' }}>Visibles</option>
                 <option value="oculto" {{ request('visible') == 'oculto' ? 'selected' : '' }}>Ocultos</option>
             </select>
-            <button type="submit" class="bg-blue-600 text-white px-4 py-1 rounded-lg text-sm">Filtrar</button>
+            <button type="submit" class="bg-[#1e3a5f] hover:bg-[#152c47] text-white font-semibold px-4 py-1 rounded-lg text-sm">Filtrar</button>
         </form>
     </div>
     
@@ -123,7 +123,7 @@
 <div id="modalOcultar" class="fixed inset-0 z-[80] hidden bg-black/50 backdrop-blur-sm" onclick="cerrarModalOcultarFondo(event)">
     <div class="min-h-full flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden" onclick="event.stopPropagation()">
-            <div class="bg-gradient-to-r from-[#1e3a5f] to-[#e11d48] px-6 py-4 flex items-center justify-between">
+            <div class="bg-[#1e3a5f] hover:bg-[#152c47] text-white font-semibold px-6 py-4 flex items-center justify-between">
                 <h3 class="text-white font-bold text-lg">
                     <i class="fas fa-eye-slash mr-2"></i> Ocultar portafolio
                 </h3>

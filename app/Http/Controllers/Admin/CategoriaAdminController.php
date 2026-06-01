@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Traits\LogsActivity;
 use App\Models\Categoria;
 use Illuminate\Http\Request;
+use App\Models\Notification;
+use App\Models\Usuario;
 
 class CategoriaAdminController extends Controller
 {
@@ -26,6 +28,19 @@ class CategoriaAdminController extends Controller
         $categoria = Categoria::create($validated);
 
         $this->logAdminAction('categoria_creada', "Categoría: {$categoria->nombre}");
+
+        $usuarios = Usuario::all();
+        foreach ($usuarios as $usuario) {
+            Notification::create([
+                'id_usuario' => $usuario->id_usuario,
+                'titulo' => 'Nueva categoría disponible',
+                'mensaje' => "Se ha agregado una nueva categoría: {$categoria->nombre}",
+                'tipo' => 'info',
+                'icono' => 'fa-tags',
+                'url' => route('dashboard') . '?seccion=habilidades',
+                'leido' => false
+            ]);
+        }
 
         return back()->with('success', 'Categoría creada correctamente');
     }

@@ -127,6 +127,11 @@ class UsuarioAdminController extends Controller
         $usuario->telefono = $request->telefono;
         $usuario->is_admin = $request->is_admin ?? false;
         
+        // Actualizar estado si viene en la solicitud
+        if ($request->has('estado')) {
+            $usuario->estado = $request->estado;
+        }
+        
         if ($request->filled('contrasenia')) {
             $usuario->contrasenia = Hash::make($request->contrasenia);
         }
@@ -141,8 +146,40 @@ class UsuarioAdminController extends Controller
             "Usuario ID {$usuario->id_usuario} | Antes: {$datosAntiguos} | Después: {$datosNuevos}"
         );
         
+        // Verificar si es una petición AJAX
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Usuario actualizado correctamente',
+                'usuario' => $usuario
+            ]);
+        }
+        
         return redirect()->route('admin.usuarios')
             ->with('success', 'Usuario actualizado correctamente');
+    }
+    public function showJson($id)
+    {
+        try {
+            $usuario = User::with([
+                'perfil.experienciasLaborales',
+                'perfil.proyectos',
+                'perfil.habilidades.categoria',
+                'perfil.habilidadesBlandas',
+                'perfil.formacionAcademica',
+                'perfil.links'
+            ])->findOrFail($id);
+            
+            return response()->json([
+                'success' => true,
+                'usuario' => $usuario
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Usuario no encontrado'
+            ], 404);
+        }
     }
     
     // Cambiar estado (activar/suspender)
@@ -209,6 +246,16 @@ class UsuarioAdminController extends Controller
     public function destroy(Request $request, $id)
     {
         return back()->with('error', 'La eliminación de cuentas está deshabilitada. Usa "Suspender" para bloquear el acceso del usuario.');
+    }
+    
+    public function listadoSimple()
+    {
+        $usuarios = \App\Models\Usuario::all(['id_usuario', 'nombre', 'apellido', 'correo_electronico']);
+        
+        return response()->json([
+            'success' => true,
+            'usuarios' => $usuarios
+        ]);
     }
 
 }

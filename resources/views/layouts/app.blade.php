@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Portfolio Digital - @yield('title', 'Admin Panel')</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -234,6 +235,10 @@
                         <i class="fas fa-trash-alt w-5 h-5 mr-3 {{ request()->routeIs('admin.papelera*') ? 'text-white' : 'text-gray-500' }}"></i>
                         <span class="font-medium">Papelera</span>
                     </a>
+                    <a href="{{ route('admin.notifications') }}" class="flex items-center px-6 py-3 text-gray-700 transition-all sidebar-item {{ request()->routeIs('admin.notifications*') ? 'bg-[#1e3a5f] text-white' : '' }}">
+                        <i class="fas fa-bell mr-3 {{ request()->routeIs('admin.notifications*') ? 'text-white' : 'text-gray-500' }}"></i>
+                        <span class="font-medium">Notificaciones</span>
+                    </a>
                     <a href="{{ route('admin.configuracion') }}" class="flex items-center px-6 py-3 text-gray-700 transition-all sidebar-item {{ request()->routeIs('admin.configuracion*') ? 'bg-[#1e3a5f] text-white' : '' }}">
                         <i class="fas fa-cog w-5 h-5 mr-3 {{ request()->routeIs('admin.configuracion*') ? 'text-white' : 'text-gray-500' }}"></i>
                         <span class="font-medium">Configuración</span>
@@ -412,5 +417,161 @@
         }
         @endif
     </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+    function marcarLeida(id, url) {
+        fetch('{{ route("notifications.marcar-leida") }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: id })
+        }).then(() => {
+            if (url) {
+                window.location.href = url;
+            } else {
+                location.reload();
+            }
+        });
+    }
+</script>
+<script>
+    // Función para subir foto de perfil 
+    function subirFotoPerfil(input) {
+        if (!input.files || !input.files[0]) return;
+        
+        const file = input.files[0];
+        
+        // Validar tipo de archivo
+        if (!file.type.startsWith('image/')) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Por favor, selecciona una imagen válida (JPG, PNG, GIF)',
+                confirmButtonColor: '#1e3a5f'
+            });
+            input.value = '';
+            return;
+        }
+        
+        // Validar tamaño (máximo 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'La imagen no debe superar los 2MB',
+                confirmButtonColor: '#1e3a5f'
+            });
+            input.value = '';
+            return;
+        }
+        
+        // Mostrar preview temporal
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const fotoContainer = document.getElementById('perfil-foto-container');
+            if (fotoContainer) {
+                fotoContainer.innerHTML = `<img src="${e.target.result}" alt="Foto de perfil" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-blue-100">`;
+            }
+        };
+        reader.readAsDataURL(file);
+        
+        // Mostrar barra de progreso
+        const progressContainer = document.getElementById('progress-foto-container');
+        const progressBar = document.getElementById('progress-foto-bar');
+        if (progressContainer) {
+            progressContainer.classList.remove('hidden');
+        }
+        if (progressBar) {
+            progressBar.style.width = '0%';
+        }
+        
+        // Simular progreso
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 10;
+            if (progress <= 90 && progressBar) {
+                progressBar.style.width = progress + '%';
+            }
+        }, 100);
+        
+        // Subir al servidor
+        const formData = new FormData();
+        formData.append('foto', file);
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+        
+        fetch('/perfil/actualizar-foto', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            clearInterval(interval);
+            if (progressBar) {
+                progressBar.style.width = '100%';
+            }
+            
+            if (data.success) {
+                // Actualizar con la foto real del servidor
+                const fotoContainer = document.getElementById('perfil-foto-container');
+                if (fotoContainer) {
+                    fotoContainer.innerHTML = `<img src="${data.foto_url}" alt="Foto de perfil" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-blue-100">`;
+                }
+                setTimeout(() => {
+                    if (progressContainer) {
+                        progressContainer.classList.add('hidden');
+                    }
+                }, 1000);
+                
+                // También actualizar en el modal de edición si existe
+                const modalFoto = document.querySelector('#modal-editar-perfil #foto-perfil-actual');
+                if (modalFoto) {
+                    modalFoto.innerHTML = `<img src="${data.foto_url}?t=${Date.now()}" alt="Foto de perfil" class="w-full h-full object-cover">`;
+                }
+                
+                // Actualizar foto en el header
+                const headerFoto = document.querySelector('header .dropdown button img');
+                if (headerFoto) {
+                    headerFoto.src = data.foto_url + '?t=' + Date.now();
+                } else {
+                    const headerSpan = document.querySelector('header .dropdown button span.w-10.h-10');
+                    if (headerSpan && headerSpan.classList.contains('bg-gradient-to-br')) {
+                        headerSpan.outerHTML = `<img src="${data.foto_url}?t=${Date.now()}" alt="Foto perfil" class="w-10 h-10 rounded-full object-cover shadow-md">`;
+                    }
+                }
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Foto actualizada!',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            } else {
+                throw new Error(data.message || 'Error al subir la foto');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            clearInterval(interval);
+            if (progressContainer) {
+                progressContainer.classList.add('hidden');
+            }
+            
+            // Recargar la foto original
+            location.reload();
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo subir la imagen. Intenta nuevamente.',
+                confirmButtonColor: '#d33'
+            });
+        });
+    }
+</script>
 </body>
 </html>
