@@ -26,13 +26,13 @@
         {{-- Encabezado --}}
         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6 md:mb-8">
             <div>
-                <h2 class="text-2xl md:text-3xl font-bold text-[#1e3a5f]">Formación Académica</h2>
-                <p class="text-sm text-gray-500 mt-1">Administra tu historial educativo y controla lo que muestras al mundo</p>
+                <h2 class="text-2xl md:text-3xl font-bold text-[#1e3a5f]">{{ __('general.formacion.titulo') }}</h2>
+                <p class="text-sm text-gray-500 mt-1">{{ __('general.formacion.subtitulo') }}</p>
                 <div class="mt-2 h-1 w-16 rounded-full bg-[#e11d48]"></div>
             </div>
             <button onclick="abrirModalEducacion()"
                 class="inline-flex items-center justify-center gap-2 bg-[#1e3a5f] hover:bg-[#e11d48] text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors duration-200 self-start sm:self-auto">
-                <i class="fas fa-plus text-xs"></i> Nueva Formación
+                <i class="fas fa-plus text-xs"></i> {{ __('general.formacion.btn_nueva') }}
             </button>
         </div>
 
@@ -42,37 +42,37 @@
             {{-- Total --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 border-l-4 border-l-[#1e3a5f]">
                 <div class="flex justify-between items-start mb-3">
-                    <p class="text-sm text-gray-500 font-medium">Total Formaciones</p>
+                    <p class="text-sm text-gray-500 font-medium">{{ __('general.formacion.stat_total') }}</p>
                     <div class="w-9 h-9 rounded-xl bg-[#1e3a5f]/8 flex items-center justify-center">
                         <i class="fas fa-graduation-cap text-[#1e3a5f] text-sm"></i>
                     </div>
                 </div>
                 <p id="stat-edu-total" class="text-4xl font-bold text-[#1e3a5f]">{{ $totalEdu }}</p>
-                <p class="text-xs text-gray-400 mt-1">Todas las registradas</p>
+                <p class="text-xs text-gray-400 mt-1">{{ __('general.formacion.stat_total_desc') }}</p>
             </div>
 
             {{-- En curso --}}
             <div class="bg-[#1e3a5f]/5 rounded-2xl border border-[#1e3a5f]/15 shadow-sm p-6 border-l-4 border-l-[#1e3a5f]">
                 <div class="flex justify-between items-start mb-3">
-                    <p class="text-sm text-[#1e3a5f] font-semibold">En Curso</p>
+                    <p class="text-sm text-[#1e3a5f] font-semibold">{{ __('general.formacion.stat_en_curso') }}</p>
                     <div class="w-9 h-9 rounded-xl bg-[#1e3a5f]/10 flex items-center justify-center">
                         <i class="fas fa-spinner text-[#1e3a5f] text-sm"></i>
                     </div>
                 </div>
                 <p id="stat-edu-en-curso" class="text-4xl font-bold text-[#1e3a5f]">{{ $enCursoEdu }}</p>
-                <p class="text-xs text-[#1e3a5f]/60 mt-1">Actualmente estudiando</p>
+                <p class="text-xs text-[#1e3a5f]/60 mt-1">{{ __('general.formacion.stat_en_curso_desc') }}</p>
             </div>
 
             {{-- Completadas --}}
             <div class="bg-red-50 rounded-2xl border border-red-100 shadow-sm p-6 border-l-4 border-l-[#e11d48]">
                 <div class="flex justify-between items-start mb-3">
-                    <p class="text-sm text-[#e11d48] font-semibold">Completadas</p>
+                    <p class="text-sm text-[#e11d48] font-semibold">{{ __('general.formacion.stat_completadas') }}</p>
                     <div class="w-9 h-9 rounded-xl bg-[#e11d48]/10 flex items-center justify-center">
                         <i class="fas fa-check-circle text-[#e11d48] text-sm"></i>
                     </div>
                 </div>
                 <p id="stat-edu-completada" class="text-4xl font-bold text-[#1e3a5f]">{{ $completadasEdu }}</p>
-                <p class="text-xs text-[#e11d48]/70 mt-1">Formaciones finalizadas</p>
+                <p class="text-xs text-[#e11d48]/70 mt-1">{{ __('general.formacion.stat_compl_desc') }}</p>
             </div>
         </div>
 
@@ -81,11 +81,11 @@
             <div class="w-16 h-16 rounded-full bg-[#1e3a5f]/8 flex items-center justify-center mx-auto mb-4">
                 <i class="fas fa-graduation-cap text-3xl text-[#1e3a5f]/40"></i>
             </div>
-            <p class="text-gray-600 font-semibold">No tienes formaciones registradas aún</p>
-            <p class="text-xs text-gray-400 mt-1 mb-4">Comienza agregando tu primera formación académica</p>
+            <p class="text-gray-600 font-semibold">{{ __('general.formacion.vacio_titulo') }}</p>
+            <p class="text-xs text-gray-400 mt-1 mb-4">{{ __('general.formacion.vacio_subtitulo') }}</p>
             <button onclick="abrirModalEducacion()"
                 class="inline-flex items-center gap-2 text-sm bg-[#1e3a5f] hover:bg-[#e11d48] text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium">
-                <i class="fas fa-plus text-xs"></i> Agregar primera formación
+                <i class="fas fa-plus text-xs"></i> {{ __('general.formacion.vacio_btn') }}
             </button>
         </div>
 
@@ -126,11 +126,11 @@
                 <div class="flex items-center text-xs text-gray-400 gap-1.5">
                     <i class="fas fa-calendar-alt text-[#1e3a5f]/50"></i>
                     <span>
-                        {{ \Carbon\Carbon::parse($edu->fecha_ini)->format('M Y') }} –
+                        {{ \Carbon\Carbon::parse($edu->fecha_ini)->locale(app()->getLocale())->isoFormat('MMM YYYY') }} –
                         @if($enCurso)
-                            <span class="text-green-600 font-medium">En curso</span>
+                            <span class="text-green-600 font-medium">{{ __('general.formacion.badge_en_curso') }}</span>
                         @else
-                            {{ \Carbon\Carbon::parse($edu->fecha_fin)->format('M Y') }}
+                            {{ \Carbon\Carbon::parse($edu->fecha_fin)->locale(app()->getLocale())->isoFormat('MMM YYYY') }}
                         @endif
                     </span>
                 </div>
@@ -144,11 +144,11 @@
                 <div class="flex gap-2 pt-2 border-t border-gray-100 mt-auto">
                     <button onclick='abrirModalEditarEducacion(@json($edu))'
                         class="flex-1 flex items-center justify-center gap-1.5 text-xs border border-[#1e3a5f]/30 text-[#1e3a5f] hover:bg-[#1e3a5f]/5 px-3 py-1.5 rounded-lg transition">
-                        <i class="fas fa-pencil-alt"></i> Editar
+                        <i class="fas fa-pencil-alt"></i> {{ __('general.common.editar') }}
                     </button>
                     <button onclick="confirmarEliminarEducacion({{ $edu->id_formacion }})"
                         class="flex-1 flex items-center justify-center gap-1.5 text-xs bg-[#e11d48] hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition">
-                        <i class="fas fa-trash"></i> Eliminar
+                        <i class="fas fa-trash"></i> {{ __('general.common.eliminar') }}
                     </button>
                 </div>
             </div>

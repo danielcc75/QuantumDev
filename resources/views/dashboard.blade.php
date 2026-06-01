@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,7 +29,11 @@
         if ($perfilIdDash && DB::table('habilidades')->where('id_perfil', $perfilIdDash)->whereNull('deleted_at')->exists()) $progreso += 10; // habilidades
 
         $progresoColor = $progreso < 40 ? '#e11d48' : ($progreso < 75 ? '#f59e0b' : '#1e3a5f');
-        $progresoLabel = $progreso < 40 ? 'Perfil incompleto' : ($progreso < 75 ? 'Perfil en progreso' : 'Perfil casi completo');
+        $progresoLabel = $progreso < 40
+            ? __('general.dashboard.shell.progreso_baja')
+            : ($progreso < 75
+                ? __('general.dashboard.shell.progreso_media')
+                : __('general.dashboard.shell.progreso_alta'));
 
         $visibilidadDash = $perfilDash->visibilidad ?? 'privado';
     @endphp
@@ -77,42 +81,42 @@
             </button>
             <nav class="mt-6 pb-6">
                 <div class="px-4 mb-2">
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Submenu</p>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ __('general.dashboard.shell.submenu') }}</p>
                 </div>
 
                 <a href="#" data-seccion="resumen" class="seccion-link flex items-center px-6 py-3 text-gray-700 transition-all">
                     <i class="fas fa-chart-pie w-5 h-5 mr-3 text-gray-500"></i>
-                    <span class="font-medium">Resumen general</span>
+                    <span class="font-medium">{{ __('general.dashboard.shell.resumen') }}</span>
                 </a>
 
                 <a href="#" data-seccion="perfil" class="seccion-link flex items-center px-6 py-3 text-gray-700 transition-all">
                     <i class="fas fa-user-circle w-5 h-5 mr-3 text-gray-500"></i>
-                    <span class="font-medium">Mi perfil</span>
+                    <span class="font-medium">{{ __('general.dashboard.shell.mi_perfil') }}</span>
                 </a>
 
                 <a href="#" data-seccion="habilidades" class="seccion-link flex items-center px-6 py-3 text-gray-700 transition-all">
                     <i class="fas fa-code w-5 h-5 mr-3 text-gray-500"></i>
-                    <span class="font-medium">Mis Habilidades</span>
+                    <span class="font-medium">{{ __('general.dashboard.shell.habilidades') }}</span>
                 </a>
 
                 <a href="#" data-seccion="experiencia" class="seccion-link flex items-center px-6 py-3 text-gray-700 transition-all">
                     <i class="fas fa-briefcase w-5 h-5 mr-3 text-gray-500"></i>
-                    <span class="font-medium">Experiencia Laboral</span>
+                    <span class="font-medium">{{ __('general.dashboard.shell.experiencia') }}</span>
                 </a>
 
                 <a href="#" data-seccion="formacion" class="seccion-link flex items-center px-6 py-3 text-gray-700 transition-all">
                     <i class="fas fa-graduation-cap w-5 h-5 mr-3 text-gray-500"></i>
-                    <span class="font-medium">Formación Académica</span>
+                    <span class="font-medium">{{ __('general.dashboard.shell.formacion') }}</span>
                 </a>
 
                 <a href="#" data-seccion="proyectos" class="seccion-link flex items-center px-6 py-3 text-gray-700 transition-all">
                     <i class="fas fa-folder-open w-5 h-5 mr-3 text-gray-500"></i>
-                    <span class="font-medium">Mis Proyectos</span>
+                    <span class="font-medium">{{ __('general.dashboard.shell.proyectos') }}</span>
                 </a>
 
                 <a href="#" data-seccion="publicar" class="seccion-link flex items-center px-6 py-3 text-gray-700 transition-all">
                     <i class="fas fa-globe w-5 h-5 mr-3 text-gray-500"></i>
-                    <span class="font-medium">Publicar Portafolio</span>
+                    <span class="font-medium">{{ __('general.dashboard.shell.publicar') }}</span>
                 </a>
 
             </nav>

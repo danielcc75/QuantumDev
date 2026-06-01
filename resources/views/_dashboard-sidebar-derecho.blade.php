@@ -14,63 +14,65 @@
                      data-hoy="{{ \Carbon\Carbon::now()->toDateString() }}"
                      data-endpoint="{{ route('calendario.eventos') }}">
                     <div class="flex justify-between items-center mb-3">
-                        <button type="button" id="cal-prev" class="w-7 h-7 rounded-full hover:bg-gray-200 text-gray-600 flex items-center justify-center" aria-label="Mes anterior">
+                        <button type="button" id="cal-prev" class="w-7 h-7 rounded-full hover:bg-gray-200 text-gray-600 flex items-center justify-center" aria-label="{{ __('general.dashboard.sidebar.mes_anterior') }}">
                             <i class="fas fa-chevron-left text-xs"></i>
                         </button>
                         <h3 class="font-semibold text-gray-800 text-sm" id="cal-titulo">—</h3>
-                        <button type="button" id="cal-next" class="w-7 h-7 rounded-full hover:bg-gray-200 text-gray-600 flex items-center justify-center" aria-label="Mes siguiente">
+                        <button type="button" id="cal-next" class="w-7 h-7 rounded-full hover:bg-gray-200 text-gray-600 flex items-center justify-center" aria-label="{{ __('general.dashboard.sidebar.mes_siguiente') }}">
                             <i class="fas fa-chevron-right text-xs"></i>
                         </button>
                     </div>
                     <div class="grid grid-cols-7 gap-1 text-center text-xs text-gray-500 font-medium mb-1">
-                        <div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div><div>D</div>
+                        @foreach (__('general.dashboard.sidebar.dias_iniciales') as $dia)
+                            <div>{{ $dia }}</div>
+                        @endforeach
                     </div>
                     <div id="cal-grid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
 
                     <div id="cal-panel-eventos" class="mt-4 pt-3 border-t border-gray-200">
-                        <p class="text-xs font-medium text-gray-700 mb-2" id="cal-panel-titulo">Eventos del día</p>
+                        <p class="text-xs font-medium text-gray-700 mb-2" id="cal-panel-titulo">{{ __('general.dashboard.sidebar.eventos_dia') }}</p>
                         <div id="cal-panel-lista" class="space-y-2 max-h-56 overflow-y-auto">
-                            <p class="text-xs text-gray-400 italic">Selecciona un día para ver sus eventos.</p>
+                            <p class="text-xs text-gray-400 italic">{{ __('general.dashboard.sidebar.selecciona_dia') }}</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="bg-gray-50 rounded-xl p-4 right-sidebar-item">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-semibold text-gray-800">Notificaciones y novedades</h3>
+                        <h3 class="font-semibold text-gray-800">{{ __('general.dashboard.sidebar.notificaciones_novedades') }}</h3>
                             <button type="button"
                                     id="btn-marcar-novedades-vistas"
                                 class="text-xs text-blue-600 hover:underline hidden">
-                                Marcar leídas
+                                {{ __('general.dashboard.sidebar.marcar_leidas') }}
                             </button>
                     </div>
                     <div class="space-y-3" id="contenedor-novedades">
                         <div class="text-center py-4" id="novedades-loading">
                             <i class="fas fa-spinner fa-spin text-gray-400"></i>
-                            <p class="text-xs text-gray-500 mt-1">Cargando...</p>
+                            <p class="text-xs text-gray-500 mt-1">{{ __('general.dashboard.sidebar.cargando') }}</p>
                             </div>
                     </div>
                 </div>
 
                 <div class="bg-gray-50 rounded-xl p-4 right-sidebar-item">
-                    <h3 class="font-semibold text-gray-800 mb-3">Enlaces rápidos</h3>
+                    <h3 class="font-semibold text-gray-800 mb-3">{{ __('general.dashboard.sidebar.enlaces_rapidos') }}</h3>
                     <ul class="space-y-2 text-sm">
                         <li>
                             <a href="#" class="text-blue-600 hover:underline flex items-center">
                                 <i class="fas fa-external-link-alt mr-2 text-xs"></i>
-                                Mi portafolio público
+                                {{ __('general.dashboard.sidebar.mi_portafolio_publico') }}
                             </a>
                         </li>
                         <li>
                             <a href="#" class="text-blue-600 hover:underline flex items-center">
                                 <i class="fas fa-bookmark mr-2 text-xs"></i>
-                                Artículos guardados
+                                {{ __('general.dashboard.sidebar.articulos_guardados') }}
                             </a>
                         </li>
                         <li>
                             <a href="#" class="text-blue-600 hover:underline flex items-center">
                                 <i class="fas fa-bullhorn mr-2 text-xs"></i>
-                                Novedades del sistema
+                                {{ __('general.dashboard.sidebar.novedades_sistema') }}
                             </a>
                         </li>
                     </ul>
@@ -107,7 +109,7 @@ function cargarNovedades() {
         }
         
         if (!data.novedades || data.novedades.length === 0) {
-            container.innerHTML = '<p class="text-xs text-gray-500 italic">No hay novedades recientes.</p>';
+            container.innerHTML = `<p class="text-xs text-gray-500 italic">${__t('js.dashboard.sin_novedades')}</p>`;
             if (btnMarcar) btnMarcar.classList.add('hidden');
             return;
         }
@@ -135,7 +137,7 @@ function cargarNovedades() {
                      data-url="${novedad.url || ''}">
                     <i class="${novedad.icono || 'fas fa-bell'} ${novedad.color || 'text-gray-500'} mt-1 text-sm"></i>
                     <div class="flex-1">
-                        <p class="font-medium text-gray-800 text-sm">${escapeHtml(novedad.titulo || 'Sin título')}</p>
+                        <p class="font-medium text-gray-800 text-sm">${escapeHtml(novedad.titulo || __t('js.dashboard.sin_titulo'))}</p>
                         <p class="text-xs text-gray-500">${escapeHtml(novedad.detalle || '')}</p>
                     </div>
                     ${novedad.tipo === 'notificacion' && !novedad.leido ? '<span class="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2"></span>' : ''}
@@ -175,7 +177,7 @@ function cargarNovedades() {
     .catch(error => {
         console.error('Error:', error);
         if (loadingDiv) loadingDiv.style.display = 'none';
-        container.innerHTML = '<p class="text-xs text-red-500 italic">Error al cargar novedades</p>';
+        container.innerHTML = `<p class="text-xs text-red-500 italic">${__t('js.dashboard.error_novedades')}</p>`;
     });
 }
 

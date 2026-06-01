@@ -25,7 +25,7 @@
                     <input
                         id="buscador-global"
                         type="text"
-                        placeholder="Buscar proyectos..."
+                        placeholder="{{ __('general.dashboard.shell.buscar_placeholder') }}"
                         class="bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none w-full"
                     >
                     <button id="buscador-clear" onclick="limpiarBusqueda()" class="hidden text-gray-400 hover:text-gray-600 transition">
@@ -66,16 +66,16 @@
          class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 hidden overflow-hidden">
         
         <div class="bg-[#1e3a5f] text-white px-4 py-3 flex justify-between items-center">
-            <h3 class="font-semibold">Notificaciones</h3>
+            <h3 class="font-semibold">{{ __('general.dashboard.header.notificaciones') }}</h3>
             <a href="{{ route('notifications.index') }}" class="text-xs text-blue-200 hover:text-white">
-                Ver todas
+                {{ __('general.dashboard.header.ver_todas') }}
             </a>
                                 </div>
-        
+
         <div id="notificaciones-lista" class="max-h-96 overflow-y-auto">
             <div class="p-6 text-center">
                 <i class="fas fa-spinner fa-spin text-gray-400 text-2xl"></i>
-                <p class="text-gray-500 text-sm mt-2">Cargando...</p>
+                <p class="text-gray-500 text-sm mt-2">{{ __('general.dashboard.header.cargando') }}</p>
                                 </div>
                         </div>
                     </div>
@@ -90,7 +90,7 @@
 
                         <span id="header-avatar" class="block">
                             @if($fotoPerfilHeader)
-                                <img src="{{ $fotoPerfilHeader }}" alt="Foto perfil" class="w-10 h-10 rounded-full object-cover shadow-md">
+                                <img src="{{ $fotoPerfilHeader }}" alt="{{ __('general.dashboard.shell.foto_perfil_alt') }}" class="w-10 h-10 rounded-full object-cover shadow-md">
                             @else
                                 <span class="w-10 h-10 bg-gradient-to-br from-[#1e3a5f] to-indigo-600 rounded-full flex items-center justify-center shadow-md">
                                     <span class="text-white text-sm font-bold">{{ $iniciales }}</span>
@@ -104,16 +104,16 @@
 
                     <div class="dropdown-menu hidden absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-lg border border-gray-100 z-30">
                         <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <i class="fas fa-user mr-2"></i> Mi perfil
+                            <i class="fas fa-user mr-2"></i> {{ __('general.dashboard.header.mi_perfil') }}
                         </a>
                         <a href="#" onclick="irAConfiguracionCuenta(); return false;" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <i class="fas fa-cog mr-2"></i> Configuración
+                            <i class="fas fa-cog mr-2"></i> {{ __('general.dashboard.header.configuracion') }}
                         </a>
                         <div class="border-t border-gray-100"></div>
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
                             <button type="submit" class="w-full text-left px-4 py-2 text-sm text-[#e11d48] hover:bg-gray-100">
-                                <i class="fas fa-sign-out-alt mr-2"></i> Cerrar sesion
+                                <i class="fas fa-sign-out-alt mr-2"></i> {{ __('general.dashboard.header.cerrar_sesion') }}
                             </button>
                         </form>
                     </div>
@@ -140,7 +140,7 @@
         <div id="buscador-mobile-wrapper" class="md:hidden hidden px-4 pb-3">
             <div class="flex items-center bg-gray-100 rounded-xl px-4 py-2 gap-2">
                 <i class="fas fa-search text-gray-400 text-sm"></i>
-                <input id="buscador-global-mobile" type="text" placeholder="Buscar proyectos..."
+                <input id="buscador-global-mobile" type="text" placeholder="{{ __('general.dashboard.shell.buscar_placeholder') }}"
                     class="bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none w-full">
             </div>
         </div>

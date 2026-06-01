@@ -247,7 +247,7 @@
                 resultadosPanel.innerHTML = `
                     <div class="px-4 py-6 text-center text-sm text-gray-400">
                         <i class="fas fa-search mb-2 block text-lg"></i>
-                        Sin resultados para "<strong>${q}</strong>"
+                        ${__t('js.dashboard.sin_resultados', { q: `<strong>${q}</strong>` })}
                     </div>`;
             } else {
                 matches.forEach(card => {
@@ -319,7 +319,7 @@
                 if (contSide && !contSide.querySelector('div')) {
                     const vacio = document.createElement('p');
                     vacio.className = 'text-xs text-gray-500 italic';
-                    vacio.textContent = 'No hay novedades recientes.';
+                    vacio.textContent = __t('js.dashboard.sin_novedades');
                     contSide.appendChild(vacio);
                 }
 
@@ -328,7 +328,7 @@
                 if (contHdr && !contHdr.querySelector('div')) {
                     const vacio = document.createElement('p');
                     vacio.className = 'p-4 text-xs text-gray-500 italic text-center';
-                    vacio.textContent = 'Sin notificaciones';
+                    vacio.textContent = __t('js.dashboard.sin_notificaciones');
                     contHdr.appendChild(vacio);
                 }
 
@@ -369,7 +369,10 @@
             const btnPrev = document.getElementById('cal-prev');
             const btnNext = document.getElementById('cal-next');
 
-            const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            const MESES = (window.__lang?.js?.dashboard?.meses_capital)
+                || ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            const MESES_MIN = (window.__lang?.js?.dashboard?.meses)
+                || MESES.map(m => m.toLowerCase());
             const hoy = parseFecha(hoyStr);
             let mesVisible = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
             let diaSeleccionado = formatearFecha(hoy);
@@ -387,7 +390,11 @@
             }
             function formatearLargoEsp(str) {
                 const d = parseFecha(str);
-                return `${d.getDate()} de ${MESES[d.getMonth()].toLowerCase()} de ${d.getFullYear()}`;
+                return __t('js.dashboard.fecha_larga', {
+                    dia:  d.getDate(),
+                    mes:  MESES_MIN[d.getMonth()] || MESES[d.getMonth()].toLowerCase(),
+                    anio: d.getFullYear(),
+                });
             }
 
             async function cargarMes() {
@@ -451,11 +458,11 @@
             }
 
             function renderizarPanel(fechaStr) {
-                panelTitulo.textContent = `Eventos · ${formatearLargoEsp(fechaStr)}`;
+                panelTitulo.textContent = __t('js.dashboard.eventos_de', { fecha: formatearLargoEsp(fechaStr) });
                 const eventos = eventosCache[fechaStr] || [];
 
                 if (!eventos.length) {
-                    panelLista.innerHTML = '<p class="text-xs text-gray-400 italic">Sin eventos ese día.</p>';
+                    panelLista.innerHTML = `<p class="text-xs text-gray-400 italic">${__t('js.dashboard.sin_eventos')}</p>`;
                     return;
                 }
 
@@ -521,7 +528,7 @@ function cargarNotificaciones() {
                 lista.innerHTML = `
                     <div class="p-6 text-center">
                         <i class="fas fa-bell-slash text-gray-300 text-3xl mb-2"></i>
-                        <p class="text-gray-500 text-sm">No hay notificaciones</p>
+                        <p class="text-gray-500 text-sm">${__t('js.dashboard.no_notificaciones')}</p>
                     </div>
                 `;
             } else {

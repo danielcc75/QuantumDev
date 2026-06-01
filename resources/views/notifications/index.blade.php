@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Portfolio Digital - Mis Notificaciones</title>
+    <title>{{ __('general.dashboard.notifications.titulo_browser') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -29,7 +29,11 @@
         if ($perfilIdDash && DB::table('habilidades')->where('id_perfil', $perfilIdDash)->whereNull('deleted_at')->exists()) $progreso += 10;
 
         $progresoColor = $progreso < 40 ? '#e11d48' : ($progreso < 75 ? '#f59e0b' : '#1e3a5f');
-        $progresoLabel = $progreso < 40 ? 'Perfil incompleto' : ($progreso < 75 ? 'Perfil en progreso' : 'Perfil casi completo');
+        $progresoLabel = $progreso < 40
+            ? __('general.dashboard.shell.progreso_baja')
+            : ($progreso < 75
+                ? __('general.dashboard.shell.progreso_media')
+                : __('general.dashboard.shell.progreso_alta'));
 
         $visibilidadDash = $perfilDash->visibilidad ?? 'privado';
     @endphp
@@ -54,37 +58,37 @@
             </button>
             <nav class="mt-6 pb-6">
                 <div class="px-4 mb-2">
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Submenu</p>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ __('general.dashboard.shell.submenu') }}</p>
                 </div>
 
                 <a href="{{ route('dashboard') }}" class="flex items-center px-6 py-3 text-gray-700 transition-all">
                     <i class="fas fa-chart-pie w-5 h-5 mr-3 text-gray-500"></i>
-                    <span class="font-medium">Resumen general</span>
+                    <span class="font-medium">{{ __('general.dashboard.shell.resumen') }}</span>
                 </a>
 
                 <a href="{{ route('dashboard') }}?seccion=perfil" class="flex items-center px-6 py-3 text-gray-700 transition-all">
                     <i class="fas fa-user-circle w-5 h-5 mr-3 text-gray-500"></i>
-                    <span class="font-medium">Mi perfil</span>
+                    <span class="font-medium">{{ __('general.dashboard.shell.mi_perfil') }}</span>
                 </a>
 
                 <a href="{{ route('dashboard') }}?seccion=habilidades" class="flex items-center px-6 py-3 text-gray-700 transition-all">
                     <i class="fas fa-code w-5 h-5 mr-3 text-gray-500"></i>
-                    <span class="font-medium">Mis Habilidades</span>
+                    <span class="font-medium">{{ __('general.dashboard.shell.habilidades') }}</span>
                 </a>
 
                 <a href="{{ route('dashboard') }}?seccion=experiencia" class="flex items-center px-6 py-3 text-gray-700 transition-all">
                     <i class="fas fa-briefcase w-5 h-5 mr-3 text-gray-500"></i>
-                    <span class="font-medium">Experiencia Laboral</span>
+                    <span class="font-medium">{{ __('general.dashboard.shell.experiencia') }}</span>
                 </a>
 
                 <a href="{{ route('dashboard') }}?seccion=formacion" class="flex items-center px-6 py-3 text-gray-700 transition-all">
                     <i class="fas fa-graduation-cap w-5 h-5 mr-3 text-gray-500"></i>
-                    <span class="font-medium">Formación Académica</span>
+                    <span class="font-medium">{{ __('general.dashboard.shell.formacion') }}</span>
                 </a>
 
                 <a href="{{ route('dashboard') }}?seccion=proyectos" class="flex items-center px-6 py-3 text-gray-700 transition-all">
                     <i class="fas fa-folder-open w-5 h-5 mr-3 text-gray-500"></i>
-                    <span class="font-medium">Mis Proyectos</span>
+                    <span class="font-medium">{{ __('general.dashboard.shell.proyectos') }}</span>
                 </a>
             </nav>
         </aside>
@@ -92,19 +96,19 @@
         <!-- contenido central -->
         <div class="flex-1 min-w-0 order-2 lg:order-none p-6">
             <div class="max-w-3xl mx-auto">
-                
+
                 <div class="bg-white rounded-xl shadow-md p-6 mb-6">
                     <div class="flex justify-between items-center">
                         <div>
                             <h1 class="text-2xl font-bold text-gray-800">
                                 <i class="fas fa-bell text-[#1e3a5f] mr-2"></i>
-                                Mis Notificaciones
+                                {{ __('general.dashboard.notifications.titulo_pagina') }}
                             </h1>
                             <p class="text-gray-500 text-sm mt-1">
                                 @if($noLeidas > 0)
-                                    Tienes <strong class="text-red-500">{{ $noLeidas }}</strong> notificaciones no leídas
+                                    {!! __('general.dashboard.notifications.no_leidas', ['n' => '<strong class="text-red-500">' . $noLeidas . '</strong>']) !!}
                                 @else
-                                    No tienes notificaciones pendientes
+                                    {{ __('general.dashboard.notifications.sin_pendientes') }}
                                 @endif
                             </p>
                         </div>
@@ -112,21 +116,21 @@
                             <form action="{{ route('notifications.marcar-todas') }}" method="POST">
                                 @csrf
                                 <button type="submit" class="text-sm bg-gray-100 px-3 py-1 rounded-lg hover:bg-gray-200">
-                                    Marcar todas como leídas
+                                    {{ __('general.dashboard.notifications.marcar_todas') }}
                                 </button>
                             </form>
                         @endif
                     </div>
                 </div>
-                
+
                 @forelse($notificaciones as $notif)
-                    <div class="bg-white rounded-xl shadow-md p-4 mb-3 border-l-4 
+                    <div class="bg-white rounded-xl shadow-md p-4 mb-3 border-l-4
                         @if($notif->tipo == 'info') border-blue-500
                         @elseif($notif->tipo == 'success') border-green-500
                         @elseif($notif->tipo == 'warning') border-yellow-500
                         @else border-red-500 @endif
                         {{ !$notif->leido ? 'bg-blue-50' : '' }}">
-                        
+
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
                                 <div class="flex items-center gap-2 mb-1">
@@ -141,7 +145,7 @@
                                     @endif
                                     <h3 class="font-bold text-gray-800">{{ $notif->titulo }}</h3>
                                     @if(!$notif->leido)
-                                        <span class="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">Nueva</span>
+                                        <span class="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">{{ __('general.dashboard.notifications.badge_nueva') }}</span>
                                     @endif
                                 </div>
                                 <p class="text-gray-600 text-sm mb-2">{{ $notif->mensaje }}</p>
@@ -151,7 +155,7 @@
                                         <form action="{{ route('notifications.marcar', $notif->id_notification) }}" method="POST">
                                             @csrf
                                             <button type="submit" class="text-xs text-blue-500 hover:underline">
-                                                Marcar como leída
+                                                {{ __('general.dashboard.notifications.marcar_leida') }}
                                             </button>
                                         </form>
                                     @endif
@@ -167,11 +171,11 @@
                 @empty
                     <div class="bg-white rounded-xl shadow-md p-12 text-center">
                         <i class="fas fa-bell-slash text-gray-300 text-5xl mb-3"></i>
-                        <p class="text-gray-500 text-lg">No tienes notificaciones</p>
-                        <p class="text-gray-400 text-sm">Cuando recibas notificaciones aparecerán aquí</p>
+                        <p class="text-gray-500 text-lg">{{ __('general.dashboard.notifications.vacio_titulo') }}</p>
+                        <p class="text-gray-400 text-sm">{{ __('general.dashboard.notifications.vacio_subtitulo') }}</p>
                     </div>
                 @endforelse
-                
+
                 <div class="mt-4">
                     {{ $notificaciones->links() }}
                 </div>
@@ -182,6 +186,9 @@
         @include('_dashboard-sidebar-derecho')
 
     </div>
+
+    {{-- Bootstrap de traducciones para JS (debe ir antes de _dashboard-scripts) --}}
+    @include('partials._translations-bootstrap')
 
     @include('_dashboard-scripts')
 
