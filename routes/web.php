@@ -10,9 +10,17 @@ use App\Http\Controllers\AuthWebController;
 use App\Http\Controllers\NovedadesController;
 use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\PortafolioBuscadorController;
+use App\Http\Controllers\LocaleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NotificationController; 
+
+// =========================
+// LOCALE SWITCHER (MULTILINGUALIDAD)
+// =========================
+Route::get('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
+Route::get('/api/locales', [LocaleController::class, 'getAvailableLocales']);
+
 // =========================
 // HOME
 // =========================
@@ -287,4 +295,4 @@ Route::post('/notificaciones/marcar-todas', [NotificationController::class, 'mar
 
 // NOVEDADES (moderación, proyectos ocultos, etc)
 Route::get('/novedades/list', [NotificationController::class, 'obtenerNovedades'])->name('novedades.list');
-Route::post('/novedades/marcar-vista', [NotificationController::class, 'marcarNovedadVista'])->name('novedades.marcar-vista');  
+Route::post('/novedades/marcar-vista', [NotificationController::class, 'marcarNovedadVista'])->name('novedades.marcar-vista');
