@@ -17,14 +17,17 @@
 
             <!-- menu -->
             <nav class="hidden md:flex gap-8 text-gray-600">
-                <a href="#inicio" class="nav-link menu-link text-[#e11d48] font-bold transition">Inicio</a>
-                <a href="#como-funciona" class="nav-link menu-link hover:text-[#1e3a5f] transition">Como funciona</a>
-                <a href="#sobre-nosotros" class="nav-link menu-link hover:text-[#1e3a5f] transition">Sobre nosotros</a>
-                <a href="#explorar" class="nav-link menu-link hover:text-[#1e3a5f] transition">Explorar</a>
+                <a href="#inicio" class="nav-link menu-link text-[#e11d48] font-bold transition">{{ __('general.nav.inicio') }}</a>
+                <a href="#como-funciona" class="nav-link menu-link hover:text-[#1e3a5f] transition">{{ __('general.nav.como_funciona') }}</a>
+                <a href="#sobre-nosotros" class="nav-link menu-link hover:text-[#1e3a5f] transition">{{ __('general.nav.sobre_nosotros') }}</a>
+                <a href="#explorar" class="nav-link menu-link hover:text-[#1e3a5f] transition">{{ __('general.nav.explorar') }}</a>
             </nav>
 
             <!-- botones / usuario -->
             <div class="flex items-center gap-3">
+
+                <x-locale-switcher />
+
                 @if (session('usuario_id'))
 
                     @php
@@ -61,7 +64,7 @@
                         <div class="dropdown-menu hidden absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-lg border border-gray-100 z-40">
 
                             <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-user mr-2"></i> Mi dashboard
+                                <i class="fas fa-user mr-2"></i> {{ __('general.nav.mi_dashboard') }}
                             </a>
 
                             <div class="border-t border-gray-100"></div>
@@ -69,7 +72,7 @@
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
                                 <button type="submit" class="w-full text-left px-4 py-2 text-sm text-[#e11d48] hover:bg-gray-100">
-                                    <i class="fas fa-sign-out-alt mr-2"></i> Cerrar sesion
+                                    <i class="fas fa-sign-out-alt mr-2"></i> {{ __('general.nav.cerrar_sesion') }}
                                 </button>
                             </form>
 
@@ -78,10 +81,10 @@
 
                 @else
                     <a href="javascript:void(0)" onclick="abrirLogin()" class="border border-[#1e3a5f]/20 px-4 py-2 rounded-md text-[#1e3a5f] hover:bg-[#1e3a5f]/5 transition-all-soft hover-lift">
-                        Iniciar sesion
+                        {{ __('general.nav.iniciar_sesion') }}
                     </a>
                     <a href="javascript:void(0)" onclick="abrirRegister()" class="bg-[#1e3a5f] text-white px-4 py-2 rounded-md hover:bg-[#16304d] transition-all-soft hover-lift">
-                        Registrarse
+                        {{ __('general.nav.registrarse') }}
                     </a>
                 @endif
             </div>

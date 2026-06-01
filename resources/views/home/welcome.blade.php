@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -139,9 +139,7 @@
                 </div>
 
                 <p class="text-gray-600 mt-4 leading-relaxed">
-                    Una plataforma pensada para que estudiantes y desarrolladores puedan
-                    crear, organizar y compartir sus proyectos en un espacio profesional,
-                    claro y accesible.
+                    {{ __('general.home.hero.descripcion') }}
                 </p>
 
                 <!-- botones -->
@@ -149,18 +147,18 @@
                     @if (session('usuario_id'))
                         <a href="{{ route('dashboard') }}"
                         class="bg-[#1e3a5f] text-white px-6 py-3 rounded-md hover:bg-[#16304d] transition-all-soft hover-scale">
-                            Ir a mi portafolio
+                            {{ __('general.home.hero.cta_ir_portafolio') }}
                         </a>
                     @else
                         <a href="javascript:void(0)" onclick="abrirRegister()"
                         class="bg-[#1e3a5f] text-white px-6 py-3 rounded-md hover:bg-[#16304d] transition-all-soft hover-scale">
-                            Crea tu portafolio
+                            {{ __('general.home.hero.cta_crear_portafolio') }}
                         </a>
                     @endif
 
                     <a href="#explorar"
                        class="bg-gray-200 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-300 transition-all-soft hover-scale">
-                        Explorar proyectos
+                        {{ __('general.home.hero.cta_explorar') }}
                     </a>
                 </div>
 
@@ -168,15 +166,15 @@
                 <div class="flex gap-10 mt-10 text-[#1e3a5f] font-bold flex-wrap">
                     <div class="transition-all-soft hover-scale">
                         <p class="text-2xl">+5</p>
-                        <span class="text-gray-500 text-sm font-normal">Años de Experiencia</span>
+                        <span class="text-gray-500 text-sm font-normal">{{ __('general.home.hero.stats_anios') }}</span>
                     </div>
                     <div class="transition-all-soft hover-scale">
                         <p class="text-2xl">+40</p>
-                        <span class="text-gray-500 text-sm font-normal">Proyectos Entregados</span>
+                        <span class="text-gray-500 text-sm font-normal">{{ __('general.home.hero.stats_proyectos') }}</span>
                     </div>
                     <div class="transition-all-soft hover-scale">
                         <p class="text-2xl">100%</p>
-                        <span class="text-gray-500 text-sm font-normal">Satisfaccion</span>
+                        <span class="text-gray-500 text-sm font-normal">{{ __('general.home.hero.stats_satisfaccion') }}</span>
                     </div>
                 </div>
             </div>
@@ -190,10 +188,10 @@
                     <div class="w-3 h-3 bg-[#e11d48] rounded-full animate-pulse"></div>
                     <div>
                         <p class="text-sm font-semibold text-gray-800">
-                            Crea tu presencia profesional
+                            {{ __('general.home.hero.badge_titulo') }}
                         </p>
                         <span class="text-xs text-gray-500">
-                            Proyectos, habilidades y perfil en un solo lugar
+                            {{ __('general.home.hero.badge_subtitulo') }}
                         </span>
                     </div>
                 </div>
@@ -218,36 +216,40 @@
             <div>
                 <h2 class="font-bold text-lg">Portafolio Digital</h2>
                 <p class="text-sm mt-2 text-gray-300">
-                    {{ $configSitio?->descripcion ?? 'Construyendo espacios digitales donde estudiantes y desarrolladores puedan mostrar su talento de forma clara y profesional.' }}
+                    {{ __('general.home.footer.descripcion_default') }}
                 </p>
             </div>
 
             <div>
-                <h3 class="font-semibold mb-2">Enlaces</h3>
+                <h3 class="font-semibold mb-2">{{ __('general.home.footer.enlaces') }}</h3>
                 <ul class="text-gray-300 text-sm space-y-1">
-                    <li><a href="#inicio" class="hover:text-white transition-all-soft">Inicio</a></li>
-                    <li><a href="#explorar" class="hover:text-white transition-all-soft">Explorar</a></li>
-                    <li><a href="#como-funciona" class="hover:text-white transition-all-soft">Como funciona</a></li>
-                    <li><a href="#sobre-nosotros" class="hover:text-white transition-all-soft">Sobre nosotros</a></li>
+                    <li><a href="#inicio" class="hover:text-white transition-all-soft">{{ __('general.nav.inicio') }}</a></li>
+                    <li><a href="#explorar" class="hover:text-white transition-all-soft">{{ __('general.nav.explorar') }}</a></li>
+                    <li><a href="#como-funciona" class="hover:text-white transition-all-soft">{{ __('general.nav.como_funciona') }}</a></li>
+                    <li><a href="#sobre-nosotros" class="hover:text-white transition-all-soft">{{ __('general.nav.sobre_nosotros') }}</a></li>
                 </ul>
             </div>
 
             <div>
-                <h3 class="font-semibold mb-2">Contacto</h3>
+                <h3 class="font-semibold mb-2">{{ __('general.home.footer.contacto') }}</h3>
                 <p class="text-gray-300 text-sm">{{ $configSitio?->nombre_empresa ?? 'QuantumDev' }}</p>
-                <p class="text-gray-300 text-sm">Email: {{ $configSitio?->email_contacto ?? 'contacto@quantumdev.dev' }}</p>
-                <p class="text-gray-300 text-sm">Tel: {{ $configSitio?->telefono ?? '+591 700 123 456' }}</p>
+                <p class="text-gray-300 text-sm">{{ __('general.home.footer.email_label') }}: {{ $configSitio?->email_contacto ?? 'contacto@quantumdev.dev' }}</p>
+                <p class="text-gray-300 text-sm">{{ __('general.home.footer.tel_label') }}: {{ $configSitio?->telefono ?? '+591 700 123 456' }}</p>
             </div>
 
         </div>
 
         <div class="text-center text-gray-300 text-sm pb-4">
-            © 2026 Portafolio Digital. Todos los derechos reservados.
+            {{ __('general.home.footer.copyright', ['year' => date('Y')]) }}
         </div>
     </footer>
 
     @include('auth.login')
     @include('auth.register')
+
+    {{-- Bootstrap de traducciones para JS (debe ir antes de scripts-home) --}}
+    @include('partials._translations-bootstrap')
+
     @include('home.scripts-home')
 
     {{-- Modal global de confirmación (window.confirmar / data-confirm) --}}

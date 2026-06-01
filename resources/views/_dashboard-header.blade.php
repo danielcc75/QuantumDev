@@ -51,6 +51,8 @@
                     <i class="fas fa-calendar-alt text-lg"></i>
                 </button>
 
+                <!-- selector de idioma -->
+                <x-locale-switcher />
 
                 <!-- Campana de notificaciones con dropdown -->
 <div class="relative" id="notificaciones-dropdown">

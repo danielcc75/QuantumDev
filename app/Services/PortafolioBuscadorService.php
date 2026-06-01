@@ -207,7 +207,7 @@ class PortafolioBuscadorService
             ->where('publicado', true)
             ->whereNull('deleted_at')
             ->orderByDesc('fecha_ini')
-            ->value('cargo') ?? 'Desarrollador';
+            ->value('cargo') ?? __('general.service.buscador.cargo_default');
 
         $tags = DB::table('habilidades')
             ->where('id_perfil', $p->id_perfil)
@@ -229,9 +229,19 @@ class PortafolioBuscadorService
             $fin = ($e->trabajo_actual || !$e->fecha_fin) ? Carbon::now() : Carbon::parse($e->fecha_fin);
             $meses += max(0, $ini->diffInMonths($fin));
         }
-        $anios   = (int) floor($meses / 12);
-        $anioStr = $anios > 0 ? ($anios . ' año' . ($anios === 1 ? '' : 's'))
-                              : ($meses > 0 ? 'Menos de 1 año' : 'Sin experiencia registrada');
+        $anios = (int) floor($meses / 12);
+        if ($anios > 0) {
+            $anioStr = __(
+                $anios === 1
+                    ? 'general.service.buscador.anios_singular'
+                    : 'general.service.buscador.anios_plural',
+                ['n' => $anios]
+            );
+        } elseif ($meses > 0) {
+            $anioStr = __('general.service.buscador.menos_de_un_anio');
+        } else {
+            $anioStr = __('general.service.buscador.sin_experiencia');
+        }
 
         $cntProy = DB::table('proyectos')
             ->where('id_perfil', $p->id_perfil)->where('visible', true)->whereNull('deleted_at')->count();
@@ -356,11 +366,16 @@ class PortafolioBuscadorService
             'tags_extra'  => $extraTags,
             'anios'       => $anioStr,
             'anios_num'   => $anios,
-            'proyectos'   => $cntProy . ' proyecto' . ($cntProy === 1 ? '' : 's'),
+            'proyectos'   => __(
+                $cntProy === 1
+                    ? 'general.service.buscador.proyectos_singular'
+                    : 'general.service.buscador.proyectos_plural',
+                ['n' => $cntProy]
+            ),
             'cnt_proy'    => $cntProy,
             'cnt_habs'    => $totalHabs,
             'cnt_empresas'=> $cntEmpresas,
-            'ubicacion'   => $p->ubicacion ?: 'Sin ubicación',
+            'ubicacion'   => $p->ubicacion ?: __('general.service.buscador.sin_ubicacion'),
             'email'       => $usuarioRow->correo_electronico ?? null,
             'telefono'    => $usuarioRow->telefono ?? null,
             'links'       => $links,

@@ -173,18 +173,18 @@
             let hayErrores = false;
 
             if (!correo) {
-                marcarInputError(loginCorreo, loginCorreoError, 'Debes ingresar tu correo electrónico.');
+                marcarInputError(loginCorreo, loginCorreoError, __t('js.auth.login.correo_requerido'));
                 hayErrores = true;
             } else {
                 const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailValido.test(correo)) {
-                    marcarInputError(loginCorreo, loginCorreoError, 'Ingresa un correo electrónico válido.');
+                    marcarInputError(loginCorreo, loginCorreoError, __t('js.auth.login.correo_invalido'));
                     hayErrores = true;
                 }
             }
 
             if (!contrasenia) {
-                marcarInputError(loginContrasenia, loginContraseniaError, 'Debes ingresar tu contraseña.');
+                marcarInputError(loginContrasenia, loginContraseniaError, __t('js.auth.login.password_requerido'));
                 hayErrores = true;
             }
 
@@ -205,25 +205,25 @@
                 const contentType = response.headers.get('content-type') || '';
 
                 if (!contentType.includes('application/json')) {
-                    mostrarErrorGeneralLogin('La respuesta del servidor no fue válida.');
+                    mostrarErrorGeneralLogin(__t('js.auth.shared.respuesta_invalida'));
                     return;
                 }
 
                 const data = await response.json();
 
                 if (!response.ok) {
-                    mostrarErrorGeneralLogin(data.message || 'No se pudo iniciar sesión.');
+                    mostrarErrorGeneralLogin(data.message || __t('js.auth.login.no_iniciar'));
                     return;
                 }
 
                 if (data.ok && data.redirect) {
                     window.location.href = data.redirect;
                 } else {
-                    mostrarErrorGeneralLogin('Ocurrió un error inesperado.');
+                    mostrarErrorGeneralLogin(__t('js.auth.shared.error_inesperado'));
                 }
 
             } catch (error) {
-                mostrarErrorGeneralLogin('No se pudo conectar con el servidor. Intenta nuevamente.');
+                mostrarErrorGeneralLogin(__t('js.auth.shared.sin_conexion'));
             }
         });
 
@@ -313,53 +313,53 @@
             let hayErrores = false;
 
             if (!nombre) {
-                marcarInputErrorRegister(registerNombre, registerNombreError, 'Debes ingresar tu nombre.');
+                marcarInputErrorRegister(registerNombre, registerNombreError, __t('js.auth.register.nombre_requerido'));
                 hayErrores = true;
             }
 
             if (!apellido) {
-                marcarInputErrorRegister(registerApellido, registerApellidoError, 'Debes ingresar tus apellidos.');
+                marcarInputErrorRegister(registerApellido, registerApellidoError, __t('js.auth.register.apellido_requerido'));
                 hayErrores = true;
             }
 
             if (!correo) {
-                marcarInputErrorRegister(registerCorreo, registerCorreoError, 'Debes ingresar tu correo electrónico.');
+                marcarInputErrorRegister(registerCorreo, registerCorreoError, __t('js.auth.register.correo_requerido'));
                 hayErrores = true;
             } else {
                 const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailValido.test(correo)) {
-                    marcarInputErrorRegister(registerCorreo, registerCorreoError, 'Ingresa un correo electrónico válido.');
+                    marcarInputErrorRegister(registerCorreo, registerCorreoError, __t('js.auth.register.correo_invalido'));
                     hayErrores = true;
                 }
             }
 
             if (telefono.length > 50) {
-                marcarInputErrorRegister(registerTelefono, registerTelefonoError, 'El teléfono no debe exceder los 50 caracteres.');
+                marcarInputErrorRegister(registerTelefono, registerTelefonoError, __t('js.auth.register.telefono_max'));
                 hayErrores = true;
             }
 
             if (!contrasenia) {
-                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, 'Debes ingresar una contraseña.');
+                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, __t('js.auth.register.password_requerido'));
                 hayErrores = true;
             } else if (contrasenia.length < 8) {
-                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, 'La contraseña debe tener al menos 8 caracteres.');
+                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, __t('js.auth.register.password_min'));
                 hayErrores = true;
             } else if (!/[a-z]/.test(contrasenia)) {
-                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, 'La contraseña debe incluir al menos una letra minúscula.');
+                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, __t('js.auth.register.password_minuscula'));
                 hayErrores = true;
             } else if (!/[A-Z]/.test(contrasenia)) {
-                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, 'La contraseña debe incluir al menos una letra mayúscula.');
+                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, __t('js.auth.register.password_mayuscula'));
                 hayErrores = true;
             } else if (!/[0-9]/.test(contrasenia)) {
-                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, 'La contraseña debe incluir al menos un número.');
+                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, __t('js.auth.register.password_numero'));
                 hayErrores = true;
             } else if (!/[^A-Za-z0-9]/.test(contrasenia)) {
-                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, 'La contraseña debe incluir al menos un símbolo.');
+                marcarInputErrorRegister(registerContrasenia, registerContraseniaError, __t('js.auth.register.password_simbolo'));
                 hayErrores = true;
             }
 
             if (!confirmacion) {
-                marcarInputErrorRegister(registerContraseniaConfirmacion, registerContraseniaConfirmacionError, 'Debes confirmar tu contraseña.');
+                marcarInputErrorRegister(registerContraseniaConfirmacion, registerContraseniaConfirmacionError, __t('js.auth.register.confirmar_requerido'));
                 hayErrores = true;
             }
 
@@ -369,7 +369,7 @@
                 marcarInputErrorRegister(
                     registerContraseniaConfirmacion,
                     registerContraseniaConfirmacionError,
-                    'Las contraseñas no coinciden.'
+                    __t('js.auth.register.no_coinciden')
                 );
                 return;
             }
@@ -389,7 +389,7 @@
                 const contentType = response.headers.get('content-type') || '';
 
                 if (!contentType.includes('application/json')) {
-                    mostrarErrorGeneralRegister('La respuesta del servidor no fue válida.');
+                    mostrarErrorGeneralRegister(__t('js.auth.shared.respuesta_invalida'));
                     return;
                 }
 
@@ -413,7 +413,7 @@
                             marcarInputErrorRegister(registerContrasenia, registerContraseniaError, data.errors.contrasenia[0]);
                         }
                     } else {
-                        mostrarErrorGeneralRegister(data.message || 'No se pudo crear la cuenta.');
+                        mostrarErrorGeneralRegister(data.message || __t('js.auth.register.no_crear'));
                     }
                     return;
                 }
@@ -421,11 +421,11 @@
                 if (data.ok && data.redirect) {
                     window.location.href = data.redirect;
                 } else {
-                    mostrarErrorGeneralRegister('Ocurrió un error inesperado.');
+                    mostrarErrorGeneralRegister(__t('js.auth.shared.error_inesperado'));
                 }
 
             } catch (error) {
-                mostrarErrorGeneralRegister('No se pudo conectar con el servidor. Intenta nuevamente.');
+                mostrarErrorGeneralRegister(__t('js.auth.shared.sin_conexion'));
             }
         });
 
@@ -507,9 +507,9 @@
                     removeItemButton: true,
                     shouldSort: false,
                     placeholder: true,
-                    placeholderValue: sel.getAttribute('placeholder') || 'Selecciona...',
-                    noResultsText: 'Sin coincidencias',
-                    noChoicesText: 'No hay más opciones',
+                    placeholderValue: sel.getAttribute('placeholder') || __t('js.buscador.choices_placeholder'),
+                    noResultsText: __t('js.buscador.choices_sin_coincidencias'),
+                    noChoicesText: __t('js.buscador.choices_no_opciones'),
                     itemSelectText: '',
                     classNames: { containerInner: 'choices__inner buscador-choice' },
                 });
@@ -524,7 +524,7 @@
                 const inst = new Choices(sel, {
                     shouldSort: false,
                     searchEnabled: true,
-                    noResultsText: 'Sin coincidencias',
+                    noResultsText: __t('js.buscador.choices_sin_coincidencias'),
                     itemSelectText: '',
                     classNames: { containerInner: 'choices__inner buscador-choice' },
                 });
@@ -543,7 +543,7 @@
         function construirCatalogoTecnologias(sel) {
             const grupos = [];
             sel.querySelectorAll('optgroup').forEach(og => {
-                const label = og.getAttribute('label') || 'Otras';
+                const label = og.getAttribute('label') || __t('js.buscador.grupo_otras');
                 const choices = Array.from(og.querySelectorAll('option')).map(op => ({
                     value: op.value,
                     label: op.textContent,
@@ -587,7 +587,7 @@
             const huerfanas = tecSeleccionadas.filter(v => !todasIds.has(v));
             if (huerfanas.length) {
                 gruposParaChoices.push({
-                    label: 'Seleccionadas (fuera del filtro)',
+                    label: __t('js.buscador.grupo_huerfanas'),
                     id: '__huerfanas__',
                     choices: huerfanas.map(v => ({ value: v, label: v, selected: true })),
                 });
@@ -688,7 +688,7 @@
                             ${escapeHtmlBP(p.ubicacion)}
                         </span>
                         <button type="button" class="font-semibold text-[#e11d48] hover:text-[#1e3a5f] transition-colors flex items-center gap-1">
-                            Ver portafolio
+                            ${__t('js.buscador.ver_portafolio')}
                             <i class="fas fa-external-link-alt text-[10px]"></i>
                         </button>
                     </div>
@@ -718,9 +718,9 @@
             vacio.classList.add('hidden');
             if (reset) {
                 skeleton.classList.remove('hidden');
-                estado.textContent = 'Buscando portafolios...';
+                estado.textContent = __t('js.buscador.buscando');
             } else {
-                estado.textContent = 'Cargando más...';
+                estado.textContent = __t('js.buscador.cargando_mas');
             }
 
             try {
@@ -737,12 +737,18 @@
                     estado.textContent = '';
                     vacio.classList.remove('hidden');
                 } else {
-                    estado.textContent = `Mostrando ${contenedor.children.length} de ${total} portafolio${total === 1 ? '' : 's'}`;
+                    estado.textContent = __t('js.buscador.mostrando', {
+                        actual:   contenedor.children.length,
+                        total:    total,
+                        etiqueta: total === 1
+                            ? __t('js.buscador.portafolio_singular')
+                            : __t('js.buscador.portafolio_plural'),
+                    });
                 }
 
                 if (data.hay_mas) btnCargarMas.classList.remove('hidden');
             } catch (e) {
-                estado.textContent = 'No se pudo cargar los portafolios. Intenta de nuevo.';
+                estado.textContent = __t('js.buscador.error_carga');
             } finally {
                 skeleton.classList.add('hidden');
                 cargando = false;

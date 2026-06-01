@@ -172,6 +172,9 @@
 
     </div>
 
+    {{-- Bootstrap de traducciones para JS (debe ir antes de _dashboard-scripts) --}}
+    @include('partials._translations-bootstrap')
+
     @include('_dashboard-scripts')
 
     {{-- Modal global de confirmación (window.confirmar / data-confirm) --}}

@@ -19,7 +19,7 @@ use App\Http\Controllers\NotificationController;
 // LOCALE SWITCHER (MULTILINGUALIDAD)
 // =========================
 Route::get('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
-Route::get('/api/locales', [LocaleController::class, 'getAvailableLocales']);
+Route::get('/api/translations/{locale}', [LocaleController::class, 'translations'])->name('locale.translations');
 
 // =========================
 // HOME

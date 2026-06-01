@@ -4,16 +4,15 @@
         <!-- encabezado -->
         <div class="max-w-3xl mx-auto text-center mb-14">
             <span class="inline-block text-sm font-semibold tracking-wide uppercase text-[#e11d48] bg-red-50 px-4 py-1 rounded-full mb-4">
-                Como funciona
+                {{ __('general.home.como_funciona.eyebrow') }}
             </span>
 
             <h2 class="text-3xl md:text-4xl font-bold text-[#1e3a5f] leading-tight">
-                Crea y comparte tu portafolio en pocos pasos
+                {{ __('general.home.como_funciona.titulo') }}
             </h2>
 
             <p class="mt-5 text-gray-600 text-base md:text-lg leading-relaxed">
-                La plataforma esta diseñada para que puedas construir tu portafolio digital
-                de forma sencilla, ordenada y profesional.
+                {{ __('general.home.como_funciona.subtitulo') }}
             </p>
         </div>
 
@@ -31,12 +30,11 @@
                     </div>
 
                     <h3 class="text-xl font-semibold text-gray-800 mb-3">
-                        Crea tu perfil
+                        {{ __('general.home.como_funciona.paso1_titulo') }}
                     </h3>
 
                     <p class="text-gray-600 leading-relaxed">
-                        Registra tu informacion personal y profesional para construir
-                        una base solida de tu portafolio digital.
+                        {{ __('general.home.como_funciona.paso1_desc') }}
                     </p>
                 </div>
             </div>
@@ -52,12 +50,11 @@
                     </div>
 
                     <h3 class="text-xl font-semibold text-gray-800 mb-3">
-                        Agrega tus proyectos
+                        {{ __('general.home.como_funciona.paso2_titulo') }}
                     </h3>
 
                     <p class="text-gray-600 leading-relaxed">
-                        Incorpora tus trabajos, tecnologias, descripciones y logros
-                        para mostrar mejor tu experiencia y capacidades.
+                        {{ __('general.home.como_funciona.paso2_desc') }}
                     </p>
                 </div>
             </div>
@@ -73,12 +70,11 @@
                     </div>
 
                     <h3 class="text-xl font-semibold text-gray-800 mb-3">
-                        Comparte tu portafolio
+                        {{ __('general.home.como_funciona.paso3_titulo') }}
                     </h3>
 
                     <p class="text-gray-600 leading-relaxed">
-                        Publica tu perfil y permite que otras personas puedan ver
-                        tu trabajo de una manera clara, accesible y profesional.
+                        {{ __('general.home.como_funciona.paso3_desc') }}
                     </p>
                 </div>
             </div>
