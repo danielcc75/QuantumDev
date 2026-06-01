@@ -38,84 +38,17 @@
                 <div class="bg-gray-50 rounded-xl p-4 right-sidebar-item">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-semibold text-gray-800">Notificaciones y novedades</h3>
-                        @if(($novedades ?? collect())->isNotEmpty())
                             <button type="button"
                                     id="btn-marcar-novedades-vistas"
-                                    class="text-xs text-blue-600 hover:underline">
+                                class="text-xs text-blue-600 hover:underline hidden">
                                 Marcar leídas
                             </button>
-                        @endif
                     </div>
-                    <div class="space-y-3" id="contenedor-notificaciones">
-                        @php
-                            $perfilUsuario = $usuario->perfil ?? null;
-                            $portafolioOculto = $perfilUsuario && !$perfilUsuario->visible;
-                            $notaModeracion   = $perfilUsuario->moderation_note ?? null;
-                            $novedades = $novedades ?? collect();
-                            $proyectosOcultosMod = $proyectosOcultosMod ?? collect();
-                            $habilidadesOcultasMod = $habilidadesOcultasMod ?? collect();
-                            $hayAvisos = $portafolioOculto || $notaModeracion || $proyectosOcultosMod->isNotEmpty() || $habilidadesOcultasMod->isNotEmpty();
-                        @endphp
-
-                        @if($portafolioOculto)
-                            <div class="flex items-start space-x-3 pb-3 border-b border-gray-200 bg-red-50 -mx-4 -mt-1 px-4 py-2 rounded-t-xl">
-                                <i class="fas fa-eye-slash text-red-600 mt-1 text-sm"></i>
-                                <div>
-                                    <p class="font-medium text-red-800 text-sm">Un administrador ocultó tu portafolio</p>
-                                    @if($notaModeracion)
-                                        <p class="text-xs text-red-700 mt-1"><span class="font-semibold">Motivo:</span> {{ $notaModeracion }}</p>
-                                    @else
-                                        <p class="text-xs text-red-700 mt-1">No se indicó motivo. Contacta al administrador.</p>
-                                    @endif
-                                </div>
+                    <div class="space-y-3" id="contenedor-novedades">
+                        <div class="text-center py-4" id="novedades-loading">
+                            <i class="fas fa-spinner fa-spin text-gray-400"></i>
+                            <p class="text-xs text-gray-500 mt-1">Cargando...</p>
                             </div>
-                        @elseif($notaModeracion)
-                            <div class="flex items-start space-x-3 pb-3 border-b border-gray-200 bg-yellow-50 -mx-4 -mt-1 px-4 py-2 rounded-t-xl">
-                                <i class="fas fa-exclamation-triangle text-yellow-600 mt-1 text-sm"></i>
-                                <div>
-                                    <p class="font-medium text-yellow-800 text-sm">Aviso del administrador</p>
-                                    <p class="text-xs text-yellow-700 mt-1">{{ $notaModeracion }}</p>
-                                </div>
-                            </div>
-                        @endif
-
-                        @foreach($proyectosOcultosMod as $proyOculto)
-                            <div class="flex items-start space-x-3 pb-3 border-b border-gray-200 bg-orange-50 -mx-4 px-4 py-2">
-                                <i class="fas fa-folder-minus text-orange-600 mt-1 text-sm"></i>
-                                <div>
-                                    <p class="font-medium text-orange-800 text-sm">Proyecto oculto: «{{ $proyOculto->nombre }}»</p>
-                                    <p class="text-xs text-orange-700 mt-1"><span class="font-semibold">Motivo:</span> {{ $proyOculto->moderation_note }}</p>
-                                </div>
-                            </div>
-                        @endforeach
-
-                        @foreach($habilidadesOcultasMod as $habOculta)
-                            <div class="flex items-start space-x-3 pb-3 border-b border-gray-200 bg-orange-50 -mx-4 px-4 py-2">
-                                <i class="fas fa-code text-orange-600 mt-1 text-sm"></i>
-                                <div>
-                                    <p class="font-medium text-orange-800 text-sm">Habilidad oculta: «{{ $habOculta->nombre }}»</p>
-                                    <p class="text-xs text-orange-700 mt-1"><span class="font-semibold">Motivo:</span> {{ $habOculta->moderation_note }}</p>
-                                </div>
-                            </div>
-                        @endforeach
-
-                        @forelse($novedades as $novedad)
-                            <div class="flex items-start space-x-3 pb-3 @if(!$loop->last) border-b border-gray-200 @endif novedad-item"
-                                 data-tipo="{{ $novedad['tipo'] }}"
-                                 data-id="{{ $novedad['id_entidad'] }}">
-                                <i class="{{ $novedad['icono'] }} {{ $novedad['color'] }} mt-1 text-sm"></i>
-                                <div class="flex-1">
-                                    <p class="font-medium text-gray-800 text-sm">{{ $novedad['titulo'] }}</p>
-                                    <p class="text-xs text-gray-500">
-                                        {{ $novedad['detalle'] }} · {{ \Carbon\Carbon::parse($novedad['created_at'])->diffForHumans() }}
-                                    </p>
-                                </div>
-                            </div>
-                        @empty
-                            @unless($hayAvisos)
-                                <p class="text-xs text-gray-500 italic">No hay novedades recientes.</p>
-                            @endunless
-                        @endforelse
                     </div>
                 </div>
 
@@ -144,3 +77,129 @@
                 </div>
             </div>
         </aside>
+
+<script>
+function cargarNovedades() {
+    const container = document.getElementById('contenedor-novedades');
+    const loadingDiv = document.getElementById('novedades-loading');
+    const btnMarcar = document.getElementById('btn-marcar-novedades-vistas');
+    
+    fetch('{{ route("novedades.list") }}', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('HTTP error ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (loadingDiv) loadingDiv.style.display = 'none';
+        
+        if (data.error) {
+            container.innerHTML = `<p class="text-xs text-red-500 italic">Error: ${data.error}</p>`;
+            if (btnMarcar) btnMarcar.classList.add('hidden');
+            return;
+        }
+        
+        if (!data.novedades || data.novedades.length === 0) {
+            container.innerHTML = '<p class="text-xs text-gray-500 italic">No hay novedades recientes.</p>';
+            if (btnMarcar) btnMarcar.classList.add('hidden');
+            return;
+        }
+        
+        const hayNoLeidas = data.novedades.some(n => n.tipo === 'notificacion' && !n.leido);
+        if (btnMarcar) {
+            if (hayNoLeidas) {
+                btnMarcar.classList.remove('hidden');
+            } else {
+                btnMarcar.classList.add('hidden');
+            }
+        }
+        
+        let html = '';
+        data.novedades.forEach(novedad => {
+            let bgClass = '';
+            if (novedad.tipo === 'portafolio_oculto') bgClass = 'bg-red-50';
+            else if (novedad.tipo === 'nota_moderacion') bgClass = 'bg-yellow-50';
+            else if (novedad.tipo === 'notificacion' && !novedad.leido) bgClass = 'bg-blue-50';
+            
+            html += `
+                <div class="flex items-start space-x-3 pb-3 border-b border-gray-200 ${bgClass} p-2 rounded-lg transition cursor-pointer"
+                     data-tipo="${novedad.tipo || ''}"
+                     data-id="${novedad.id_entidad || ''}"
+                     data-url="${novedad.url || ''}">
+                    <i class="${novedad.icono || 'fas fa-bell'} ${novedad.color || 'text-gray-500'} mt-1 text-sm"></i>
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-800 text-sm">${escapeHtml(novedad.titulo || 'Sin título')}</p>
+                        <p class="text-xs text-gray-500">${escapeHtml(novedad.detalle || '')}</p>
+                    </div>
+                    ${novedad.tipo === 'notificacion' && !novedad.leido ? '<span class="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2"></span>' : ''}
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        
+        document.querySelectorAll('[data-tipo]').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const tipo = this.dataset.tipo;
+                const id = this.dataset.id;
+                const url = this.dataset.url;
+                
+                if (tipo === 'notificacion' && id) {
+                    fetch('{{ route("novedades.marcar-vista") }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ tipo: tipo, id: id })
+                    }).then(() => {
+                        if (url) {
+                            window.location.href = url;
+                        } else {
+                            cargarNovedades();
+                        }
+                    }).catch(err => console.error('Error:', err));
+                } else if (url) {
+                    window.location.href = url;
+                }
+            });
+        });
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        if (loadingDiv) loadingDiv.style.display = 'none';
+        container.innerHTML = '<p class="text-xs text-red-500 italic">Error al cargar novedades</p>';
+    });
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+document.getElementById('btn-marcar-novedades-vistas')?.addEventListener('click', function() {
+    fetch('{{ route("novedades.marcar-vista") }}', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ todas: true })
+    }).then(() => {
+        cargarNovedades();
+    }).catch(err => console.error('Error:', err));
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    cargarNovedades();
+});
+</script>

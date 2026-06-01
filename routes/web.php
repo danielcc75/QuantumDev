@@ -12,7 +12,7 @@ use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\PortafolioBuscadorController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\NotificationController; 
 // =========================
 // HOME
 // =========================
@@ -53,6 +53,7 @@ Route::get('/mi-perfil', [PerfilWebController::class, 'ver'])->name('perfil.ver'
 Route::get('/mi-perfil/editar', [PerfilWebController::class, 'editar'])->name('perfil.editar');
 Route::put('/mi-perfil', [PerfilWebController::class, 'actualizar'])->name('perfil.actualizar');
 
+Route::post('/perfil/actualizar-foto', [App\Http\Controllers\PerfilWebController::class, 'actualizarFoto'])->name('perfil.actualizar-foto');
 // Experiencia Laboral
 Route::get('/perfil/experiencia/{id}', [App\Http\Controllers\ExperienciaController::class, 'show'])->name('perfil.experiencia.mostrar');
 Route::post('/perfil/experiencia', [App\Http\Controllers\ExperienciaController::class, 'store'])->name('perfil.experiencia.guardar');
@@ -143,7 +144,9 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     // ========================================
     Route::get('/usuarios', [UsuarioAdminController::class, 'index'])->name('admin.usuarios');
     Route::get('/usuarios/crear', [UsuarioAdminController::class, 'create'])->name('admin.usuarios.create');
+    Route::get('/usuarios/listado-simple', [UsuarioAdminController::class, 'listadoSimple'])->name('admin.usuarios.listado-simple');
     Route::post('/usuarios', [UsuarioAdminController::class, 'store'])->name('admin.usuarios.store');
+   
     Route::get('/usuarios/{id}', [UsuarioAdminController::class, 'show'])->name('admin.usuarios.show');
     Route::get('/usuarios/{id}/editar', [UsuarioAdminController::class, 'edit'])->name('admin.usuarios.edit');
     Route::put('/usuarios/{id}', [UsuarioAdminController::class, 'update'])->name('admin.usuarios.update');
@@ -241,3 +244,41 @@ Route::get('/auth/github/callback', [AuthController::class, 'callbackGithub']);
 
 Route::get('/auth/google', [AuthController::class, 'redirectGoogle']);
 Route::get('/auth/google/callback', [AuthController::class, 'callbackGoogle']);
+
+
+// Notificaciones Admin (usa el controlador que ya tienes en Admin/)
+Route::prefix('admin')->middleware(['admin'])->group(function () {
+
+    Route::get('/notificaciones', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('admin.notifications');
+    Route::get('/notificaciones/crear', [App\Http\Controllers\Admin\NotificationController::class, 'create'])->name('admin.notifications.create');
+    Route::post('/notificaciones', [App\Http\Controllers\Admin\NotificationController::class, 'store'])->name('admin.notifications.store');
+    Route::get('/notificaciones/{id}', [App\Http\Controllers\Admin\NotificationController::class, 'show'])->name('admin.notifications.show');
+    Route::delete('/notificaciones/limpiar', [App\Http\Controllers\Admin\NotificationController::class, 'limpiar'])->name('admin.notifications.limpiar');
+    Route::delete('/notificaciones/{id}', [App\Http\Controllers\Admin\NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
+    
+});
+   // ========================================
+// NOTIFICACIONES DE USUARIO
+// ========================================
+
+// Ver mis notificaciones (página completa)
+Route::get('/mis-notificaciones', [NotificationController::class, 'index'])->name('notifications.index');
+
+// API para dropdown (AJAX)
+Route::get('/notificaciones/list', [NotificationController::class, 'listarParaDropdown'])->name('notifications.list');
+
+// Contar no leídas (AJAX)
+Route::get('/notificaciones/count', [NotificationController::class, 'contarNoLeidas'])->name('notifications.count');
+
+// Marcar una como leída (AJAX)
+Route::post('/notificaciones/marcar-leida', [NotificationController::class, 'marcarLeidaAjax'])->name('notifications.marcar-leida');
+
+// Marcar una como leída (desde página, método POST)
+Route::post('/notificaciones/{id}/leer', [NotificationController::class, 'marcarLeida'])->name('notifications.marcar');
+
+// Marcar todas como leídas
+Route::post('/notificaciones/marcar-todas', [NotificationController::class, 'marcarTodasLeidas'])->name('notifications.marcar-todas');
+
+// NOVEDADES (moderación, proyectos ocultos, etc)
+Route::get('/novedades/list', [NotificationController::class, 'obtenerNovedades'])->name('novedades.list');
+Route::post('/novedades/marcar-vista', [NotificationController::class, 'marcarNovedadVista'])->name('novedades.marcar-vista');  

@@ -490,5 +490,150 @@
 
             cargarMes();
         })();
+// ========================================
+// NOTIFICACIONES DROPDOWN (MEJORADO)
+// ========================================
+const btnNotif = document.getElementById('btn-notificaciones');
+const menuNotif = document.getElementById('notificaciones-menu');
+let notifAbierto = false;
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function cargarNotificaciones() {
+    fetch('{{ route("notifications.list") }}')
+        .then(response => response.json())
+        .then(data => {
+            const lista = document.getElementById('notificaciones-lista');
+            const badge = document.getElementById('notificaciones-badge');
+            
+            if (data.noLeidas > 0) {
+                badge.textContent = data.noLeidas > 99 ? '99+' : data.noLeidas;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+            
+            if (data.notificaciones.length === 0) {
+                lista.innerHTML = `
+                    <div class="p-6 text-center">
+                        <i class="fas fa-bell-slash text-gray-300 text-3xl mb-2"></i>
+                        <p class="text-gray-500 text-sm">No hay notificaciones</p>
+                    </div>
+                `;
+            } else {
+                let html = '';
+                data.notificaciones.forEach(notif => {
+                    let tipoIcon = '';
+                    if (notif.tipo === 'info') tipoIcon = 'fa-info-circle text-blue-500';
+                    else if (notif.tipo === 'success') tipoIcon = 'fa-check-circle text-green-500';
+                    else if (notif.tipo === 'warning') tipoIcon = 'fa-exclamation-triangle text-yellow-500';
+                    else tipoIcon = 'fa-times-circle text-red-500';
+                    
+                    const fondoClass = !notif.leido ? 'bg-blue-50' : 'bg-white';
+                    
+                    html += `
+                        <div onclick="marcarLeida(${notif.id}, '${notif.url || ''}', this)" 
+                             class="p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition ${fondoClass}">
+                            <div class="flex gap-3">
+                                <div class="flex-shrink-0">
+                                    <i class="fas ${tipoIcon} text-lg"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-semibold text-gray-800">${escapeHtml(notif.titulo)}</p>
+                                    <p class="text-xs text-gray-500 truncate">${escapeHtml(notif.mensaje)}</p>
+                                    <p class="text-xs text-gray-400 mt-1">${notif.hace}</p>
+                                </div>
+                                ${!notif.leido ? '<div class="flex-shrink-0"><span class="w-2 h-2 bg-blue-500 rounded-full block"></span></div>' : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                lista.innerHTML = html;
+            }
+        });
+}
+
+function marcarLeida(id, url, elemento) {
+    if (elemento && elemento.classList.contains('marcando')) return;
+    if (elemento) elemento.classList.add('marcando', 'opacity-50');
+    
+    fetch('{{ route("notifications.marcar-leida") }}', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: id })
+    }).then(() => {
+        if (elemento) {
+            elemento.classList.remove('bg-blue-50');
+            elemento.classList.add('bg-white');
+            const badgeAzul = elemento.querySelector('.w-2.h-2.bg-blue-500');
+            if (badgeAzul) badgeAzul.remove();
+        }
+        
+        if (url && url !== '') {
+            window.location.href = url;
+        } else {
+            actualizarContadorNotificaciones();
+            if (notifAbierto) cargarNotificaciones();
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        if (elemento) elemento.classList.remove('opacity-50');
+    }).finally(() => {
+        if (elemento) {
+            elemento.classList.remove('marcando');
+            setTimeout(() => {
+                if (elemento) elemento.classList.remove('opacity-50');
+            }, 300);
+        }
+    });
+}
+
+function actualizarContadorNotificaciones() {
+    fetch('{{ route("notifications.count") }}')
+        .then(response => response.json())
+        .then(data => {
+            const badge = document.getElementById('notificaciones-badge');
+            if (data.count > 0) {
+                badge.textContent = data.count > 99 ? '99+' : data.count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        });
+}
+
+if (btnNotif) {
+    btnNotif.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!notifAbierto) {
+            cargarNotificaciones();
+            menuNotif.classList.remove('hidden');
+            notifAbierto = true;
+        } else {
+            menuNotif.classList.add('hidden');
+            notifAbierto = false;
+        }
+    });
+    
+    document.addEventListener('click', (e) => {
+        if (btnNotif && menuNotif && 
+            !btnNotif.contains(e.target) && 
+            !menuNotif.contains(e.target)) {
+            menuNotif.classList.add('hidden');
+            notifAbierto = false;
+        }
+    });
+}
+
+// Inicializar
+actualizarContadorNotificaciones();
+setInterval(actualizarContadorNotificaciones, 30000);
 
     </script>

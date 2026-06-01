@@ -10,7 +10,7 @@
             </h3>
             <p class="text-sm text-gray-600 mt-1">Administra el catálogo de tecnologías</p>
         </div>
-        <button onclick="abrirModalCrear()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition transform hover:scale-105 inline-flex items-center">
+        <button onclick="abrirModalCrear()" class="bg-[#1e3a5f] hover:bg-[#152c47] text-white font-semibold py-2 px-4 rounded-lg transition inline-flex items-center">
             <i class="fas fa-plus mr-2"></i>
             Nueva Tecnología
         </button>
@@ -66,7 +66,7 @@
             <a href="{{ route('admin.tecnologias') }}" class="px-4 py-2 text-sm border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-100 inline-flex items-center gap-2">
                 <i class="fas fa-times text-xs"></i> Limpiar
             </a>
-            <button type="submit" class="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg inline-flex items-center gap-2">
+            <button type="submit" class="bg-[#1e3a5f] hover:bg-[#152c47] text-white font-semibold py-2 px-4 rounded-lg transition inline-flex items-center">
                 <i class="fas fa-filter text-xs"></i> Aplicar
             </button>
         </div>

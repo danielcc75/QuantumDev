@@ -1,16 +1,35 @@
-@extends('layouts.app')
-
-@section('content')
-<div class="max-w-4xl mx-auto">
-    
-    <div class="mb-4">
+<!-- Modal: ver proyecto -->
+<div id="modalVerProyecto" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh] overflow-y-auto">
+        
+        <!-- Header del modal - AHORA SOLO AZUL -->
+        <div class="bg-[#1e3a5f] px-6 py-4 rounded-t-2xl sticky top-0 z-10">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-bold text-white">
+                        <i class="fas fa-project-diagram mr-2"></i> Detalle del Proyecto
+                    </h2>
+                    <p class="text-blue-200 text-sm">Información completa del proyecto</p>
+                </div>
+                <button type="button" onclick="cerrarModalVerProyecto()" class="text-white hover:text-gray-200 transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Contenido del modal -->
+        <div class="p-6">
+            
+            <!-- Botón volver (oculto en el modal) -->
+            <div class="mb-4 hidden">
         <a href="{{ route('admin.proyectos') }}" class="text-[#1e3a5f] hover:underline inline-flex items-center">
             <i class="fas fa-arrow-left mr-2"></i> Volver a proyectos
         </a>
     </div>
     
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
-        <div class="bg-gradient-to-r from-[#1e3a5f] to-indigo-600 px-6 py-4">
+                <!-- Cabecera del proyecto - AHORA SOLO AZUL -->
+                <div class="bg-[#1e3a5f] px-6 py-4">
             <h1 class="text-2xl font-bold text-white">{{ $proyecto->nombre }}</h1>
             <p class="text-blue-200 text-sm mt-1">
                 Creado por {{ $proyecto->perfil->usuario->nombre ?? 'Usuario' }} 
@@ -70,5 +89,58 @@
             </div>
         </div>
     </div>
+            
+        </div>
+    </div>
 </div>
-@endsection
+
+<script>
+    function abrirModalVerProyecto() {
+        const modal = document.getElementById('modalVerProyecto');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function cerrarModalVerProyecto() {
+        const modal = document.getElementById('modalVerProyecto');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = '';
+    }
+    
+    // Cerrar modal con ESC
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const modal = document.getElementById('modalVerProyecto');
+            if (modal && !modal.classList.contains('hidden')) {
+                cerrarModalVerProyecto();
+            }
+        }
+    });
+    
+    // Cerrar modal al hacer clic fuera
+    const modalProyecto = document.getElementById('modalVerProyecto');
+    if (modalProyecto) {
+        modalProyecto.addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarModalVerProyecto();
+            }
+        });
+    }
+</script>
+
+<style>
+    #modalVerProyecto {
+        animation: fadeIn 0.2s ease-out;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+</style>

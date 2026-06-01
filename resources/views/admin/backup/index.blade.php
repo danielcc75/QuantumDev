@@ -41,7 +41,7 @@
             <form action="{{ route('admin.backup.create') }}" method="POST">
                 @csrf
                 <button type="submit"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition">
+                    class="w-full bg-[#1e3a5f] hover:bg-[#152c47] text-white font-semibold py-2 px-4 rounded-lg transition">
                     <i class="fas fa-plus mr-2"></i>Crear backup completo
                 </button>
             </form>
@@ -86,7 +86,7 @@
                     </div>
                 </div>
                 <button type="submit"
-                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition">
+                    class="w-full bg-[#1e3a5f] hover:bg-[#152c47] text-white font-semibold py-2 px-4 rounded-lg transition">
                     <i class="fas fa-plus mr-2"></i>Crear backup por fechas
                 </button>
             </form>
@@ -107,7 +107,7 @@
                     class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
             <button type="submit"
-                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">
+                class="px-4 py-2 bg-[#1e3a5f] hover:bg-[#152c47] text-white font-semibold rounded-lg text-sm font-medium">
                 <i class="fas fa-filter mr-1"></i> Filtrar
             </button>
             @if($filtroDesde || $filtroHasta)

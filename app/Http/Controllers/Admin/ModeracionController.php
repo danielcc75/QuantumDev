@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Traits\LogsActivity;
 use App\Models\Perfil;
 use App\Models\Usuario;
+use App\Models\Notification;  // 👈 AGREGADO
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -13,6 +14,7 @@ use Carbon\Carbon;
 class ModeracionController extends Controller
 {
     use LogsActivity;
+    
     // Listado de perfiles para moderar
     public function perfiles(Request $request)
     {
@@ -244,15 +246,45 @@ class ModeracionController extends Controller
                 'motivo.required' => 'Debes indicar el motivo para ocultar el portafolio.',
             ]);
             $perfil->moderation_note = $request->motivo;
+        } else {
+            // Si va a mostrar, limpiamos la nota de moderación
+            $perfil->moderation_note = null;
         }
 
         $perfil->visible = !$perfil->visible;
         $perfil->save();
 
+        // 👇 CREAR NOTIFICACIÓN EN LA TABLA NOTIFICATIONS PARA LA CAMPANA 👇
+        if ($perfil->visible) {
+            // Perfil reactivado
+            Notification::create([
+                'id_usuario' => $perfil->id_usuario,
+                'titulo' => '✅ Portafolio visible',
+                'mensaje' => 'Tu portafolio ha sido reactivado y ya es visible al público.',
+                'tipo' => 'success',
+                'icono' => 'fa-eye',
+                'url' => route('dashboard'),
+                'leido' => false
+            ]);
+        } else {
+            // Perfil ocultado
+            $motivo = $perfil->moderation_note ?? 'No se especificó un motivo. Contacta con el administrador.';
+            Notification::create([
+                'id_usuario' => $perfil->id_usuario,
+                'titulo' => '⚠️ Portafolio oculto',
+                'mensaje' => "Un administrador ha ocultado tu portafolio. Motivo: {$motivo}",
+                'tipo' => 'warning',
+                'icono' => 'fa-eye-slash',
+                'url' => route('dashboard'),
+                'leido' => false
+            ]);
+        }
+
         $estado = $perfil->visible ? 'visible' : 'oculto';
         $usuario = $perfil->usuario;
         $nombre  = $usuario ? "{$usuario->nombre} {$usuario->apellido}" : "Perfil ID {$perfil->id_perfil}";
         $this->logAdminAction('perfil_visibilidad_cambiada', "Portafolio de {$nombre} marcado como {$estado}" . (!$perfil->visible && $perfil->moderation_note ? " | Motivo: {$perfil->moderation_note}" : ''));
+        
         return back()->with('success', "Perfil marcado como {$estado}");
     }
     
@@ -268,9 +300,23 @@ class ModeracionController extends Controller
         $perfil->moderation_note = $request->moderation_note;
         $perfil->save();
 
+        // 👇 NOTIFICAR AL USUARIO 👇
+        if ($request->moderation_note) {
+            Notification::create([
+                'id_usuario' => $perfil->id_usuario,
+                'titulo' => '📝 Nota de moderación',
+                'mensaje' => "El administrador ha agregado una nota a tu perfil: {$request->moderation_note}",
+                'tipo' => 'info',
+                'icono' => 'fa-pen',
+                'url' => route('dashboard'),
+                'leido' => false
+            ]);
+        }
+
         $usuario = $perfil->usuario;
         $nombre  = $usuario ? "{$usuario->nombre} {$usuario->apellido}" : "Perfil ID {$perfil->id_perfil}";
         $this->logAdminAction('nota_moderacion_guardada', "Portafolio de {$nombre} | Nota: " . ($perfil->moderation_note ?? '(borrada)'));
+        
         return back()->with('success', 'Nota de moderación guardada');
     }
 }

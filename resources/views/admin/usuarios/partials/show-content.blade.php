@@ -1,35 +1,4 @@
-<!-- ======================================== -->
-<!-- MODAL PARA VER USUARIO (show.blade.php) -->
-<!-- ======================================== -->
-<div id="modalVerUsuario" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[95vh] overflow-y-auto">
-        
-        <!-- Header del modal -->
-        <div class="bg-[#1e3a5f] px-6 py-4 rounded-t-2xl sticky top-0 z-10">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h2 class="text-xl font-bold text-white">
-                        <i class="fas fa-user mr-2"></i> Perfil de Usuario
-                    </h2>
-                    <p class="text-blue-200 text-sm">Información detallada del usuario</p>
-                </div>
-                <button type="button" onclick="cerrarModalVerUsuario()" class="text-white hover:text-gray-200 transition-colors">
-                    <i class="fas fa-times text-2xl"></i>
-                </button>
-            </div>
-        </div>
-        
-        <!-- Contenido del modal (TODOS LOS DATOS DEL USUARIO) -->
-        <div class="p-6">
 <div class="max-w-6xl mx-auto">
-    
-                <!-- Botón volver (oculto en el modal) -->
-                <div class="mb-4 hidden">
-        <a href="{{ route('admin.usuarios') }}" class="text-[#1e3a5f] hover:text-[#152c47] inline-flex items-center gap-2">
-            <i class="fas fa-arrow-left"></i>
-            <span>Volver a usuarios</span>
-        </a>
-    </div>
     
     <!-- Título con nombre del usuario -->
     <div class="flex items-center gap-4 mb-6">
@@ -250,7 +219,7 @@
                 </div>
             </div>
             
-                        <!-- Panel: Habilidades técnicas -->
+            <!-- Panel: Habilidades -->
             <div class="bg-white rounded-xl shadow-md p-6">
                 <h2 class="text-xl font-bold text-gray-800 mb-4">
                     Habilidades técnicas
@@ -323,9 +292,6 @@
                     @endforelse
                 </div>
             </div>
-        </div>
-    </div>
-</div>
         </div>
     </div>
 </div>

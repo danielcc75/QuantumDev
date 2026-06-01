@@ -24,10 +24,10 @@
                     <option value="suspendido">Inactivos</option>
                 </select>
             </div>
-            <a href="{{ route('admin.usuarios.create') }}" class="bg-[#1e3a5f] hover:bg-[#152c47] text-white font-semibold py-2 px-4 rounded-lg transition inline-flex items-center">
+            <button type="button" onclick="abrirModalUsuario()" class="bg-[#1e3a5f] hover:bg-[#152c47] text-white font-semibold py-2 px-4 rounded-lg transition inline-flex items-center">
                 <i class="fas fa-plus mr-2"></i>
                 Nuevo Usuario
-            </a>
+            </button>
         </div>
     </div>
     
@@ -80,19 +80,19 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div class="flex space-x-2">
-                            <!-- Ver -->
-                            <a href="{{ route('admin.usuarios.show', $usuario->id_usuario) }}" 
+                            <!-- Botón Ver -->
+                            <button type="button" onclick="abrirModalVerUsuario({{ $usuario->id_usuario }})" 
                             class="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 p-2 rounded-lg transition" 
                             title="Ver perfil">
                                 <i class="fas fa-eye"></i>
-                            </a>
+                            </button>
                             
-                            <!-- Editar -->
-                            <a href="{{ route('admin.usuarios.edit', $usuario->id_usuario) }}" 
+                            <!-- Botón Editar -->
+                            <button type="button" onclick="abrirModalEditarUsuario({{ $usuario->id_usuario }})" 
                             class="text-yellow-600 hover:text-yellow-900 bg-yellow-100 hover:bg-yellow-200 p-2 rounded-lg transition" 
                             title="Editar usuario">
                                 <i class="fas fa-edit"></i>
-                            </a>
+                            </button>
                             
                             @if($usuario->estado == 'activo')
                                 <form action="{{ route('admin.usuarios.toggle-estado', $usuario->id_usuario) }}" method="POST" class="inline">
@@ -110,7 +110,7 @@
                                     </button>
                                 </form>
                             @endif
-                            <!-- Cambiar rol (Admin/Usuario) -->
+                            
                             @if($usuario->id_usuario != session('usuario_id'))
                                 <form action="{{ route('admin.usuarios.toggle-rol', $usuario->id_usuario) }}" method="POST" class="inline">
                                     @csrf
@@ -119,7 +119,6 @@
                                     </button>
                                 </form>
                             @endif
-                            
                         </div>
                     </td>
                 </tr>
@@ -129,9 +128,9 @@
                         <div class="text-center">
                             <i class="fas fa-users text-gray-400 text-5xl mb-3"></i>
                             <p class="text-gray-500 text-lg">No hay usuarios registrados</p>
-                            <a href="{{ route('admin.usuarios.create') }}" class="mt-3 inline-block bg-[#1e3a5f] hover:bg-[#152c47] text-white font-semibold py-2 px-4 rounded-lg">
+                            <button type="button" onclick="abrirModalUsuario()" class="mt-3 inline-block bg-[#1e3a5f] hover:bg-[#152c47] text-white font-semibold py-2 px-4 rounded-lg">
                                 Crear el primer usuario
-                            </a>
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -169,8 +168,147 @@
     </div>
 </div>
 
+<!-- Incluir los modales -->
+@include('admin.usuarios.create')
+@include('admin.usuarios.edit')
+@include('admin.usuarios.show')
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Buscador en tiempo real
+    // Función para abrir el modal de crear usuario
+    function abrirModalUsuario() {
+        const modal = document.getElementById('modalCrearUsuario');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    }
+    
+    // Función para abrir modal VER con AJAX
+    function abrirModalVerUsuario(id) {
+        const modal = document.getElementById('modalVerUsuario');
+        const contenidoDiv = modal.querySelector('.p-6');
+        
+        // Mostrar loading
+        contenidoDiv.innerHTML = '<div class="text-center py-12"><i class="fas fa-spinner fa-spin text-4xl text-[#1e3a5f]"></i><p class="mt-4">Cargando...</p></div>';
+        
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+        
+        // Cargar contenido vía AJAX
+        fetch(`/admin/usuarios/${id}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const nuevoContenido = doc.querySelector('#modalVerUsuario .p-6');
+            if (nuevoContenido) {
+                contenidoDiv.innerHTML = nuevoContenido.innerHTML;
+            } else {
+                contenidoDiv.innerHTML = '<p class="text-center text-red-500">Error al cargar el perfil</p>';
+            }
+        })
+        .catch(() => {
+            contenidoDiv.innerHTML = '<p class="text-center text-red-500">Error de conexión</p>';
+        });
+    }
+    
+    // Función para abrir modal EDITAR con AJAX
+    function abrirModalEditarUsuario(id) {
+        const modal = document.getElementById('modalEditarUsuario');
+        const contenidoDiv = modal.querySelector('.p-6');
+        
+        // Mostrar loading
+        contenidoDiv.innerHTML = '<div class="text-center py-12"><i class="fas fa-spinner fa-spin text-4xl text-[#1e3a5f]"></i><p class="mt-4">Cargando...</p></div>';
+        
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+        
+        fetch(`/admin/usuarios/${id}/editar`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const nuevoContenido = doc.querySelector('#modalEditarUsuario .p-6');
+            if (nuevoContenido) {
+                contenidoDiv.innerHTML = nuevoContenido.innerHTML;
+                // Actualizar action del formulario
+                const form = contenidoDiv.querySelector('form');
+                if (form) form.action = `/admin/usuarios/${id}`;
+                // Re-ejecutar scripts si es necesario (para togglePassword, etc.)
+                const scripts = nuevoContenido.querySelectorAll('script');
+                scripts.forEach(script => {
+                    const newScript = document.createElement('script');
+                    if (script.src) {
+                        newScript.src = script.src;
+                    } else {
+                        newScript.textContent = script.textContent;
+                    }
+                    document.body.appendChild(newScript);
+                });
+            } else {
+                contenidoDiv.innerHTML = '<p class="text-center text-red-500">Error al cargar el formulario</p>';
+            }
+        })
+        .catch(() => {
+            contenidoDiv.innerHTML = '<p class="text-center text-red-500">Error de conexión</p>';
+        });
+    }
+    
+    // Cerrar modales (funciones ya definidas en cada archivo, pero las redefinimos globalmente por si acaso)
+    window.cerrarModalVerUsuario = function() {
+        const modal = document.getElementById('modalVerUsuario');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
+        }
+    };
+    
+    window.cerrarModalEditarUsuario = function() {
+        const modal = document.getElementById('modalEditarUsuario');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
+        }
+    };
+    
+    window.cerrarModalUsuario = function() {
+        const modal = document.getElementById('modalCrearUsuario');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    };
+    
+    // Cerrar modales con ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            cerrarModalVerUsuario();
+            cerrarModalEditarUsuario();
+            cerrarModalUsuario();
+        }
+    });
+    
+    // Cerrar al hacer clic fuera
+    document.getElementById('modalVerUsuario')?.addEventListener('click', function(e) {
+        if (e.target === this) cerrarModalVerUsuario();
+    });
+    document.getElementById('modalEditarUsuario')?.addEventListener('click', function(e) {
+        if (e.target === this) cerrarModalEditarUsuario();
+    });
+    document.getElementById('modalCrearUsuario')?.addEventListener('click', function(e) {
+        if (e.target === this) cerrarModalUsuario();
+    });
+    
+    // Buscador en tiempo real (sin cambios)
     const searchInput = document.getElementById('searchInput');
     const estadoFilter = document.getElementById('estadoFilter');
     const tableRows = document.querySelectorAll('tbody tr[data-estado]');
@@ -178,27 +316,17 @@
     function filtrarTabla() {
         const searchTerm = searchInput.value.toLowerCase();
         const estadoValue = estadoFilter.value;
-        
         tableRows.forEach(row => {
             const nombre = row.getAttribute('data-nombre') || '';
             const email = row.getAttribute('data-email') || '';
             const estado = row.getAttribute('data-estado');
-            
             const matchesSearch = searchTerm === '' || nombre.includes(searchTerm) || email.includes(searchTerm);
             const matchesEstado = estadoValue === 'todos' || estado === estadoValue;
-            
-            if (matchesSearch && matchesEstado) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
+            row.style.display = (matchesSearch && matchesEstado) ? '' : 'none';
         });
     }
     
-    searchInput.addEventListener('input', filtrarTabla);
-    estadoFilter.addEventListener('change', filtrarTabla);
-    
+    if (searchInput) searchInput.addEventListener('input', filtrarTabla);
+    if (estadoFilter) estadoFilter.addEventListener('change', filtrarTabla);
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endsection
