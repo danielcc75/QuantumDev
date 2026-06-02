@@ -10,12 +10,12 @@
     <!-- NOMBRE -->
     <div class="mb-4">
         <label class="block text-xs font-medium text-gray-700 mb-1">
-            Nombre de la Habilidad <span class="text-red-500">*</span>
+            {{ __('general.habilidades.modal.nombre') }} <span class="text-red-500">*</span>
         </label>
         <input type="text"
             id="hab_nombre"
             name="nombreHabilidad"
-            placeholder="Ej: React, Node.js, PostgreSQL"
+            placeholder="{{ __('general.habilidades.modal.nombre_ph') }}"
             value="{{ old('nombreHabilidad', $habilidad->nombre ?? '') }}"
             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
     </div>
@@ -23,13 +23,13 @@
     <!-- CATEGORÍA -->
     <div class="mb-4">
         <label class="block text-xs font-medium text-gray-700 mb-1">
-            Categoría <span class="text-red-500">*</span>
+            {{ __('general.habilidades.modal.categoria') }} <span class="text-red-500">*</span>
         </label>
         <select id="hab_categoria"
             name="categoria"
             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
 
-            <option value="">Selecciona una categoría</option>
+            <option value="">{{ __('general.habilidades.modal.selecciona_cat') }}</option>
 
             @foreach ($categorias as $categoria)
                 <option value="{{ $categoria->id_categoria }}"
@@ -38,7 +38,7 @@
                 </option>
             @endforeach
             <option disabled>──────────</option>
-            <option value="sugerir" class="font-semibold text-blue-600 bg-blue-50">+ Sugerir categoría...</option>
+            <option value="sugerir" class="font-semibold text-blue-600 bg-blue-50">{{ __('general.habilidades.modal.sugerir_cat') }}</option>
 
         </select>
     </div>
@@ -46,14 +46,14 @@
     <!-- AÑOS DE EXPERIENCIA -->
     <div class="mb-4">
         <label class="block text-xs font-medium text-gray-700 mb-1">
-            Años de Experiencia <span class="text-red-500">*</span>
+            {{ __('general.habilidades.modal.anios') }} <span class="text-red-500">*</span>
         </label>
         <input type="number"
             id="hab_anios"
             step="1"
             min="0"
             name="anosExperiencia"
-            placeholder="Ej: 3"
+            placeholder="{{ __('general.habilidades.modal.anios_ph') }}"
             value="{{ old('anosExperiencia', $habilidad->anios_experiencia ?? '') }}"
             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
     </div>
@@ -61,25 +61,25 @@
     <!-- DESCRIPCIÓN -->
     <div class="mb-4">
         <label class="block text-xs font-medium text-gray-700 mb-1">
-            Descripción <span class="text-red-500">*</span>
+            {{ __('general.habilidades.modal.descripcion') }} <span class="text-red-500">*</span>
         </label>
         <textarea id="hab_descripcion"
             name="descripcion"
             rows="3"
-            placeholder="Describe tu experiencia y proyectos realizados..."
+            placeholder="{{ __('general.habilidades.modal.descripcion_ph') }}"
             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none">{{ old('descripcion', $habilidad->descripcion ?? '') }}</textarea>
-        <p class="text-xs text-gray-400 mt-1">Mínimo 20 caracteres, máximo 500</p>
+        <p class="text-xs text-gray-400 mt-1">{{ __('general.habilidades.modal.desc_help') }}</p>
     </div>
 
     <!-- BOTONES -->
     <div class="flex gap-3 mt-6 pt-4 border-t border-gray-100">
         <button type="button" onclick="confirmarCancelarHabilidad()"
             class="flex-1 px-4 py-2 text-sm border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition">
-            Cancelar
+            {{ __('general.habilidades.modal.cancelar') }}
         </button>
         <button type="button" onclick="confirmarGuardarHabilidad()"
             class="flex-1 px-4 py-2 text-sm bg-[#1e3a5f] hover:bg-[#e11d48] text-white rounded-lg font-medium transition">
-            <i class="fas fa-save text-xs mr-1"></i> Guardar
+            <i class="fas fa-save text-xs mr-1"></i> {{ __('general.habilidades.modal.guardar') }}
         </button>
     </div>
 

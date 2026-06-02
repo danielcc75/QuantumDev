@@ -3,8 +3,8 @@
 
     const CONFIRM_CONFIG_HAB = {
         guardar: {
-            titulo:    '¿Guardar habilidad?',
-            mensaje:   'Se almacenará la información de tu habilidad. Podrás editarla en cualquier momento.',
+            titulo:    __t('js.habilidades.confirm_guardar_titulo'),
+            mensaje:   __t('js.habilidades.confirm_guardar_mensaje'),
             icon:      'fas fa-save',
             iconBg:    'bg-blue-50',
             iconColor: 'text-blue-500',
@@ -12,8 +12,8 @@
             accion:    () => submitHabilidad(),
         },
         cancelar: {
-            titulo:    '¿Descartar cambios?',
-            mensaje:   'Los datos ingresados no se guardarán. Esta acción no se puede deshacer.',
+            titulo:    __t('js.habilidades.confirm_cancelar_titulo'),
+            mensaje:   __t('js.habilidades.confirm_cancelar_mensaje'),
             icon:      'fas fa-times-circle',
             iconBg:    'bg-red-50',
             iconColor: 'text-red-500',
@@ -21,8 +21,8 @@
             accion:    () => cerrarModalHabilidad(),
         },
         eliminar: {
-            titulo:    '¿Eliminar habilidad?',
-            mensaje:   'Esta acción es permanente y no se puede deshacer. La habilidad será eliminada definitivamente.',
+            titulo:    __t('js.habilidades.confirm_eliminar_titulo'),
+            mensaje:   __t('js.habilidades.confirm_eliminar_mensaje'),
             icon:      'fas fa-trash-alt',
             iconBg:    'bg-red-50',
             iconColor: 'text-red-500',
@@ -90,7 +90,7 @@
         const form        = document.getElementById('formHabilidad');
         const tituloModal = document.getElementById('titulo-modal-habilidad');
 
-        tituloModal.textContent = 'Registrar Habilidad';
+        tituloModal.textContent = __t('js.habilidades.modal_titulo_agregar');
         form.reset();
         form.querySelector('[name="nombreHabilidad"]').value = '';
         form.querySelector('[name="categoria"]').value       = '';
@@ -121,12 +121,12 @@
         const anios       = document.getElementById('hab_anios').value;
         const descripcion = document.getElementById('hab_descripcion').value.trim();
 
-        if (!nombre)      { resaltarErrorHabilidad('hab_nombre',      'El nombre es obligatorio.');         return; }
-        if (!categoria)   { resaltarErrorHabilidad('hab_categoria',   'La categoría es obligatoria.');      return; }
-        if (anios === '') { resaltarErrorHabilidad('hab_anios',       'Los años de experiencia son obligatorios.'); return; }
-        if (parseInt(anios) < 0) { resaltarErrorHabilidad('hab_anios', 'Los años no pueden ser negativos.'); return; }
-        if (!descripcion) { resaltarErrorHabilidad('hab_descripcion', 'La descripción es obligatoria.');    return; }
-        if (descripcion.length < 20) { resaltarErrorHabilidad('hab_descripcion', 'La descripción debe tener al menos 20 caracteres.'); return; }
+        if (!nombre)      { resaltarErrorHabilidad('hab_nombre',      __t('js.habilidades.err_nombre_req'));         return; }
+        if (!categoria)   { resaltarErrorHabilidad('hab_categoria',   __t('js.habilidades.err_categoria_req'));      return; }
+        if (anios === '') { resaltarErrorHabilidad('hab_anios',       __t('js.habilidades.err_anios_req')); return; }
+        if (parseInt(anios) < 0) { resaltarErrorHabilidad('hab_anios', __t('js.habilidades.err_anios_neg')); return; }
+        if (!descripcion) { resaltarErrorHabilidad('hab_descripcion', __t('js.habilidades.err_desc_req'));    return; }
+        if (descripcion.length < 20) { resaltarErrorHabilidad('hab_descripcion', __t('js.habilidades.err_desc_min')); return; }
 
         mostrarConfirmacionHabilidad('guardar');
     };
@@ -163,7 +163,7 @@
             const form        = document.getElementById('formHabilidad');
             const tituloModal = document.getElementById('titulo-modal-habilidad');
 
-            tituloModal.textContent = 'Editar Habilidad';
+            tituloModal.textContent = __t('js.habilidades.modal_titulo_editar');
 
             form.querySelector('[name="nombreHabilidad"]').value = nombre;
             form.querySelector('[name="categoria"]').value       = categoria;

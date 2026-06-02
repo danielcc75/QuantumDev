@@ -6,8 +6,8 @@
         {{-- HEADER --}}
         <div class="bg-[#1e3a5f] text-white px-6 py-4 flex justify-between items-center rounded-t-2xl">
             <div>
-                <h3 class="text-lg font-bold">Habilidades Blandas</h3>
-                <p class="text-xs text-blue-200">Selecciona hasta 6 habilidades</p>
+                <h3 class="text-lg font-bold">{{ __('general.habilidades_blandas.modal.titulo') }}</h3>
+                <p class="text-xs text-blue-200">{{ __('general.habilidades_blandas.modal.subtitulo') }}</p>
             </div>
 
             <button
@@ -27,7 +27,7 @@
                 <input
                     type="text"
                     id="buscar-habilidades-blandas"
-                    placeholder="Buscar habilidades..."
+                    placeholder="{{ __('general.habilidades_blandas.modal.buscar_ph') }}"
                     class="w-full border rounded-lg px-4 py-2 text-sm"
                     onkeyup="filtrarHabilidadesBlandas()"
                 >
@@ -57,7 +57,7 @@
                     </button>
                 @empty
                     <p class="text-sm text-gray-400">
-                        no hay habilidades blandas activas disponibles
+                        {{ __('general.habilidades_blandas.modal.sin_activas') }}
                     </p>
                 @endforelse
 
@@ -65,19 +65,19 @@
 
             {{-- CONTADOR --}}
             <div id="contador-wrapper" class="mt-4 text-sm text-gray-500">
-                seleccionadas:
+                {{ __('general.habilidades_blandas.modal.seleccionadas') }}
                 <span id="contador-habilidades">{{ count($habilidadesBlandasSeleccionadas) }}</span> / 6
             </div>
 
             <div class="mt-4 pt-4 border-t border-gray-100">
     <button type="button" onclick="abrirModalSugerirHBlanda()" class="text-sm text-[#1e3a5f] font-semibold hover:text-[#e11d48] flex items-center gap-1 transition">
-        <i class="fas fa-lightbulb"></i> Sugerir habilidad blanda
+        <i class="fas fa-lightbulb"></i> {{ __('general.habilidades_blandas.modal.sugerir') }}
     </button>
 </div>
 
 {{-- MENSAJE LIMITE --}}
             <div id="mensaje-limite" class="text-xs text-red-500 mt-1 hidden">
-                solo puedes seleccionar hasta 6 habilidades
+                {{ __('general.habilidades_blandas.modal.limite') }}
             </div>
 
             {{-- BOTON --}}
@@ -86,7 +86,7 @@
                     type="button"
                     onclick="guardarHabilidadesBlandas()"
                     class="w-full bg-[#1e3a5f] text-white py-3 rounded-lg font-medium hover:bg-[#e11d48] transition duration-200">
-                    Guardar habilidades blandas
+                    {{ __('general.habilidades_blandas.modal.btn_guardar') }}
                 </button>
             </div>
 
@@ -179,11 +179,11 @@
                     window.notificarItemPublicable('blanda');
                 }
             } else {
-                alert('No se pudieron guardar las habilidades blandas.');
+                alert(__t('js.habilidades_blandas.guardar_fail'));
             }
         })
         .catch(() => {
-            alert('Ocurrió un error al guardar las habilidades blandas.');
+            alert(__t('js.habilidades_blandas.guardar_err'));
         });
     }
 
@@ -200,8 +200,8 @@
                     <div class="w-14 h-14 rounded-full bg-[#1e3a5f]/8 flex items-center justify-center mb-3">
                         <i class="fas fa-user-friends text-2xl text-[#1e3a5f]/40"></i>
                     </div>
-                    <p class="text-gray-600 font-semibold text-sm">Aún no agregaste habilidades blandas</p>
-                    <p class="text-xs text-gray-400 mt-1">Agrega habilidades interpersonales para completar tu perfil</p>
+                    <p class="text-gray-600 font-semibold text-sm">${__t('js.habilidades_blandas.vacio_titulo')}</p>
+                    <p class="text-xs text-gray-400 mt-1">${__t('js.habilidades_blandas.vacio_sub')}</p>
                 </div>`;
             return;
         }
@@ -220,7 +220,7 @@
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md" onclick="event.stopPropagation()">
         <div class="bg-[#1e3a5f] text-white px-6 py-4 flex items-center justify-between rounded-t-2xl">
             <div>
-                <h3 class="text-lg font-bold">Sugerir Habilidad Blanda</h3>
+                <h3 class="text-lg font-bold">{{ __('general.sugerir.hblanda_titulo') }}</h3>
             </div>
             <button type="button" onclick="cerrarModalSugerirHBlanda()" class="text-white hover:text-blue-200 transition">
                 <i class="fas fa-times text-lg"></i>
@@ -229,17 +229,17 @@
         <div class="p-6">
             <form id="formSugerirHBlanda">
                 <div class="mb-4">
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Título de la habilidad <span class="text-red-500">*</span></label>
-                    <input type="text" id="sugerir_titulo_hblanda" name="titulo" placeholder="Ej: Liderazgo" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('general.sugerir.hblanda_label') }} <span class="text-red-500">*</span></label>
+                    <input type="text" id="sugerir_titulo_hblanda" name="titulo" placeholder="{{ __('general.sugerir.hblanda_ph') }}" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                 </div>
                 <div class="mb-6">
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Descripción corta <span class="text-red-500">*</span></label>
-                    <textarea id="sugerir_descripcion_hblanda" name="descripcion" rows="3" placeholder="Por qué deberíamos agregar esta habilidad..." class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"></textarea>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('general.sugerir.desc_label') }} <span class="text-red-500">*</span></label>
+                    <textarea id="sugerir_descripcion_hblanda" name="descripcion" rows="3" placeholder="{{ __('general.sugerir.hblanda_desc_ph') }}" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"></textarea>
                 </div>
                 <div class="flex gap-3 pt-4 border-t border-gray-100">
-                    <button type="button" onclick="cerrarModalSugerirHBlanda()" class="flex-1 px-4 py-2 text-sm border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition">Cancelar</button>
+                    <button type="button" onclick="cerrarModalSugerirHBlanda()" class="flex-1 px-4 py-2 text-sm border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition">{{ __('general.sugerir.cancelar') }}</button>
                     <button type="button" onclick="enviarSugerenciaHBlanda()" class="flex-1 px-4 py-2 text-sm bg-[#1e3a5f] hover:bg-[#e11d48] text-white rounded-lg font-medium transition">
-                        <i class="fas fa-paper-plane text-xs mr-1"></i> Enviar
+                        <i class="fas fa-paper-plane text-xs mr-1"></i> {{ __('general.sugerir.enviar') }}
                     </button>
                 </div>
             </form>
@@ -265,8 +265,8 @@
         const descripcionEl = document.getElementById("sugerir_descripcion_hblanda");
         const titulo = tituloEl ? tituloEl.value.trim() : "";
         const descripcion = descripcionEl ? descripcionEl.value.trim() : "";
-        if (!titulo) { alert("El título es obligatorio."); return; }
-        if (!descripcion) { alert("La descripción es obligatoria."); return; }
+        if (!titulo) { alert(__t('js.sugerir.titulo_req')); return; }
+        if (!descripcion) { alert(__t('js.sugerir.desc_req')); return; }
         
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -285,26 +285,26 @@
                 if (typeof window.confirmar === 'function') {
                     window.confirmar({
                         tipo:           'success',
-                        titulo:         '¡Sugerencia Enviada!',
-                        mensaje:        data.message || 'Tu sugerencia se ha enviado correctamente. ¡Gracias!',
+                        titulo:         __t('js.sugerir.enviada_titulo'),
+                        mensaje:        data.message || __t('js.sugerir.enviada_msg'),
                         icon:           'fas fa-check-circle',
                         iconBg:         'bg-green-50',
                         iconColor:      'text-green-500',
                         btnClass:       'bg-green-500 hover:bg-green-600',
-                        textoConfirmar: 'OK',
+                        textoConfirmar: __t('js.sugerir.ok'),
                         soloConfirmar:  true,
                     });
                     setTimeout(() => { if(typeof window.cerrarConfirmar === 'function') window.cerrarConfirmar(); }, 2500);
                 } else if (typeof window.Toastify === "function") {
-                    window.Toastify({ text: data.message || "Sugerencia enviada correctamente. ¡Gracias!", duration: 3000, close: true, gravity: "top", position: "right", style: { background: "#4caf50" } }).showToast();
+                    window.Toastify({ text: data.message || __t('js.sugerir.enviada_toast'), duration: 3000, close: true, gravity: "top", position: "right", style: { background: "#4caf50" } }).showToast();
                 } else {
-                    alert(data.message || "Sugerencia enviada correctamente. ¡Gracias!");
+                    alert(data.message || __t('js.sugerir.enviada_toast'));
                 }
             } else {
-                alert(data.error || 'Ocurrió un error al enviar la sugerencia.');
+                alert(data.error || __t('js.sugerir.error_enviar'));
             }
         } catch (error) {
-            alert('Error de conexión al enviar la sugerencia.');
+            alert(__t('js.sugerir.error_conexion'));
         }
     };
 </script>
