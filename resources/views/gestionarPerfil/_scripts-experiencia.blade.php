@@ -35,8 +35,8 @@ window.syncProyectoEnListaExp = function(action, proyecto) {
 // ============================================================
 const CONFIRM_CONFIG_EXPERIENCIA = {
     guardar: {
-        titulo:      '¿Guardar experiencia?',
-        mensaje:     'Se almacenará la información de tu experiencia laboral. Podrás editarla en cualquier momento.',
+        titulo:      __t('js.experiencia.confirm_guardar_titulo'),
+        mensaje:     __t('js.experiencia.confirm_guardar_mensaje'),
         icon:        'fas fa-save',
         iconBg:      'bg-[#1e3a5f]/10',
         iconColor:   'text-[#1e3a5f]',
@@ -45,8 +45,8 @@ const CONFIRM_CONFIG_EXPERIENCIA = {
         accion:      () => submitExperiencia(),
     },
     cancelar: {
-        titulo:      '¿Descartar cambios?',
-        mensaje:     'Los datos ingresados no se guardarán. Esta acción no se puede deshacer.',
+        titulo:      __t('js.experiencia.confirm_cancelar_titulo'),
+        mensaje:     __t('js.experiencia.confirm_cancelar_mensaje'),
         icon:        'fas fa-times-circle',
         iconBg:      'bg-red-50',
         iconColor:   'text-red-500',
@@ -55,8 +55,8 @@ const CONFIRM_CONFIG_EXPERIENCIA = {
         accion:      () => cerrarModalExperiencia(),
     },
     eliminar: {
-        titulo:      '¿Eliminar experiencia?',
-        mensaje:     'Esta acción es permanente y no se puede deshacer. La experiencia será eliminada definitivamente.',
+        titulo:      __t('js.experiencia.confirm_eliminar_titulo'),
+        mensaje:     __t('js.experiencia.confirm_eliminar_mensaje'),
         icon:        'fas fa-trash-alt',
         iconBg:      'bg-[#e11d48]/10',
         iconColor:   'text-[#e11d48]',
@@ -138,16 +138,16 @@ function confirmarGuardarExperiencia() {
     const fechaFin    = document.getElementById('exp_fecha_fin').value;
     const trabajoActual = document.getElementById('exp_trabajo_actual').checked;
 
-    if (!cargo)   { resaltarErrorExperiencia('exp_cargo',    'El cargo es obligatorio.');    return; }
-    if (!empresa) { resaltarErrorExperiencia('exp_empresa',  'La empresa es obligatoria.');  return; }
-    if (!fechaIni){ resaltarErrorExperiencia('exp_fecha_ini','La fecha de inicio es obligatoria.'); return; }
+    if (!cargo)   { resaltarErrorExperiencia('exp_cargo',    __t('js.experiencia.err_cargo_req'));    return; }
+    if (!empresa) { resaltarErrorExperiencia('exp_empresa',  __t('js.experiencia.err_empresa_req'));  return; }
+    if (!fechaIni){ resaltarErrorExperiencia('exp_fecha_ini',__t('js.experiencia.err_fecha_ini_req')); return; }
 
     if (!trabajoActual && !fechaFin) {
-        resaltarErrorExperiencia('exp_fecha_fin', 'Si no es tu trabajo actual, indica la fecha de finalización.');
+        resaltarErrorExperiencia('exp_fecha_fin', __t('js.experiencia.err_fecha_fin_no_act'));
         return;
     }
     if (!trabajoActual && fechaFin && fechaFin < fechaIni) {
-        resaltarErrorExperiencia('exp_fecha_fin', 'La fecha de fin no puede ser anterior al inicio.');
+        resaltarErrorExperiencia('exp_fecha_fin', __t('js.experiencia.err_fecha_fin_inv'));
         return;
     }
 
@@ -157,7 +157,7 @@ function confirmarGuardarExperiencia() {
     if (modo === 'existente') {
         const seleccionados = getProyectosExistentesSeleccionados();
         if (seleccionados.length === 0) {
-            mostrarToastExp('Selecciona al menos un proyecto para vincular.', 'error');
+            mostrarToastExp(__t('js.experiencia.toast_sel_proy_min'), 'error');
             return;
         }
     } else if (modo === 'nuevo') {
@@ -167,21 +167,21 @@ function confirmarGuardarExperiencia() {
         const projUrlLink  = document.getElementById('exp_proj_url_link').value.trim();
         const hoy          = new Date().toISOString().split('T')[0];
 
-        if (!projNombre)   { resaltarErrorExperiencia('exp_proj_nombre',   'El nombre del proyecto es obligatorio.');          return; }
-        if (!projFechaIni) { resaltarErrorExperiencia('exp_proj_fecha_ini','La fecha de inicio del proyecto es obligatoria.'); return; }
+        if (!projNombre)   { resaltarErrorExperiencia('exp_proj_nombre',   __t('js.experiencia.err_proy_nombre_req'));          return; }
+        if (!projFechaIni) { resaltarErrorExperiencia('exp_proj_fecha_ini',__t('js.experiencia.err_proy_fecha_ini')); return; }
 
         if (projFechaFin && projFechaFin < projFechaIni) {
-            resaltarErrorExperiencia('exp_proj_fecha_fin', 'La fecha de fin del proyecto no puede ser anterior al inicio.');
+            resaltarErrorExperiencia('exp_proj_fecha_fin', __t('js.experiencia.err_proy_fecha_fin'));
             return;
         }
 
         if (projFechaFin && projFechaFin < hoy) {
             if (!projUrlLink) {
-                resaltarErrorExperiencia('exp_proj_url_link', 'El proyecto ya finalizó. El enlace es obligatorio.');
+                resaltarErrorExperiencia('exp_proj_url_link', __t('js.experiencia.err_url_obligatorio'));
                 return;
             }
             try { new URL(projUrlLink); } catch (_) {
-                resaltarErrorExperiencia('exp_proj_url_link', 'Ingresa una URL válida (ej: https://miproyecto.com).');
+                resaltarErrorExperiencia('exp_proj_url_link', __t('js.experiencia.err_url_invalida'));
                 return;
             }
         }
@@ -252,7 +252,7 @@ function popularChipsProyectosDisponibles(idExperienciaActual = null) {
         chip.dataset.idProyecto = p.id_proyecto;
         chip.dataset.activo  = '0';
         chip.className       = 'text-xs px-2.5 py-1 rounded-full border border-[#1e3a5f]/20 bg-white text-[#1e3a5f] hover:bg-[#1e3a5f]/10 transition cursor-pointer select-none';
-        chip.innerHTML       = `<i class="fas fa-folder text-[10px] mr-1"></i>${escapeHtmlExp(p.nombre)}${yaVinculadoAOtra ? ' <span class="text-[10px] opacity-60">(en otra exp.)</span>' : ''}`;
+        chip.innerHTML       = `<i class="fas fa-folder text-[10px] mr-1"></i>${escapeHtmlExp(p.nombre)}${yaVinculadoAOtra ? ` <span class="text-[10px] opacity-60">${__t('js.experiencia.en_otra_exp')}</span>` : ''}`;
         chip.addEventListener('click', () => toggleChipProyectoExistente(chip));
         cont.appendChild(chip);
     });
@@ -290,7 +290,7 @@ function renderProyectosVinculadosEnModal(idExperiencia, proyectos) {
         chip.innerHTML = `
             <i class="fas fa-folder text-[10px]"></i>
             <span class="truncate max-w-[140px]">${escapeHtmlExp(p.nombre)}</span>
-            <button type="button" title="Desvincular" class="text-blue-400 hover:text-red-500 ml-1">
+            <button type="button" title="${__t('js.experiencia.desvincular')}" class="text-blue-400 hover:text-red-500 ml-1">
                 <i class="fas fa-times text-xs"></i>
             </button>`;
         chip.querySelector('button').addEventListener('click', () => desvincularProyectoExp(p.id_proyecto, idExperiencia, chip));
@@ -310,7 +310,7 @@ function desvincularProyectoExp(idProyecto, idExperiencia, chipEl) {
     })
     .then(r => r.json())
     .then(res => {
-        if (!res.success) { mostrarToastExp('No se pudo desvincular el proyecto', 'error'); return; }
+        if (!res.success) { mostrarToastExp(__t('js.experiencia.toast_desvincular_fail'), 'error'); return; }
 
         // Actualizar lista global
         const item = (window.PROYECTOS_USUARIO_LIST || []).find(p => Number(p.id_proyecto) === Number(idProyecto));
@@ -337,9 +337,9 @@ function desvincularProyectoExp(idProyecto, idExperiencia, chipEl) {
             link?.remove();
         }
 
-        mostrarToastExp('Proyecto desvinculado', 'success');
+        mostrarToastExp(__t('js.experiencia.toast_desvinculado'), 'success');
     })
-    .catch(() => mostrarToastExp('Error al desvincular el proyecto', 'error'));
+    .catch(() => mostrarToastExp(__t('js.experiencia.toast_desvincular_err'), 'error'));
 }
 
 // ============================================================
@@ -366,7 +366,7 @@ document.addEventListener('change', function(e) {
 // ABRIR MODAL CREAR
 // ============================================================
 function abrirModalExperiencia() {
-    document.getElementById('modalExperienciaTitulo').textContent = 'Agregar Experiencia Laboral';
+    document.getElementById('modalExperienciaTitulo').textContent = __t('js.experiencia.modal_titulo_agregar');
     document.getElementById('formExperiencia').reset();
     document.getElementById('exp_id_experiencia').value = '';
     experienciaEditandoId = null;
@@ -396,7 +396,7 @@ function editarExperienciaDesdeBoton(exp) {
 }
 
 function abrirModalEditarExperiencia(exp, proyectosVinculados = []) {
-    document.getElementById('modalExperienciaTitulo').textContent = 'Editar Experiencia Laboral';
+    document.getElementById('modalExperienciaTitulo').textContent = __t('js.experiencia.modal_titulo_editar');
     // Mostrar sección de proyecto también al editar
     document.getElementById('exp_proyecto_wrapper').classList.remove('hidden');
     resetProyectoForm();
@@ -642,7 +642,7 @@ function manejarProyectoEnSubmit(idExperiencia, editing) {
 
     if (modo === 'ninguno') {
         cerrarModalExperiencia();
-        mostrarToastExp(editing ? 'Experiencia actualizada correctamente' : 'Experiencia guardada correctamente', 'success');
+        mostrarToastExp(editing ? __t('js.experiencia.toast_actualizada') : __t('js.experiencia.toast_guardada'), 'success');
         return;
     }
 
@@ -674,11 +674,11 @@ function manejarProyectoEnSubmit(idExperiencia, editing) {
 
             cerrarModalExperiencia();
             if (fallidos.length === 0) {
-                mostrarToastExp(`Experiencia guardada y ${exitosos.length} proyecto${exitosos.length === 1 ? '' : 's'} vinculado${exitosos.length === 1 ? '' : 's'}`, 'success');
+                mostrarToastExp(__t('js.experiencia.toast_vinculados_ok', { n: exitosos.length }), 'success');
             } else if (exitosos.length === 0) {
-                mostrarToastExp('Experiencia guardada, pero no se pudo vincular ningún proyecto', 'error');
+                mostrarToastExp(__t('js.experiencia.toast_vinc_ninguno'), 'error');
             } else {
-                mostrarToastExp(`Experiencia guardada. ${exitosos.length} vinculado(s), ${fallidos.length} fallaron`, 'error');
+                mostrarToastExp(__t('js.experiencia.toast_vinc_parcial', { ok: exitosos.length, fail: fallidos.length }), 'error');
             }
         });
         return;
@@ -730,14 +730,14 @@ function manejarProyectoEnSubmit(idExperiencia, editing) {
         cerrarModalExperiencia();
         mostrarToastExp(
             projRes.success
-                ? 'Experiencia y proyecto guardados correctamente'
-                : 'Experiencia guardada, pero el proyecto no pudo crearse',
+                ? __t('js.experiencia.toast_proy_ok')
+                : __t('js.experiencia.toast_proy_fail'),
             projRes.success ? 'success' : 'error'
         );
     })
     .catch(() => {
         cerrarModalExperiencia();
-        mostrarToastExp('Experiencia guardada, pero hubo un problema al crear el proyecto', 'error');
+        mostrarToastExp(__t('js.experiencia.toast_vinc_proy_err'), 'error');
     });
 }
 
@@ -748,7 +748,7 @@ function submitExperiencia() {
     const btnGuardar = document.querySelector('#modalExperiencia button[onclick="confirmarGuardarExperiencia()"]');
     const textoOriginal = btnGuardar.innerHTML;
     btnGuardar.disabled = true;
-    btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Guardando...';
+    btnGuardar.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> ${__t('js.experiencia.guardando')}`;
 
     const trabajoActual = document.getElementById('exp_trabajo_actual').checked;
     const data = {
@@ -775,7 +775,7 @@ function submitExperiencia() {
     .then(r => {
         if (r.status === 422) {
             return r.json().then(err => {
-                const msgs = err.errors ? Object.values(err.errors).flat() : [err.message ?? 'Error de validación'];
+                const msgs = err.errors ? Object.values(err.errors).flat() : [err.message ?? __t('js.experiencia.val_err')];
                 resaltarErrorExperiencia('exp_cargo', msgs[0]);
                 throw new Error('validation');
             });
@@ -784,7 +784,7 @@ function submitExperiencia() {
     })
     .then(res => {
         if (!res.success) {
-            mostrarToastExp(res.error || 'Error al guardar', 'error');
+            mostrarToastExp(res.error || __t('js.experiencia.toast_guardar_err'), 'error');
             return;
         }
 
@@ -813,7 +813,7 @@ function submitExperiencia() {
     .catch(err => {
         if (err.message !== 'validation') {
             console.error(err);
-            mostrarToastExp('Hubo un problema al guardar', 'error');
+            mostrarToastExp(__t('js.experiencia.toast_guardar_prob'), 'error');
         }
     })
     .finally(() => {
@@ -970,9 +970,9 @@ function ejecutarEliminarExperiencia(id) {
             const card = document.querySelector(`[data-experiencia-id="${id}"]`);
             if (card) card.remove();
             recalcularStatsExperiencia();
-            mostrarToastExp('Experiencia eliminada correctamente', 'success');
+            mostrarToastExp(__t('js.experiencia.toast_eliminada'), 'success');
         } else {
-            mostrarToastExp(res.error || 'Error al eliminar', 'error');
+            mostrarToastExp(res.error || __t('js.experiencia.toast_eliminar_err'), 'error');
         }
     });
 }

@@ -38,6 +38,9 @@
         $visibilidadDash = $perfilDash->visibilidad ?? 'privado';
     @endphp
 
+    {{-- Bootstrap de traducciones para JS (debe ir ANTES de cualquier script). --}}
+    @include('partials._translations-bootstrap')
+
     <!-- barra superior -->
     @include('_dashboard-header')
 
@@ -186,9 +189,6 @@
         @include('_dashboard-sidebar-derecho')
 
     </div>
-
-    {{-- Bootstrap de traducciones para JS (debe ir antes de _dashboard-scripts) --}}
-    @include('partials._translations-bootstrap')
 
     @include('_dashboard-scripts')
 

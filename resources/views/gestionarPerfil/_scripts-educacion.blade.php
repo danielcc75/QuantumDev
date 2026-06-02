@@ -9,8 +9,8 @@ let educacionEditandoId = null;
 // ============================================================
 const CONFIRM_CONFIG_EDUCACION = {
     guardar: {
-        titulo:    '¿Guardar formación?',
-        mensaje:   'Se almacenará la información de tu formación académica. Podrás editarla en cualquier momento.',
+        titulo:    __t('js.formacion.confirm_guardar_titulo'),
+        mensaje:   __t('js.formacion.confirm_guardar_mensaje'),
         icon:      'fas fa-save',
         iconBg:    'bg-blue-50',
         iconColor: 'text-blue-500',
@@ -18,8 +18,8 @@ const CONFIRM_CONFIG_EDUCACION = {
         accion:    () => submitEducacion(),
     },
     cancelar: {
-        titulo:    '¿Descartar cambios?',
-        mensaje:   'Los datos ingresados no se guardarán. Esta acción no se puede deshacer.',
+        titulo:    __t('js.formacion.confirm_cancelar_titulo'),
+        mensaje:   __t('js.formacion.confirm_cancelar_mensaje'),
         icon:      'fas fa-times-circle',
         iconBg:    'bg-red-50',
         iconColor: 'text-red-500',
@@ -27,8 +27,8 @@ const CONFIRM_CONFIG_EDUCACION = {
         accion:    () => cerrarModalEducacion(),
     },
     eliminar: {
-        titulo:    '¿Eliminar formación?',
-        mensaje:   'Esta acción es permanente y no se puede deshacer. La formación será eliminada definitivamente.',
+        titulo:    __t('js.formacion.confirm_eliminar_titulo'),
+        mensaje:   __t('js.formacion.confirm_eliminar_mensaje'),
         icon:      'fas fa-trash-alt',
         iconBg:    'bg-red-50',
         iconColor: 'text-red-500',
@@ -109,17 +109,17 @@ function confirmarGuardarEducacion() {
     const fechaFin    = document.getElementById('edu_fecha_fin').value;
     const enCurso     = document.getElementById('edu_en_curso').checked;
 
-    if (!titulo)      { resaltarErrorEducacion('edu_titulo',      'El título es obligatorio.');       return; }
-    if (!institucion) { resaltarErrorEducacion('edu_institucion', 'La institución es obligatoria.');  return; }
-    if (!nivel)       { resaltarErrorEducacion('edu_nivel',       'El nivel es obligatorio.');        return; }
-    if (!fechaIni)    { resaltarErrorEducacion('edu_fecha_ini',   'La fecha de inicio es obligatoria.'); return; }
+    if (!titulo)      { resaltarErrorEducacion('edu_titulo',      __t('js.formacion.err_titulo_req'));       return; }
+    if (!institucion) { resaltarErrorEducacion('edu_institucion', __t('js.formacion.err_institucion_req'));  return; }
+    if (!nivel)       { resaltarErrorEducacion('edu_nivel',       __t('js.formacion.err_nivel_req'));        return; }
+    if (!fechaIni)    { resaltarErrorEducacion('edu_fecha_ini',   __t('js.formacion.err_fecha_ini_req')); return; }
 
     if (!enCurso && !fechaFin) {
-        resaltarErrorEducacion('edu_fecha_fin', 'Si no está en curso, indica la fecha de finalización.');
+        resaltarErrorEducacion('edu_fecha_fin', __t('js.formacion.err_fecha_fin_no_curso'));
         return;
     }
     if (!enCurso && fechaFin && fechaFin < fechaIni) {
-        resaltarErrorEducacion('edu_fecha_fin', 'La fecha de fin no puede ser anterior al inicio.');
+        resaltarErrorEducacion('edu_fecha_fin', __t('js.formacion.err_fecha_fin_inv'));
         return;
     }
 
@@ -140,7 +140,7 @@ function confirmarCancelarEducacion() {
 // ABRIR MODAL CREAR
 // ============================================================
 function abrirModalEducacion() {
-    document.getElementById('modalEducacionTitulo').textContent = 'Agregar Formación Académica';
+    document.getElementById('modalEducacionTitulo').textContent = __t('js.formacion.modal_titulo_agregar');
     document.getElementById('formEducacion').reset();
     document.getElementById('edu_id_formacion').value = '';
     educacionEditandoId = null;
@@ -157,7 +157,7 @@ function abrirModalEducacion() {
 // ABRIR MODAL EDITAR
 // ============================================================
 function abrirModalEditarEducacion(edu) {
-    document.getElementById('modalEducacionTitulo').textContent  = 'Editar Formación Académica';
+    document.getElementById('modalEducacionTitulo').textContent  = __t('js.formacion.modal_titulo_editar');
     document.getElementById('edu_id_formacion').value = edu.id_formacion;
     document.getElementById('edu_titulo').value       = edu.titulo       ?? '';
     document.getElementById('edu_institucion').value  = edu.institucion  ?? '';
@@ -223,7 +223,8 @@ function escapeHtmlEdu(text) {
 }
 
 function buildCardHTMLEducacion(educacion) {
-    const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const meses = (window.__lang?.js?.dashboard?.meses_corto)
+        || ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
     let fechaInicioStr = '';
     if (educacion.fecha_ini) {
@@ -351,7 +352,7 @@ function submitEducacion() {
     .then(r => {
         if (r.status === 422) {
             return r.json().then(err => {
-                const msgs = err.errors ? Object.values(err.errors).flat() : [err.message ?? 'Error de validación'];
+                const msgs = err.errors ? Object.values(err.errors).flat() : [err.message ?? __t('js.formacion.toast_val_err')];
                 resaltarErrorEducacion('edu_titulo', msgs[0]);
                 throw new Error('validation');
             });
@@ -376,15 +377,15 @@ function submitEducacion() {
 
             recalcularStatsEducacion();
             cerrarModalEducacion();
-            mostrarToastEdu('Formación guardada correctamente', 'success');
+            mostrarToastEdu(__t('js.formacion.toast_guardada'), 'success');
         } else {
-            mostrarToastEdu(res.error || 'Error al guardar', 'error');
+            mostrarToastEdu(res.error || __t('js.formacion.toast_guardar_err'), 'error');
         }
     })
     .catch(err => {
         if (err.message !== 'validation') {
             console.error(err);
-            mostrarToastEdu('Hubo un problema al guardar', 'error');
+            mostrarToastEdu(__t('js.formacion.toast_guardar_prob'), 'error');
         }
     })
     .finally(() => {
@@ -415,9 +416,9 @@ function ejecutarEliminarEducacion(id) {
             const card = document.querySelector(`[data-formacion-id="${id}"]`);
             if (card) card.remove();
             recalcularStatsEducacion();
-            mostrarToastEdu('Formación eliminada correctamente', 'success');
+            mostrarToastEdu(__t('js.formacion.toast_eliminada'), 'success');
         } else {
-            mostrarToastEdu(res.error || 'Error al eliminar', 'error');
+            mostrarToastEdu(res.error || __t('js.formacion.toast_eliminar_err'), 'error');
         }
     });
 }

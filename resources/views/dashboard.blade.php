@@ -59,6 +59,11 @@
         };
     </script>
 
+    {{-- Bootstrap de traducciones para JS: debe cargar ANTES que cualquier script
+         de las secciones (gestionarPerfil/_scripts-*.blade.php usan __t() al
+         inicializar variables al cargar). --}}
+    @include('partials._translations-bootstrap')
+
     <!-- barra superior -->
     @include('_dashboard-header')
 
@@ -175,9 +180,6 @@
         @include('_dashboard-sidebar-derecho')
 
     </div>
-
-    {{-- Bootstrap de traducciones para JS (debe ir antes de _dashboard-scripts) --}}
-    @include('partials._translations-bootstrap')
 
     @include('_dashboard-scripts')
 
