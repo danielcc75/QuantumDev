@@ -5,9 +5,9 @@
 $statCards = [
     [
         'id'       => 'stat-total',
-        'label'    => 'Total Proyectos',
+        'label'    => __('general.proyectos.stat_total'),
         'value'    => $totalProyectos,
-        'subtitle' => 'Todos los registrados',
+        'subtitle' => __('general.proyectos.stat_total_desc'),
         'icon'     => 'fas fa-folder',
         'card'     => 'bg-white border-gray-100',
         'borderL'  => 'border-l-[#1e3a5f]',
@@ -18,9 +18,9 @@ $statCards = [
     ],
     [
         'id'       => 'stat-en-curso',
-        'label'    => 'En Curso',
+        'label'    => __('general.proyectos.stat_en_curso'),
         'value'    => $enCurso,
-        'subtitle' => 'Actualmente trabajando',
+        'subtitle' => __('general.proyectos.stat_en_curso_desc'),
         'icon'     => 'fas fa-spinner',
         'card'     => 'bg-[#1e3a5f]/5 border-[#1e3a5f]/15',
         'borderL'  => 'border-l-[#1e3a5f]',
@@ -31,9 +31,9 @@ $statCards = [
     ],
     [
         'id'       => 'stat-finalizados',
-        'label'    => 'Finalizados',
+        'label'    => __('general.proyectos.stat_finalizados'),
         'value'    => $finalizados,
-        'subtitle' => 'Proyectos completados',
+        'subtitle' => __('general.proyectos.stat_final_desc'),
         'icon'     => 'fas fa-check-circle',
         'card'     => 'bg-red-50 border-red-100',
         'borderL'  => 'border-l-[#e11d48]',

@@ -49,16 +49,17 @@ function recalcularStats() {
 // ── Construir HTML de tarjeta ─────────────────────────────────────────────────
 
 const ESTADO_BADGE = {
-    en_progreso: { label: 'en curso',   cls: 'bg-[#1e3a5f]/10 text-[#1e3a5f]' },
-    completado:  { label: 'finalizado', cls: 'bg-indigo-100 text-indigo-700'   },
-    pendiente:   { label: 'pendiente',  cls: 'bg-gray-100 text-gray-600'       },
-    cancelado:   { label: 'cancelado',  cls: 'bg-red-100 text-[#e11d48]'       },
+    en_progreso: { label: __t('js.proyectos.badge_en_curso'),   cls: 'bg-[#1e3a5f]/10 text-[#1e3a5f]' },
+    completado:  { label: __t('js.proyectos.badge_finalizado'), cls: 'bg-indigo-100 text-indigo-700'   },
+    pendiente:   { label: __t('js.proyectos.badge_pendiente'),  cls: 'bg-gray-100 text-gray-600'       },
+    cancelado:   { label: __t('js.proyectos.badge_cancelado'),  cls: 'bg-red-100 text-[#e11d48]'       },
 };
 
-const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const MESES = (window.__lang?.js?.dashboard?.meses_corto)
+    || ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
 function formatFecha(str) {
-    if (!str) return 'Presente';
+    if (!str) return __t('js.proyectos.presente');
     const d = new Date(str + 'T00:00:00');
     return `${String(d.getDate()).padStart(2,'0')} ${MESES[d.getMonth()]} ${d.getFullYear()}`;
 }
@@ -72,7 +73,7 @@ function toInputDate(str) {
 function buildCardHTML(p) {
     const badge    = ESTADO_BADGE[p.estado] ?? { label: p.estado, cls: 'bg-gray-100 text-gray-600' };
     const tags     = p.tecnologias ? p.tecnologias.split(',').map(t => t.trim()).filter(Boolean) : [];
-    const fechaFin = p.fecha_fin ? formatFecha(p.fecha_fin) : 'Presente';
+    const fechaFin = p.fecha_fin ? formatFecha(p.fecha_fin) : __t('js.proyectos.presente');
 
     const tagsHTML = tags.map(t =>
         `<span class="text-xs bg-[#1e3a5f]/5 text-[#1e3a5f] border border-[#1e3a5f]/15 px-2 py-0.5 rounded-md font-medium">${t}</span>`
@@ -81,7 +82,7 @@ function buildCardHTML(p) {
     const demoBtn = p.url_link
         ? `<a href="${p.url_link}" target="_blank"
               class="flex items-center gap-2 text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg w-fit transition">
-              <i class="fas fa-globe text-xs"></i> Ver Demo
+              <i class="fas fa-globe text-xs"></i> ${__t('js.proyectos.ver_demo')}
               <i class="fas fa-external-link-alt text-xs"></i>
            </a>`
         : '';
@@ -99,7 +100,7 @@ function buildCardHTML(p) {
     </div>
 
     <p class="text-xs text-gray-500 leading-relaxed line-clamp-2">
-        ${p.descripcion ?? 'Sin descripción'}
+        ${p.descripcion ?? __t('js.proyectos.sin_descripcion')}
     </p>
 
     <div class="flex items-center text-xs text-gray-400 gap-1.5">
@@ -114,11 +115,11 @@ function buildCardHTML(p) {
     <div class="flex gap-2 pt-1 border-t border-gray-100 mt-auto">
         <button onclick="confirmarEditar(${p.id_proyecto})"
             class="flex-1 flex items-center justify-center gap-1.5 text-xs border border-[#1e3a5f]/30 text-[#1e3a5f] hover:bg-[#1e3a5f]/5 px-3 py-1.5 rounded-lg transition">
-            <i class="fas fa-pencil-alt"></i> Editar
+            <i class="fas fa-pencil-alt"></i> ${__t('common.editar')}
         </button>
         <button onclick="confirmarEliminar(${p.id_proyecto})"
             class="flex-1 flex items-center justify-center gap-1.5 text-xs bg-[#e11d48] hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition">
-            <i class="fas fa-trash"></i> Eliminar
+            <i class="fas fa-trash"></i> ${__t('common.eliminar')}
         </button>
     </div>
 </div>`;
@@ -128,8 +129,8 @@ function buildCardHTML(p) {
 
 const CONFIRM_CONFIG = {
     guardar: {
-        titulo:     '¿Guardar proyecto?',
-        mensaje:    'Se almacenará toda la información ingresada. Podrás editarla en cualquier momento.',
+        titulo:     __t('js.proyectos.confirm_guardar_titulo'),
+        mensaje:    __t('js.proyectos.confirm_guardar_mensaje'),
         icon:       'fas fa-save',
         iconBg:     'bg-[#1e3a5f]/10',
         iconColor:  'text-[#1e3a5f]',
@@ -138,8 +139,8 @@ const CONFIRM_CONFIG = {
         accion:     () => submitProyecto(),
     },
     cancelar: {
-        titulo:     '¿Descartar cambios?',
-        mensaje:    'Los datos ingresados no se guardarán. Esta acción no se puede deshacer.',
+        titulo:     __t('js.proyectos.confirm_cancelar_titulo'),
+        mensaje:    __t('js.proyectos.confirm_cancelar_mensaje'),
         icon:       'fas fa-times-circle',
         iconBg:     'bg-red-50',
         iconColor:  'text-red-500',
@@ -148,8 +149,8 @@ const CONFIRM_CONFIG = {
         accion:     () => cerrarModalProyecto(),
     },
     editar: {
-        titulo:     '¿Editar este proyecto?',
-        mensaje:    'Vas a modificar la información de este proyecto. Podrás cancelar si cambias de opinión.',
+        titulo:     __t('js.proyectos.confirm_editar_titulo'),
+        mensaje:    __t('js.proyectos.confirm_editar_mensaje'),
         icon:       'fas fa-pencil-alt',
         iconBg:     'bg-[#1e3a5f]/10',
         iconColor:  'text-[#1e3a5f]',
@@ -158,8 +159,8 @@ const CONFIRM_CONFIG = {
         accion:     null,
     },
     eliminar: {
-        titulo:     '¿Eliminar proyecto?',
-        mensaje:    'Esta acción es permanente y no se puede deshacer. El proyecto será eliminado definitivamente.',
+        titulo:     __t('js.proyectos.confirm_eliminar_titulo'),
+        mensaje:    __t('js.proyectos.confirm_eliminar_mensaje'),
         icon:       'fas fa-trash-alt',
         iconBg:     'bg-[#e11d48]/10',
         iconColor:  'text-[#e11d48]',
@@ -193,39 +194,39 @@ function confirmarGuardar() {
     const urlLink  = document.getElementById('proj_url_link').value.trim();
 
     if (!nombre) {
-        resaltarError('proj_nombre', 'El nombre del proyecto es obligatorio.');
+        resaltarError('proj_nombre', __t('js.proyectos.err_nombre_req'));
         return;
     }
     if (nombre.length > 100) {
-        resaltarError('proj_nombre', 'El nombre no puede superar los 100 caracteres.');
+        resaltarError('proj_nombre', __t('js.proyectos.err_nombre_max'));
         return;
     }
     if (!fechaIni) {
-        resaltarError('proj_fecha_ini', 'La fecha de inicio es obligatoria.');
+        resaltarError('proj_fecha_ini', __t('js.proyectos.err_fecha_ini_req'));
         return;
     }
     const estado = document.getElementById('proj_estado').value;
     if (estado === 'completado' && !fechaFin) {
-        resaltarError('proj_fecha_fin', 'La fecha de finalización es obligatoria si el estado es Completado.');
+        resaltarError('proj_fecha_fin', __t('js.proyectos.err_fecha_fin_completado'));
         return;
     }
     const hoyStr = new Date().toISOString().split('T')[0];
     if (estado === 'completado' && fechaFin && fechaFin > hoyStr) {
-        resaltarError('proj_fecha_fin', 'La fecha de finalización no puede ser posterior a la fecha actual.');
+        resaltarError('proj_fecha_fin', __t('js.proyectos.err_fecha_fin_futuro'));
         return;
     }
     if (fechaFin && fechaFin < fechaIni) {
-        resaltarError('proj_fecha_fin', 'La fecha de finalización no puede ser anterior a la de inicio.');
+        resaltarError('proj_fecha_fin', __t('js.proyectos.err_fecha_fin_inv'));
         return;
     }
 
     const hoy = new Date().toISOString().split('T')[0];
     if (fechaFin && fechaFin < hoy && !urlLink) {
-        resaltarError('proj_url_link', 'El proyecto ya finalizó. El enlace es obligatorio.');
+        resaltarError('proj_url_link', __t('js.proyectos.err_url_obligatorio'));
         return;
     }
     if (urlLink && !isValidUrl(urlLink)) {
-        resaltarError('proj_url_link', 'Ingresa una URL válida (ej: https://miproyecto.com).');
+        resaltarError('proj_url_link', __t('js.proyectos.err_url_invalida'));
         return;
     }
 
@@ -339,12 +340,12 @@ function actualizarFechaFinSegunEstado() {
 
     if (completado) {
         fechaFin.max     = new Date().toISOString().split('T')[0];
-        hint.textContent = 'Obligatoria para proyectos completados (no puede ser posterior a hoy)';
+        hint.textContent = __t('js.proyectos.hint_completado_max');
         hint.className   = 'text-xs text-[#e11d48] mt-1';
     } else {
         fechaFin.value   = '';
         fechaFin.removeAttribute('max');
-        hint.textContent = 'Disponible solo cuando el estado es "Completado"';
+        hint.textContent = __t('js.proyectos.hint_completado_disabled');
         hint.className   = 'text-xs text-gray-400 mt-1';
     }
 }
@@ -407,7 +408,7 @@ document.getElementById('proj_url_link').addEventListener('input', function() {
         status.classList.add('hidden');
         this.classList.remove('border-[#1e3a5f]', 'border-red-400', 'ring-2', 'ring-[#1e3a5f]/20', 'ring-red-200');
         this.classList.add('border-gray-200');
-        hint.textContent = 'Enlace a la aplicación o sitio web en producción desarrollada para el cliente';
+        hint.textContent = __t('js.proyectos.url_hint_default');
         hint.className   = 'text-xs text-gray-400 mt-1';
         return;
     }
@@ -420,12 +421,12 @@ document.getElementById('proj_url_link').addEventListener('input', function() {
     if (valid) {
         status.innerHTML = '<i class="fas fa-check-circle text-[#1e3a5f]"></i>';
         this.classList.add('border-[#1e3a5f]', 'ring-[#1e3a5f]/20');
-        hint.textContent = '✓ URL válida';
+        hint.textContent = __t('js.proyectos.url_valida');
         hint.className   = 'text-xs text-[#1e3a5f] mt-1 font-medium';
     } else {
         status.innerHTML = '<i class="fas fa-times-circle text-red-400"></i>';
         this.classList.add('border-red-400', 'ring-red-200');
-        hint.textContent = 'URL no válida. Debe comenzar con https:// o http://';
+        hint.textContent = __t('js.proyectos.url_invalida');
         hint.className   = 'text-xs text-red-500 mt-1';
     }
 });
@@ -437,7 +438,7 @@ function resetUrlStatus() {
     input.classList.remove('border-green-400', 'border-red-400', 'ring-2', 'ring-green-200', 'ring-red-200');
     input.classList.add('border-gray-200');
     status.classList.add('hidden');
-    hint.textContent = 'Enlace a la aplicación o sitio web en producción desarrollada para el cliente';
+    hint.textContent = __t('js.proyectos.url_hint_default');
     hint.className   = 'text-xs text-gray-400 mt-1';
 }
 
@@ -451,7 +452,7 @@ function abrirModalProyecto() {
     document.getElementById('proj_categoria_select').value = '';
     document.getElementById('proj_chips').innerHTML = '';
     document.getElementById('proj_chips_container').classList.add('hidden');
-    document.getElementById('modalProyectoTitulo').textContent = 'Crear Nuevo Proyecto';
+    document.getElementById('modalProyectoTitulo').textContent = __t('js.proyectos.modal_titulo_crear');
     document.getElementById('proj_visible').value = '0';
     resetUrlStatus();
     actualizarFechaFinSegunEstado();
@@ -490,7 +491,7 @@ function ejecutarAbrirEditar(id) {
             setTags(p.tecnologias ? p.tecnologias.split(',').map(t => t.trim()).filter(Boolean) : []);
             document.getElementById('proj_visible').value = p.visible ? '1' : '0';
             actualizarFechaFinSegunEstado();
-            document.getElementById('modalProyectoTitulo').textContent = 'Editar Proyecto';
+            document.getElementById('modalProyectoTitulo').textContent = __t('js.proyectos.modal_titulo_editar');
             setModalVisible('modalProyecto', true);
         });
 }
@@ -521,7 +522,7 @@ function submitProyecto() {
     .then(r => {
         if (r.status === 422) {
             return r.json().then(err => {
-                const msgs = err.errors ? Object.values(err.errors).flat() : [err.message ?? 'Error de validación'];
+                const msgs = err.errors ? Object.values(err.errors).flat() : [err.message ?? __t('js.proyectos.val_err')];
                 resaltarError('proj_nombre', msgs[0]);
                 throw new Error('validation');
             });
@@ -529,7 +530,7 @@ function submitProyecto() {
         return r.json();
     })
     .then(data => {
-        if (!data?.success) { alert(data?.message ?? 'Error al guardar'); return; }
+        if (!data?.success) { alert(data?.message ?? __t('js.proyectos.err_guardar')); return; }
 
         cerrarModalProyecto();
         const cardHTML = buildCardHTML(data.proyecto);
@@ -583,10 +584,10 @@ function ejecutarEliminar(id) {
 const RESUMEN_ACCENTS = ['bg-[#1e3a5f]', 'bg-[#e11d48]', 'bg-indigo-600'];
 
 const RESUMEN_ESTADO = {
-    en_progreso: { label: 'En curso',   icon: 'fa-spinner',      bg: 'bg-[#1e3a5f]/10', text: 'text-[#1e3a5f]' },
-    completado:  { label: 'Finalizado', icon: 'fa-check-circle', bg: 'bg-indigo-100',   text: 'text-indigo-700' },
-    pendiente:   { label: 'Pendiente',  icon: 'fa-clock',        bg: 'bg-gray-100',     text: 'text-gray-600' },
-    cancelado:   { label: 'Cancelado',  icon: 'fa-times-circle', bg: 'bg-red-100',      text: 'text-[#e11d48]' },
+    en_progreso: { label: __t('js.proyectos.resumen_en_curso'),   icon: 'fa-spinner',      bg: 'bg-[#1e3a5f]/10', text: 'text-[#1e3a5f]' },
+    completado:  { label: __t('js.proyectos.resumen_finalizado'), icon: 'fa-check-circle', bg: 'bg-indigo-100',   text: 'text-indigo-700' },
+    pendiente:   { label: __t('js.proyectos.resumen_pendiente'),  icon: 'fa-clock',        bg: 'bg-gray-100',     text: 'text-gray-600' },
+    cancelado:   { label: __t('js.proyectos.resumen_cancelado'),  icon: 'fa-times-circle', bg: 'bg-red-100',      text: 'text-[#e11d48]' },
 };
 
 function buildResumenCardHTML(p, index) {
@@ -616,7 +617,7 @@ function buildResumenCardHTML(p, index) {
                 <p class="text-xs text-gray-400 mt-0.5"><i class="fas fa-calendar-alt mr-1"></i>${fecha}</p>
             </div>
         </div>
-        <p class="text-xs text-gray-500 leading-relaxed line-clamp-2">${p.descripcion ?? 'Sin descripción'}</p>
+        <p class="text-xs text-gray-500 leading-relaxed line-clamp-2">${p.descripcion ?? __t('js.proyectos.sin_descripcion')}</p>
         ${tags.length ? `<div class="flex flex-wrap gap-1">${tagsHTML}</div>` : ''}
         <div class="mt-auto pt-3 border-t border-gray-100">
             <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${cfg.bg} ${cfg.text}">
@@ -657,7 +658,7 @@ function actualizarResumenProyectos(proyecto, accion) {
     }
 
     const total = grid.querySelectorAll('[data-resumen-id]').length;
-    if (count) count.textContent = `Últimos ${total} registros`;
+    if (count) count.textContent = __t('js.proyectos.ultimos_registros', { n: total });
 
     const vacio = total === 0;
     grid.classList.toggle('hidden', vacio);
@@ -671,7 +672,7 @@ function actualizarResumenProyectos(proyecto, accion) {
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md" onclick="event.stopPropagation()">
         <div class="bg-[#1e3a5f] text-white px-6 py-4 flex items-center justify-between rounded-t-2xl">
             <div>
-                <h3 class="text-lg font-bold">Sugerir Tecnología</h3>
+                <h3 class="text-lg font-bold">{{ __('general.sugerir.tec_titulo') }}</h3>
             </div>
             <button type="button" onclick="cerrarModalSugerirTecnologia()" class="text-white hover:text-blue-200 transition">
                 <i class="fas fa-times text-lg"></i>
@@ -680,17 +681,17 @@ function actualizarResumenProyectos(proyecto, accion) {
         <div class="p-6">
             <form id="formSugerirTecnologia">
                 <div class="mb-4">
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Título de la tecnología <span class="text-red-500">*</span></label>
-                    <input type="text" id="sugerir_titulo_tech" name="titulo" placeholder="Ej: Next.js" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('general.sugerir.tec_label') }} <span class="text-red-500">*</span></label>
+                    <input type="text" id="sugerir_titulo_tech" name="titulo" placeholder="{{ __('general.sugerir.tec_ph') }}" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                 </div>
                 <div class="mb-6">
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Descripción corta <span class="text-red-500">*</span></label>
-                    <textarea id="sugerir_descripcion_tech" name="descripcion" rows="3" placeholder="Por qué deberíamos agregar esta tecnología..." class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"></textarea>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('general.sugerir.desc_label') }} <span class="text-red-500">*</span></label>
+                    <textarea id="sugerir_descripcion_tech" name="descripcion" rows="3" placeholder="{{ __('general.sugerir.tec_desc_ph') }}" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"></textarea>
                 </div>
                 <div class="flex gap-3 pt-4 border-t border-gray-100">
-                    <button type="button" onclick="cerrarModalSugerirTecnologia()" class="flex-1 px-4 py-2 text-sm border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition">Cancelar</button>
+                    <button type="button" onclick="cerrarModalSugerirTecnologia()" class="flex-1 px-4 py-2 text-sm border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition">{{ __('general.sugerir.cancelar') }}</button>
                     <button type="button" onclick="enviarSugerenciaTecnologia()" class="flex-1 px-4 py-2 text-sm bg-[#1e3a5f] hover:bg-[#e11d48] text-white rounded-lg font-medium transition">
-                        <i class="fas fa-paper-plane text-xs mr-1"></i> Enviar
+                        <i class="fas fa-paper-plane text-xs mr-1"></i> {{ __('general.sugerir.enviar') }}
                     </button>
                 </div>
             </form>
@@ -732,8 +733,8 @@ function actualizarResumenProyectos(proyecto, accion) {
         const descripcionEl = document.getElementById("sugerir_descripcion_tech");
         const titulo = tituloEl ? tituloEl.value.trim() : "";
         const descripcion = descripcionEl ? descripcionEl.value.trim() : "";
-        if (!titulo) { alert("El título es obligatorio."); return; }
-        if (!descripcion) { alert("La descripción es obligatoria."); return; }
+        if (!titulo) { alert(__t('js.sugerir.titulo_req')); return; }
+        if (!descripcion) { alert(__t('js.sugerir.desc_req')); return; }
         
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -752,26 +753,26 @@ function actualizarResumenProyectos(proyecto, accion) {
                 if (typeof window.confirmar === 'function') {
                     window.confirmar({
                         tipo:           'success',
-                        titulo:         '¡Sugerencia Enviada!',
-                        mensaje:        data.message || 'Tu sugerencia se ha enviado correctamente. ¡Gracias!',
+                        titulo:         __t('js.sugerir.enviada_titulo'),
+                        mensaje:        data.message || __t('js.sugerir.enviada_msg'),
                         icon:           'fas fa-check-circle',
                         iconBg:         'bg-green-50',
                         iconColor:      'text-green-500',
                         btnClass:       'bg-green-500 hover:bg-green-600',
-                        textoConfirmar: 'OK',
+                        textoConfirmar: __t('js.sugerir.ok'),
                         soloConfirmar:  true,
                     });
                     setTimeout(() => { if(typeof window.cerrarConfirmar === 'function') window.cerrarConfirmar(); }, 2500);
                 } else if (typeof window.Toastify === "function") {
-                    window.Toastify({ text: data.message || "Sugerencia enviada correctamente. ¡Gracias!", duration: 3000, close: true, gravity: "top", position: "right", style: { background: "#4caf50" } }).showToast();
+                    window.Toastify({ text: data.message || __t('js.sugerir.enviada_toast'), duration: 3000, close: true, gravity: "top", position: "right", style: { background: "#4caf50" } }).showToast();
                 } else {
-                    alert(data.message || "Sugerencia enviada correctamente. ¡Gracias!");
+                    alert(data.message || __t('js.sugerir.enviada_toast'));
                 }
             } else {
-                alert(data.error || 'Ocurrió un error al enviar la sugerencia.');
+                alert(data.error || __t('js.sugerir.error_enviar'));
             }
         } catch (error) {
-            alert('Error de conexión al enviar la sugerencia.');
+            alert(__t('js.sugerir.error_conexion'));
         }
     };
 </script>

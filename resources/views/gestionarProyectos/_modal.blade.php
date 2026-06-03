@@ -20,18 +20,18 @@
                     <i class="fas fa-arrow-left text-lg"></i>
                 </button>
                 <div class="min-w-0">
-                    <h3 id="modalProyectoTitulo" class="text-lg sm:text-xl font-bold truncate">Crear Nuevo Proyecto</h3>
-                    <p class="text-blue-200 text-xs mt-0.5 hidden sm:block">Completa la información de tu proyecto</p>
+                    <h3 id="modalProyectoTitulo" class="text-lg sm:text-xl font-bold truncate">{{ __('general.proyectos.modal.titulo_crear') }}</h3>
+                    <p class="text-blue-200 text-xs mt-0.5 hidden sm:block">{{ __('general.proyectos.modal.subtitulo') }}</p>
                 </div>
             </div>
             <div class="flex items-center gap-2 sm:gap-3 justify-end">
                 <button type="button" onclick="confirmarCancelar()"
                     class="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm border border-white/30 text-white rounded-lg hover:bg-white/10 transition">
-                    Cancelar
+                    {{ __('general.proyectos.modal.cancelar') }}
                 </button>
                 <button type="button" onclick="confirmarGuardar()"
                     class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm bg-[#e11d48] hover:bg-red-600 text-white rounded-lg font-medium transition whitespace-nowrap">
-                    <i class="fas fa-save text-xs"></i> <span>Guardar</span><span class="hidden sm:inline"> Proyecto</span>
+                    <i class="fas fa-save text-xs"></i> <span>{{ __('general.proyectos.modal.guardar') }}</span><span class="hidden sm:inline"> {{ __('general.proyectos.modal.proyecto') }}</span>
                 </button>
             </div>
         </div>
@@ -46,23 +46,23 @@
 
                 {{-- Información Básica --}}
                 <div class="bg-white rounded-2xl p-5 shadow-sm border-t-2 border-t-[#1e3a5f]">
-                    <h4 class="font-semibold text-[#1e3a5f] text-sm mb-0.5">Información Básica</h4>
-                    <p class="text-xs text-[#e11d48] mb-4">Datos principales de tu proyecto</p>
+                    <h4 class="font-semibold text-[#1e3a5f] text-sm mb-0.5">{{ __('general.proyectos.modal.seccion_info') }}</h4>
+                    <p class="text-xs text-[#e11d48] mb-4">{{ __('general.proyectos.modal.seccion_info_desc') }}</p>
 
                     <div class="mb-4">
                         <label class="block text-xs font-medium text-gray-700 mb-1">
-                            Nombre del Proyecto <span class="text-[#e11d48]">*</span>
+                            {{ __('general.proyectos.modal.nombre') }} <span class="text-[#e11d48]">*</span>
                         </label>
                         <input type="text" id="proj_nombre" required
                             class="{{ $inputCls }}"
-                            placeholder="Ej: Sistema de Gestión de Inventario">
+                            placeholder="{{ __('general.proyectos.modal.nombre_ph') }}">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Descripción</label>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('general.proyectos.modal.descripcion') }}</label>
                         <textarea id="proj_descripcion" rows="3"
                             class="{{ $textareaCls }}"
-                            placeholder="Describe brevemente el proyecto y su objetivo principal..."></textarea>
+                            placeholder="{{ __('general.proyectos.modal.descripcion_ph') }}"></textarea>
                     </div>
                 </div>
 
@@ -70,14 +70,14 @@
                 <div class="bg-white rounded-2xl p-5 shadow-sm border-t-2 border-t-[#1e3a5f]">
                     <div class="flex items-center gap-2 mb-0.5">
                         <i class="fas fa-code text-[#1e3a5f] text-sm"></i>
-                        <h4 class="font-semibold text-[#1e3a5f] text-sm">Tecnologías Utilizadas</h4>
+                        <h4 class="font-semibold text-[#1e3a5f] text-sm">{{ __('general.proyectos.modal.seccion_tec') }}</h4>
                     </div>
-                    <p class="text-xs text-gray-400 mb-4">Agrega las tecnologías, lenguajes y frameworks que usaste</p>
+                    <p class="text-xs text-gray-400 mb-4">{{ __('general.proyectos.modal.seccion_tec_desc') }}</p>
 
                     <div class="relative mb-3">
                         <select id="proj_categoria_select" onchange="filtrarTecnologias()"
                             class="{{ $selectCls }} text-gray-500">
-                            <option value="">Selecciona una categoría</option>
+                            <option value="">{{ __('general.proyectos.modal.selecciona_cat') }}</option>
                             <option value="Frontend">Frontend</option>
                             <option value="Backend">Backend</option>
                             <option value="Lenguajes">Lenguajes</option>
@@ -90,7 +90,7 @@
                             <option value="Diseño & Prototipado">Diseño &amp; Prototipado</option>
                             <option value="Gestión de Proyectos">Gestión de Proyectos</option>
                             <option disabled>──────────</option>
-                            <option value="sugerir" class="font-semibold text-blue-600 bg-blue-50">+ Sugerir tecnología...</option>
+                            <option value="sugerir" class="font-semibold text-blue-600 bg-blue-50">{{ __('general.proyectos.modal.sugerir_tec') }}</option>
                         </select>
                         <i class="fas fa-chevron-down text-gray-400 text-xs absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
                     </div>
@@ -98,10 +98,10 @@
                     <div id="proj_chips_container" class="hidden mb-2">
                         <div id="proj_chips" class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-1"></div>
                         <div class="flex items-center justify-between mt-2">
-                            <p class="text-xs text-gray-400">Haz clic para seleccionar, vuelve a hacer clic para deseleccionar</p>
+                            <p class="text-xs text-gray-400">{{ __('general.proyectos.modal.tec_help') }}</p>
                             <button type="button" onclick="agregarTecnologia()"
                                 class="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-[#1e3a5f] hover:bg-[#e11d48] text-white rounded-lg transition font-medium">
-                                <i class="fas fa-plus text-xs"></i> Agregar seleccionadas
+                                <i class="fas fa-plus text-xs"></i> {{ __('general.proyectos.modal.agregar_sel') }}
                             </button>
                         </div>
                     </div>
@@ -112,17 +112,17 @@
 
                 {{-- Estado y Visibilidad --}}
                 <div class="bg-white rounded-2xl p-5 shadow-sm border-t-2 border-t-[#1e3a5f]">
-                    <h4 class="font-semibold text-[#1e3a5f] text-sm mb-0.5">Estado y Visibilidad</h4>
-                    <p class="text-xs text-gray-400 mb-4">Configura el estado actual y quién puede ver este proyecto</p>
+                    <h4 class="font-semibold text-[#1e3a5f] text-sm mb-0.5">{{ __('general.proyectos.modal.seccion_estado') }}</h4>
+                    <p class="text-xs text-gray-400 mb-4">{{ __('general.proyectos.modal.seccion_estado_desc') }}</p>
 
                     <div class="mb-4">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Estado del Proyecto</label>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('general.proyectos.modal.estado') }}</label>
                         <div class="relative">
                             <select id="proj_estado" onchange="actualizarFechaFinSegunEstado()" class="{{ $selectCls }}">
-                                <option value="pendiente">Pendiente</option>
-                                <option value="en_progreso" selected>En Curso</option>
-                                <option value="completado">Completado</option>
-                                <option value="cancelado">Cancelado</option>
+                                <option value="pendiente">{{ __('general.proyectos.modal.estado_pendiente') }}</option>
+                                <option value="en_progreso" selected>{{ __('general.proyectos.modal.estado_progreso') }}</option>
+                                <option value="completado">{{ __('general.proyectos.modal.estado_completado') }}</option>
+                                <option value="cancelado">{{ __('general.proyectos.modal.estado_cancelado') }}</option>
                             </select>
                             <i class="fas fa-chevron-down text-gray-400 text-xs absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
                         </div>
@@ -140,12 +140,12 @@
                 <div class="bg-white rounded-2xl p-5 shadow-sm border-t-2 border-t-[#e11d48]">
                     <div class="flex items-center gap-2 mb-1">
                         <i class="fas fa-globe text-[#e11d48] text-sm"></i>
-                        <h4 class="font-semibold text-[#1e3a5f] text-sm">Enlace del Proyecto</h4>
+                        <h4 class="font-semibold text-[#1e3a5f] text-sm">{{ __('general.proyectos.modal.seccion_enlace') }}</h4>
                     </div>
-                    <p class="text-xs text-gray-400 mb-4">URL de la página web o aplicación desarrollada para la empresa o institución</p>
+                    <p class="text-xs text-gray-400 mb-4">{{ __('general.proyectos.modal.seccion_enlace_desc') }}</p>
 
                     <label class="flex items-center gap-1 text-xs font-medium text-gray-700 mb-1">
-                        <i class="fas fa-globe text-[#e11d48] text-xs"></i> URL del Proyecto Desplegado
+                        <i class="fas fa-globe text-[#e11d48] text-xs"></i> {{ __('general.proyectos.modal.url_label') }}
                     </label>
                     <div class="relative flex items-center gap-2">
                         <input type="url" id="proj_url_link"
@@ -153,47 +153,47 @@
                             placeholder="https://proyecto-cliente.com">
                         <span id="url_status" class="hidden absolute right-3 text-sm pointer-events-none"></span>
                     </div>
-                    <p id="url_hint" class="text-xs text-gray-400 mt-1">Enlace a la aplicación o sitio web en producción desarrollada para el cliente</p>
+                    <p id="url_hint" class="text-xs text-gray-400 mt-1">{{ __('general.proyectos.modal.url_hint_default') }}</p>
                 </div>
 
                 {{-- Referencias --}}
                 <div class="bg-white rounded-2xl p-5 shadow-sm border-t-2 border-t-[#e11d48]">
                     <div class="flex items-center gap-2 mb-1">
                         <i class="fas fa-user-friends text-[#e11d48] text-sm"></i>
-                        <h4 class="font-semibold text-[#1e3a5f] text-sm">Referencias del Proyecto</h4>
+                        <h4 class="font-semibold text-[#1e3a5f] text-sm">{{ __('general.proyectos.modal.seccion_refs') }}</h4>
                     </div>
-                    <p class="text-xs text-gray-400 mb-4">Información sobre personas que pueden dar referencias sobre este proyecto</p>
+                    <p class="text-xs text-gray-400 mb-4">{{ __('general.proyectos.modal.seccion_refs_desc') }}</p>
 
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Referencias</label>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('general.proyectos.modal.refs_label') }}</label>
                     <textarea id="proj_referencias" rows="4"
                         class="{{ $textareaCls }}"
-                        placeholder="Ej: Juan Pérez - Supervisor de Proyecto&#10;Email: juan@ejemplo.com&#10;Teléfono: +123456789"></textarea>
-                    <p class="text-xs text-gray-400 mt-1">Nombre, cargo, email y teléfono de las personas que pueden dar referencias</p>
+                        placeholder="{{ __('general.proyectos.modal.refs_ph') }}"></textarea>
+                    <p class="text-xs text-gray-400 mt-1">{{ __('general.proyectos.modal.refs_help') }}</p>
                 </div>
 
                 {{-- Cronograma --}}
                 <div class="bg-white rounded-2xl p-5 shadow-sm border-t-2 border-t-[#1e3a5f]">
                     <div class="flex items-center gap-2 mb-1">
                         <i class="fas fa-calendar-alt text-[#1e3a5f] text-sm"></i>
-                        <h4 class="font-semibold text-[#1e3a5f] text-sm">Cronograma</h4>
+                        <h4 class="font-semibold text-[#1e3a5f] text-sm">{{ __('general.proyectos.modal.seccion_cron') }}</h4>
                     </div>
-                    <p class="text-xs text-gray-400 mb-4">Define las fechas de inicio y finalización</p>
+                    <p class="text-xs text-gray-400 mb-4">{{ __('general.proyectos.modal.seccion_cron_desc') }}</p>
 
                     <div class="mb-3">
                         <label class="block text-xs font-medium text-gray-700 mb-1">
-                            Fecha de Inicio <span class="text-[#e11d48]">*</span>
+                            {{ __('general.proyectos.modal.fecha_ini') }} <span class="text-[#e11d48]">*</span>
                         </label>
                         <input type="date" id="proj_fecha_ini" required class="{{ $inputCls }}">
                     </div>
 
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">
-                            Fecha de Finalización
+                            {{ __('general.proyectos.modal.fecha_fin') }}
                             <span id="proj_fecha_fin_required" class="text-[#e11d48] hidden">*</span>
                         </label>
                         <input type="date" id="proj_fecha_fin" disabled
                             class="{{ $inputCls }} disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-400">
-                        <p id="proj_fecha_fin_hint" class="text-xs text-gray-400 mt-1">Disponible solo cuando el estado es "Completado"</p>
+                        <p id="proj_fecha_fin_hint" class="text-xs text-gray-400 mt-1">{{ __('general.proyectos.modal.fecha_fin_hint') }}</p>
                     </div>
                 </div>
 
