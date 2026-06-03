@@ -7,8 +7,8 @@ const CSRF_PERFIL = document.querySelector('meta[name="csrf-token"]').content;
 
 const CONFIRM_CONFIG_PERFIL = {
     guardar: {
-        titulo:    '¿Guardar cambios?',
-        mensaje:   'Se actualizará tu información de perfil. Podrás editarla en cualquier momento.',
+        titulo:    __t('js.perfil.confirm_guardar_titulo'),
+        mensaje:   __t('js.perfil.confirm_guardar_msg'),
         icon:      'fas fa-save',
         iconBg:    'bg-blue-50',
         iconColor: 'text-blue-500',
@@ -16,8 +16,8 @@ const CONFIRM_CONFIG_PERFIL = {
         accion:    () => submitPerfil(),
     },
     cancelar: {
-        titulo:    '¿Descartar cambios?',
-        mensaje:   'Los datos ingresados no se guardarán. Esta acción no se puede deshacer.',
+        titulo:    __t('js.perfil.confirm_cancelar_titulo'),
+        mensaje:   __t('js.perfil.confirm_cancelar_msg'),
         icon:      'fas fa-times-circle',
         iconBg:    'bg-red-50',
         iconColor: 'text-red-500',
@@ -28,8 +28,8 @@ const CONFIRM_CONFIG_PERFIL = {
 
 const EXITO_CONFIG_PERFIL = {
     exito: {
-        titulo:    '¡Perfil Actualizado!',
-        mensaje:   'Tu información de perfil se ha guardado correctamente.',
+        titulo:    __t('js.perfil.exito_titulo'),
+        mensaje:   __t('js.perfil.exito_msg'),
         icon:      'fas fa-check-circle',
         iconBg:    'bg-green-50',
         iconColor: 'text-green-500',
@@ -61,7 +61,7 @@ function mostrarExitoPerfil() {
         iconBg:         cfg.iconBg,
         iconColor:      cfg.iconColor,
         btnClass:       cfg.btnClass,
-        textoConfirmar: 'OK',
+        textoConfirmar: __t('js.perfil.ok'),
         soloConfirmar:  true,
     });
     setTimeout(() => window.cerrarConfirmar(), 2000);
@@ -90,7 +90,7 @@ function actualizarInterfazPerfil(data) {
     const u = data.usuario || {};
     const p = data.perfil  || {};
 
-    const nombreCompleto = `${u.nombre ?? ''} ${u.apellido ?? ''}`.trim() || 'Usuario';
+    const nombreCompleto = `${u.nombre ?? ''} ${u.apellido ?? ''}`.trim() || __t('js.perfil.usuario_default');
     const iniciales = ((u.nombre?.charAt(0) || 'U') + (u.apellido?.charAt(0) || 'S')).toUpperCase();
 
     const setText = (id, value, fallback = '—') => {
@@ -99,7 +99,7 @@ function actualizarInterfazPerfil(data) {
     };
 
     // ── Header del dashboard ──────────────────────────────────────────────────
-    setText('header-nombre-usuario', nombreCompleto, 'Usuario');
+    setText('header-nombre-usuario', nombreCompleto, __t('js.perfil.usuario_default'));
 
     const headerAvatar = document.getElementById('header-avatar');
     if (headerAvatar) {
@@ -111,9 +111,9 @@ function actualizarInterfazPerfil(data) {
     }
 
     // ── Cabecera del perfil ───────────────────────────────────────────────────
-    setText('perfil-nombre-header',    nombreCompleto, 'Usuario');
-    setText('perfil-titulo-header',    p.titulo_profesional, 'Desarrollador');
-    setText('perfil-ubicacion-header', p.ubicacion, 'Ubicación no especificada');
+    setText('perfil-nombre-header',    nombreCompleto, __t('js.perfil.usuario_default'));
+    setText('perfil-titulo-header',    p.titulo_profesional, __t('js.perfil.desarrollador_default'));
+    setText('perfil-ubicacion-header', p.ubicacion, __t('js.perfil.ubicacion_no_esp'));
     setText('perfil-correo-header',    u.correo_electronico, '___');
 
     const fotoContainer = document.getElementById('perfil-foto-container');
@@ -126,8 +126,7 @@ function actualizarInterfazPerfil(data) {
     }
 
     // ── Biografía ─────────────────────────────────────────────────────────────
-    setText('perfil_biografia_texto', p.biografia,
-        'Sin biografía. Haz clic en "Editar Perfil" para agregar una descripción.');
+    setText('perfil_biografia_texto', p.biografia, __t('js.perfil.sin_biografia'));
 
     // ── Lista de datos ────────────────────────────────────────────────────────
     setText('perfil-datos-nombre',    nombreCompleto);
@@ -199,7 +198,7 @@ function abrirModalPerfil() {
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error al cargar los datos del perfil');
+            alert(__t('js.perfil.err_cargar'));
         });
     
     document.getElementById('modalPerfil').classList.remove('hidden');
@@ -223,19 +222,19 @@ function confirmarGuardarPerfil() {
     const correo = document.getElementById('edit_correo').value.trim();
 
     if (!nombre) {
-        resaltarErrorPerfil('edit_nombre', 'El nombre es obligatorio.');
+        resaltarErrorPerfil('edit_nombre', __t('js.perfil.err_nombre_req'));
         return;
     }
     if (!apellido) {
-        resaltarErrorPerfil('edit_apellido', 'El apellido es obligatorio.');
+        resaltarErrorPerfil('edit_apellido', __t('js.perfil.err_apellido_req'));
         return;
     }
     if (!correo) {
-        resaltarErrorPerfil('edit_correo', 'El correo electrónico es obligatorio.');
+        resaltarErrorPerfil('edit_correo', __t('js.perfil.err_correo_req'));
         return;
     }
     if (!correo.includes('@')) {
-        resaltarErrorPerfil('edit_correo', 'Ingresa un correo electrónico válido.');
+        resaltarErrorPerfil('edit_correo', __t('js.perfil.err_correo_inv'));
         return;
     }
 
@@ -277,7 +276,7 @@ function submitPerfil() {
             cerrarModalPerfil();
             return fetch('{{ route("perfil.editar") }}');
         } else {
-            alert(data.message || 'Error al guardar');
+            alert(data.message || __t('js.perfil.err_guardar'));
             throw new Error('Error en guardado');
         }
     })
@@ -289,7 +288,7 @@ function submitPerfil() {
     .catch(error => {
         console.error('Error:', error);
         if (error.message !== 'Error en guardado') {
-            alert('Hubo un problema al guardar');
+            alert(__t('js.perfil.err_prob_guardar'));
         }
     });
 }

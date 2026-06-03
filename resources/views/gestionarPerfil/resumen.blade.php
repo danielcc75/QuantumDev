@@ -5,9 +5,9 @@
     <main class="p-4 sm:p-6 lg:p-8">
         <!-- Saludo -->
         <div class="mb-6 md:mb-8">
-            <div class="px-1 py-2 text-xs text-gray-400">Dashboard / Mi Perfil / Proyectos</div>
-            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mt-2">Hola, {{ $nombreUsuario ?? 'Usuario' }}</h2>
-            <p class="text-sm text-gray-500 mt-1">Resumen de tu actividad, proyectos y rendimiento reciente en el sistema.</p>
+            <div class="px-1 py-2 text-xs text-gray-400">{{ __('general.perfil.resumen.breadcrumb') }}</div>
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mt-2">{{ __('general.perfil.resumen.saludo', ['nombre' => $nombreUsuario ?? __('general.perfil.usuario_default')]) }}</h2>
+            <p class="text-sm text-gray-500 mt-1">{{ __('general.perfil.resumen.saludo_sub') }}</p>
         </div>
 
         <!-- Stats Grid -->
@@ -26,19 +26,19 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center stat-card">
                 <div id="resumen-stat-repos" class="text-3xl font-bold text-blue-600">{{ $stats['repos'] }}</div>
-                <div class="text-sm text-gray-500 mt-1">Proyectos</div>
+                <div class="text-sm text-gray-500 mt-1">{{ __('general.perfil.resumen.stat_proyectos') }}</div>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center stat-card">
                 <div id="resumen-stat-actividades" class="text-3xl font-bold text-green-600">{{ number_format($stats['commits']) }}</div>
-                <div class="text-sm text-gray-500 mt-1">Actividades</div>
+                <div class="text-sm text-gray-500 mt-1">{{ __('general.perfil.resumen.stat_actividades') }}</div>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center stat-card">
                 <div class="text-3xl font-bold text-purple-600">{{ $stats['estudios'] }}</div>
-                <div class="text-sm text-gray-500 mt-1">Estudios</div>
+                <div class="text-sm text-gray-500 mt-1">{{ __('general.perfil.resumen.stat_estudios') }}</div>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center stat-card">
                 <div class="text-3xl font-bold text-orange-600">{{ $stats['codigo_limpio'] }}%</div>
-                <div class="text-sm text-gray-500 mt-1">Completado</div>
+                <div class="text-sm text-gray-500 mt-1">{{ __('general.perfil.resumen.stat_completado') }}</div>
             </div>
         </div>
 
@@ -52,10 +52,10 @@
                 ->get() : collect();
 
             $estadoConfig = [
-                'en_progreso' => ['label' => 'En curso',   'icon' => 'fa-spinner',      'bg' => 'bg-[#1e3a5f]/10', 'text' => 'text-[#1e3a5f]'],
-                'completado'  => ['label' => 'Finalizado', 'icon' => 'fa-check-circle', 'bg' => 'bg-indigo-100',   'text' => 'text-indigo-700'],
-                'pendiente'   => ['label' => 'Pendiente',  'icon' => 'fa-clock',        'bg' => 'bg-gray-100',     'text' => 'text-gray-600'],
-                'cancelado'   => ['label' => 'Cancelado',  'icon' => 'fa-times-circle', 'bg' => 'bg-red-100',      'text' => 'text-[#e11d48]'],
+                'en_progreso' => ['label' => __('general.perfil.resumen.estado_en_curso'),   'icon' => 'fa-spinner',      'bg' => 'bg-[#1e3a5f]/10', 'text' => 'text-[#1e3a5f]'],
+                'completado'  => ['label' => __('general.perfil.resumen.estado_finalizado'), 'icon' => 'fa-check-circle', 'bg' => 'bg-indigo-100',   'text' => 'text-indigo-700'],
+                'pendiente'   => ['label' => __('general.perfil.resumen.estado_pendiente'),  'icon' => 'fa-clock',        'bg' => 'bg-gray-100',     'text' => 'text-gray-600'],
+                'cancelado'   => ['label' => __('general.perfil.resumen.estado_cancelado'),  'icon' => 'fa-times-circle', 'bg' => 'bg-red-100',      'text' => 'text-[#e11d48]'],
             ];
 
             $accentColors = [
@@ -68,10 +68,10 @@
         <div class="mb-8">
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <h3 class="text-lg font-bold text-[#1e3a5f]">Proyectos recientes</h3>
+                    <h3 class="text-lg font-bold text-[#1e3a5f]">{{ __('general.perfil.resumen.proyectos_recientes') }}</h3>
                     <div class="h-0.5 w-10 bg-[#e11d48] rounded-full mt-1"></div>
                 </div>
-                <span id="resumen-proyectos-count" class="text-xs text-gray-400">Últimos {{ $proyectosRecientes->count() }} registros</span>
+                <span id="resumen-proyectos-count" class="text-xs text-gray-400">{{ __('general.perfil.resumen.ultimos_registros', ['n' => $proyectosRecientes->count()]) }}</span>
             </div>
 
             @if($proyectosRecientes->isEmpty())
@@ -79,7 +79,7 @@
                     <div class="w-14 h-14 rounded-full bg-[#1e3a5f]/8 flex items-center justify-center mx-auto mb-3">
                         <i class="fas fa-folder-open text-2xl text-[#1e3a5f]/40"></i>
                     </div>
-                    <p class="text-gray-500 font-medium text-sm">No hay proyectos registrados</p>
+                    <p class="text-gray-500 font-medium text-sm">{{ __('general.perfil.resumen.no_proyectos') }}</p>
                 </div>
                 <div id="resumen-proyectos-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4 hidden"></div>
             @else
@@ -87,7 +87,7 @@
                     <div class="w-14 h-14 rounded-full bg-[#1e3a5f]/8 flex items-center justify-center mx-auto mb-3">
                         <i class="fas fa-folder-open text-2xl text-[#1e3a5f]/40"></i>
                     </div>
-                    <p class="text-gray-500 font-medium text-sm">No hay proyectos registrados</p>
+                    <p class="text-gray-500 font-medium text-sm">{{ __('general.perfil.resumen.no_proyectos') }}</p>
                 </div>
                 <div id="resumen-proyectos-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     @foreach($proyectosRecientes as $i => $proyecto)
@@ -121,7 +121,7 @@
 
                             {{-- Descripción --}}
                             <p class="text-xs text-gray-500 leading-relaxed line-clamp-2">
-                                {{ $proyecto->descripcion ?? 'Sin descripción' }}
+                                {{ $proyecto->descripcion ?? __('general.perfil.resumen.sin_descripcion') }}
                             </p>
 
                             {{-- Tags tecnologías --}}
@@ -174,10 +174,10 @@
         <div class="mb-8">
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <h3 class="text-lg font-bold text-[#1e3a5f]">Habilidades técnicas</h3>
+                    <h3 class="text-lg font-bold text-[#1e3a5f]">{{ __('general.perfil.resumen.habilidades_tec') }}</h3>
                     <div class="h-0.5 w-10 bg-[#e11d48] rounded-full mt-1"></div>
                 </div>
-                <span class="text-xs text-gray-400">{{ $habilidadesResumen->count() }} registradas</span>
+                <span class="text-xs text-gray-400">{{ __('general.perfil.resumen.registradas', ['n' => $habilidadesResumen->count()]) }}</span>
             </div>
 
             @if($habilidadesResumen->isEmpty())
@@ -185,13 +185,13 @@
                     <div class="w-14 h-14 rounded-full bg-[#1e3a5f]/8 flex items-center justify-center mx-auto mb-3">
                         <i class="fas fa-code text-2xl text-[#1e3a5f]/40"></i>
                     </div>
-                    <p class="text-gray-500 font-medium text-sm">No hay habilidades registradas</p>
+                    <p class="text-gray-500 font-medium text-sm">{{ __('general.perfil.resumen.no_habilidades') }}</p>
                 </div>
             @else
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     @foreach($habilidadesResumen as $hab)
                         @php
-                            $cat = $hab->nombre_categoria ?? 'Otra';
+                            $cat = $hab->nombre_categoria ?? __('general.perfil.resumen.otra_cat');
                             if (!isset($catIndex[$cat])) {
                                 $catIndex[$cat] = $colorIdx % count($catColors);
                                 $colorIdx++;
@@ -222,7 +222,7 @@
                             {{-- Años de experiencia --}}
                             <div class="mt-auto pt-2 border-t border-gray-100 flex items-center gap-1.5 text-xs text-gray-500">
                                 <i class="fas fa-clock text-gray-400 text-[11px]"></i>
-                                <span>{{ $hab->anios_experiencia }} {{ $hab->anios_experiencia == 1 ? 'año' : 'años' }} de experiencia</span>
+                                <span>{{ __('general.perfil.resumen.' . ($hab->anios_experiencia == 1 ? 'anios_singular' : 'anios_plural'), ['n' => $hab->anios_experiencia]) }}</span>
                             </div>
                         </div>
                     @endforeach

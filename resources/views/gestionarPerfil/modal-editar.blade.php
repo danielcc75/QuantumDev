@@ -10,18 +10,18 @@
                     <i class="fas fa-arrow-left text-lg"></i>
                 </button>
                 <div class="min-w-0">
-                    <h3 class="text-lg sm:text-xl font-bold truncate">Editar Perfil</h3>
-                    <p class="text-blue-200 text-xs mt-0.5 hidden sm:block">Actualiza tu información personal y profesional</p>
+                    <h3 class="text-lg sm:text-xl font-bold truncate">{{ __('general.perfil.modal.titulo') }}</h3>
+                    <p class="text-blue-200 text-xs mt-0.5 hidden sm:block">{{ __('general.perfil.modal.sub') }}</p>
                 </div>
             </div>
             <div class="flex items-center gap-2 sm:gap-3 justify-end">
                 <button type="button" onclick="confirmarCancelarPerfil()"
                     class="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm border border-white/30 text-white rounded-lg hover:bg-white/10 transition">
-                    Cancelar
+                    {{ __('general.perfil.modal.cancelar') }}
                 </button>
                 <button type="button" onclick="confirmarGuardarPerfil()"
                     class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition whitespace-nowrap">
-                    <i class="fas fa-save text-xs"></i> <span>Guardar</span><span class="hidden sm:inline"> Cambios</span>
+                    <i class="fas fa-save text-xs"></i> <span>{{ __('general.perfil.modal.guardar') }}</span><span class="hidden sm:inline"> {{ __('general.perfil.modal.cambios') }}</span>
                 </button>
             </div>
         </div>
@@ -36,12 +36,12 @@
 
                 {{-- Datos Personales --}}
                 <div class="bg-white rounded-2xl p-5 shadow-sm">
-                    <h4 class="font-semibold text-gray-800 text-sm mb-0.5">Datos Personales</h4>
-                    <p class="text-xs text-blue-500 mb-4">Información básica de contacto</p>
+                    <h4 class="font-semibold text-gray-800 text-sm mb-0.5">{{ __('general.perfil.modal.datos_personales') }}</h4>
+                    <p class="text-xs text-blue-500 mb-4">{{ __('general.perfil.modal.datos_sub') }}</p>
 
                     <div class="mb-4">
                         <label class="block text-xs font-medium text-gray-700 mb-1">
-                            Nombre <span class="text-red-500">*</span>
+                            {{ __('general.perfil.modal.nombre') }} <span class="text-red-500">*</span>
                         </label>
                         <input type="text" id="edit_nombre" name="nombre"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
@@ -49,7 +49,7 @@
 
                     <div class="mb-4">
                         <label class="block text-xs font-medium text-gray-700 mb-1">
-                            Apellido <span class="text-red-500">*</span>
+                            {{ __('general.perfil.modal.apellido') }} <span class="text-red-500">*</span>
                         </label>
                         <input type="text" id="edit_apellido" name="apellido"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
@@ -57,17 +57,17 @@
 
                     <div class="mb-4">
                         <label class="block text-xs font-medium text-gray-700 mb-1">
-                            Correo Electrónico <span class="text-red-500">*</span>
+                            {{ __('general.perfil.modal.correo') }} <span class="text-red-500">*</span>
                         </label>
                         <input type="email" id="edit_correo" name="correo_electronico"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Teléfono</label>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('general.perfil.modal.telefono') }}</label>
                         <input type="text" id="edit_telefono" name="telefono"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            placeholder="Ej: +34 123 456 789">
+                            placeholder="{{ __('general.perfil.modal.telefono_ph') }}">
                     </div>
                 </div>
 
@@ -75,30 +75,30 @@
                 <div class="bg-white rounded-2xl p-5 shadow-sm">
                     <div class="flex items-center gap-2 mb-0.5">
                         <i class="fas fa-briefcase text-blue-500 text-sm"></i>
-                        <h4 class="font-semibold text-gray-800 text-sm">Información Profesional</h4>
+                        <h4 class="font-semibold text-gray-800 text-sm">{{ __('general.perfil.modal.info_pro') }}</h4>
                     </div>
-                    <p class="text-xs text-gray-400 mb-4">Tu perfil profesional y ubicación</p>
+                    <p class="text-xs text-gray-400 mb-4">{{ __('general.perfil.modal.info_pro_sub') }}</p>
 
                     <div class="mb-4">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Título Profesional</label>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('general.perfil.modal.titulo_pro') }}</label>
                         <input type="text" id="edit_titulo" name="titulo_profesional"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            placeholder="Ej: Ingeniero de Software">
+                            placeholder="{{ __('general.perfil.modal.titulo_pro_ph') }}">
                     </div>
 
                     <div class="mb-4">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Ubicación</label>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('general.perfil.modal.ubicacion') }}</label>
                         <input type="text" id="edit_ubicacion" name="ubicacion"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            placeholder="Ciudad, País">
+                            placeholder="{{ __('general.perfil.modal.ubicacion_ph') }}">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Foto de Perfil (URL)</label>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('general.perfil.modal.foto_perfil') }}</label>
                         <input type="text" id="edit_foto" name="foto_perfil"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            placeholder="https://ejemplo.com/mi-foto.jpg">
-                        <p class="text-xs text-gray-400 mt-1">Pega la URL de tu foto de perfil</p>
+                            placeholder="{{ __('general.perfil.modal.foto_ph') }}">
+                        <p class="text-xs text-gray-400 mt-1">{{ __('general.perfil.modal.foto_help') }}</p>
                     </div>
                 </div>
 
@@ -111,23 +111,23 @@
                 <div class="bg-white rounded-2xl p-5 shadow-sm">
                     <div class="flex items-center gap-2 mb-1">
                         <i class="fas fa-user-circle text-blue-500 text-sm"></i>
-                        <h4 class="font-semibold text-gray-800 text-sm">Biografía</h4>
+                        <h4 class="font-semibold text-gray-800 text-sm">{{ __('general.perfil.modal.biografia') }}</h4>
                     </div>
-                    <p class="text-xs text-gray-400 mb-4">Cuéntanos sobre ti, tu experiencia y objetivos</p>
+                    <p class="text-xs text-gray-400 mb-4">{{ __('general.perfil.modal.biografia_sub') }}</p>
 
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Sobre mí</label>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('general.perfil.modal.sobre_mi') }}</label>
                     <textarea id="edit_biografia" name="biografia" rows="6"
                         class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
-                        placeholder="Desarrollador full-stack con 5 años de experiencia..."></textarea>
+                        placeholder="{{ __('general.perfil.modal.biografia_ph') }}"></textarea>
                 </div>
 
                 {{-- Redes Sociales --}}
                 <div class="bg-white rounded-2xl p-5 shadow-sm">
                     <div class="flex items-center gap-2 mb-1">
                         <i class="fas fa-share-alt text-blue-500 text-sm"></i>
-                        <h4 class="font-semibold text-gray-800 text-sm">Redes Sociales</h4>
+                        <h4 class="font-semibold text-gray-800 text-sm">{{ __('general.perfil.modal.redes') }}</h4>
                     </div>
-                    <p class="text-xs text-gray-400 mb-4">Conecta tu perfil con tus redes profesionales</p>
+                    <p class="text-xs text-gray-400 mb-4">{{ __('general.perfil.modal.redes_sub') }}</p>
 
                     <div class="mb-3">
                         <label class="flex items-center gap-1 text-xs font-medium text-gray-700 mb-1">
@@ -135,7 +135,7 @@
                         </label>
                         <input type="url" id="link_github" name="link_github"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            placeholder="https://github.com/tuusuario">
+                            placeholder="{{ __('general.perfil.modal.github_ph') }}">
                     </div>
 
                     <div class="mb-3">
@@ -144,7 +144,7 @@
                         </label>
                         <input type="url" id="link_linkedin" name="link_linkedin"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            placeholder="https://linkedin.com/in/tuusuario">
+                            placeholder="{{ __('general.perfil.modal.linkedin_ph') }}">
                     </div>
 
                     <div class="mb-3">
@@ -153,16 +153,16 @@
                         </label>
                         <input type="url" id="link_twitter" name="link_twitter"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            placeholder="https://twitter.com/tuusuario">
+                            placeholder="{{ __('general.perfil.modal.twitter_ph') }}">
                     </div>
 
                     <div>
                         <label class="flex items-center gap-1 text-xs font-medium text-gray-700 mb-1">
-                            <i class="fas fa-globe text-green-500"></i> Portafolio Web
+                            <i class="fas fa-globe text-green-500"></i> {{ __('general.perfil.modal.portfolio') }}
                         </label>
                         <input type="url" id="link_portfolio" name="link_portfolio"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            placeholder="https://tusitioweb.com">
+                            placeholder="{{ __('general.perfil.modal.portfolio_ph') }}">
                     </div>
                 </div>
 

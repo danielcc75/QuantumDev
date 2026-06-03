@@ -6,7 +6,7 @@
         @php
             $nombreCompleto = trim(($usuario->nombre ?? '') . ' ' . ($usuario->apellido ?? ''));
             if (empty($nombreCompleto)) {
-                $nombreCompleto = 'Usuario';
+                $nombreCompleto = __('general.perfil.usuario_default');
             }
 
             $fotoUrl = $usuario->perfil->foto_perfil ?? null;
@@ -55,13 +55,13 @@
                     <div class="flex-1 min-w-0 text-center md:text-left">
                         <h1 id="perfil-nombre-header" class="text-2xl sm:text-3xl font-bold text-gray-800 break-words">{{ $nombreCompleto }}</h1>
                         <p id="perfil-titulo-header" class="text-gray-500 mt-1">
-                            {{ $usuario->perfil->titulo_profesional ?? 'Desarrollador' }}
+                            {{ $usuario->perfil->titulo_profesional ?? __('general.perfil.desarrollador_default') }}
                         </p>
 
                         <div class="flex flex-wrap justify-center md:justify-start gap-x-4 gap-y-1 mt-3 text-sm text-gray-600">
                             <span class="flex items-center min-w-0">
                                 <i class="fas fa-map-marker-alt w-4 h-4 mr-1 text-gray-400 flex-shrink-0"></i>
-                                <span id="perfil-ubicacion-header" class="truncate">{{ $usuario->perfil->ubicacion ?? 'Ubicación no especificada' }}</span>
+                                <span id="perfil-ubicacion-header" class="truncate">{{ $usuario->perfil->ubicacion ?? __('general.perfil.ubicacion_no_esp') }}</span>
                             </span>
                             <span class="flex items-center min-w-0">
                                 <i class="fas fa-envelope w-4 h-4 mr-1 text-gray-400 flex-shrink-0"></i>
@@ -111,14 +111,14 @@
                     <div class="bg-gray-200 rounded-full h-1.5 w-full max-w-md mx-auto">
                         <div id="progress-foto-bar" class="bg-[#1e3a5f] h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
                     </div>
-                    <p class="text-xs text-gray-500 text-center mt-1">Subiendo foto...</p>
+                    <p class="text-xs text-gray-500 text-center mt-1">{{ __('general.perfil.subiendo_foto') }}</p>
                 </div>
                 
                 <!-- Botón Editar Perfil -->
                 <div class="flex justify-end mt-6 pt-4 border-t border-gray-100">
                     <button onclick="abrirModalPerfil()" class="px-4 py-2 bg-[#1e3a5f] text-white rounded-lg hover:bg-[#152c47] transition-colors">
                         <i class="fas fa-edit"></i>
-                        <span>Editar Perfil</span>
+                        <span>{{ __('general.perfil.editar_perfil') }}</span>
                     </button>
                 </div>
             </div>
@@ -127,10 +127,10 @@
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-6">
                 <h2 class="text-lg sm:text-xl font-semibold text-gray-800 mb-4 flex items-center">
                     <i class="fas fa-user-circle text-blue-500 mr-2"></i>
-                    Sobre mí
+                    {{ __('general.perfil.sobre_mi') }}
                 </h2>
                 <p class="text-sm sm:text-base text-gray-600 leading-relaxed break-words" id="perfil_biografia_texto">
-                    {{ $usuario->perfil->biografia ?? 'Sin biografía. Haz clic en "Editar Perfil" para agregar una descripción.' }}
+                    {{ $usuario->perfil->biografia ?? __('general.perfil.sin_biografia') }}
                 </p>
             </div>
 
@@ -138,33 +138,33 @@
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-6">
                 <h2 class="text-lg sm:text-xl font-semibold text-gray-800 mb-5 flex items-center">
                     <i class="fas fa-id-card text-blue-500 mr-2"></i>
-                    Mi Perfil
+                    {{ __('general.perfil.mi_perfil') }}
                 </h2>
 
                 <!-- Datos Personales -->
                 <div class="mb-5">
                     <h3 class="text-sm sm:text-base font-semibold text-blue-600 uppercase tracking-wide mb-3 flex items-center gap-2">
-                        <i class="fas fa-user text-blue-400"></i> Datos Personales
+                        <i class="fas fa-user text-blue-400"></i> {{ __('general.perfil.datos_personales') }}
                     </h3>
                     <ul class="space-y-3">
                         <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm sm:text-base text-gray-700">
                             <span class="flex items-center gap-3 sm:contents">
                                 <span class="w-5 text-gray-400 flex-shrink-0"><i class="fas fa-user"></i></span>
-                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">Nombre:</span>
+                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">{{ __('general.perfil.lbl_nombre') }}</span>
                             </span>
                             <span id="perfil-datos-nombre" class="pl-8 sm:pl-0 break-words min-w-0">{{ $usuario->nombre ?? '—' }} {{ $usuario->apellido ?? '' }}</span>
                         </li>
                         <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm sm:text-base text-gray-700">
                             <span class="flex items-center gap-3 sm:contents">
                                 <span class="w-5 text-gray-400 flex-shrink-0"><i class="fas fa-envelope"></i></span>
-                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">Correo:</span>
+                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">{{ __('general.perfil.lbl_correo') }}</span>
                             </span>
                             <span id="perfil-datos-correo" class="pl-8 sm:pl-0 break-all min-w-0">{{ $usuario->correo_electronico ?? '—' }}</span>
                         </li>
                         <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm sm:text-base text-gray-700">
                             <span class="flex items-center gap-3 sm:contents">
                                 <span class="w-5 text-gray-400 flex-shrink-0"><i class="fas fa-phone"></i></span>
-                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">Teléfono:</span>
+                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">{{ __('general.perfil.lbl_telefono') }}</span>
                             </span>
                             <span id="perfil-datos-telefono" class="pl-8 sm:pl-0 break-words min-w-0">{{ $usuario->telefono ?? '—' }}</span>
                         </li>
@@ -176,20 +176,20 @@
                 <!-- Información Profesional -->
                 <div class="mb-5">
                     <h3 class="text-sm sm:text-base font-semibold text-blue-600 uppercase tracking-wide mb-3 flex items-center gap-2">
-                        <i class="fas fa-briefcase text-blue-400"></i> Información Profesional
+                        <i class="fas fa-briefcase text-blue-400"></i> {{ __('general.perfil.info_profesional') }}
                     </h3>
                     <ul class="space-y-3">
                         <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm sm:text-base text-gray-700">
                             <span class="flex items-center gap-3 sm:contents">
                                 <span class="w-5 text-gray-400 flex-shrink-0"><i class="fas fa-briefcase"></i></span>
-                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">Título:</span>
+                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">{{ __('general.perfil.lbl_titulo') }}</span>
                             </span>
                             <span id="perfil-datos-titulo" class="pl-8 sm:pl-0 break-words min-w-0">{{ $usuario->perfil->titulo_profesional ?? '—' }}</span>
                         </li>
                         <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm sm:text-base text-gray-700">
                             <span class="flex items-center gap-3 sm:contents">
                                 <span class="w-5 text-gray-400 flex-shrink-0"><i class="fas fa-map-marker-alt"></i></span>
-                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">Ubicación:</span>
+                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">{{ __('general.perfil.lbl_ubicacion') }}</span>
                             </span>
                             <span id="perfil-datos-ubicacion" class="pl-8 sm:pl-0 break-words min-w-0">{{ $usuario->perfil->ubicacion ?? '—' }}</span>
                         </li>
@@ -201,13 +201,13 @@
                 <!-- Redes Sociales -->
                 <div>
                     <h3 class="text-sm sm:text-base font-semibold text-blue-600 uppercase tracking-wide mb-3 flex items-center gap-2">
-                        <i class="fas fa-share-alt text-blue-400"></i> Redes Sociales
+                        <i class="fas fa-share-alt text-blue-400"></i> {{ __('general.perfil.redes_sociales') }}
                     </h3>
                     <ul class="space-y-3">
                         <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm sm:text-base text-gray-700">
                             <span class="flex items-center gap-3 sm:contents">
                                 <span class="w-5 text-gray-800 flex-shrink-0"><i class="fab fa-github"></i></span>
-                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">GitHub:</span>
+                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">{{ __('general.perfil.lbl_github') }}</span>
                             </span>
                             <span id="perfil-datos-github" class="pl-8 sm:pl-0 flex-1 min-w-0 break-all">
                                 @if($links['github'] ?? false)
@@ -220,7 +220,7 @@
                         <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm sm:text-base text-gray-700">
                             <span class="flex items-center gap-3 sm:contents">
                                 <span class="w-5 text-blue-700 flex-shrink-0"><i class="fab fa-linkedin"></i></span>
-                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">LinkedIn:</span>
+                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">{{ __('general.perfil.lbl_linkedin') }}</span>
                             </span>
                             <span id="perfil-datos-linkedin" class="pl-8 sm:pl-0 flex-1 min-w-0 break-all">
                                 @if($links['linkedin'] ?? false)
@@ -233,7 +233,7 @@
                         <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm sm:text-base text-gray-700">
                             <span class="flex items-center gap-3 sm:contents">
                                 <span class="w-5 text-blue-400 flex-shrink-0"><i class="fab fa-twitter"></i></span>
-                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">Twitter / X:</span>
+                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">{{ __('general.perfil.lbl_twitter') }}</span>
                             </span>
                             <span id="perfil-datos-twitter" class="pl-8 sm:pl-0 flex-1 min-w-0 break-all">
                                 @if($links['twitter'] ?? false)
@@ -246,7 +246,7 @@
                         <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm sm:text-base text-gray-700">
                             <span class="flex items-center gap-3 sm:contents">
                                 <span class="w-5 text-green-600 flex-shrink-0"><i class="fas fa-globe"></i></span>
-                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">Portafolio:</span>
+                                <span class="font-medium text-gray-500 sm:w-36 sm:flex-shrink-0">{{ __('general.perfil.lbl_portafolio') }}</span>
                             </span>
                             <span id="perfil-datos-portfolio" class="pl-8 sm:pl-0 flex-1 min-w-0 break-all">
                                 @if($links['portfolio'] ?? false)
@@ -265,7 +265,7 @@
                 <button id="btn-abrir-configuracion" onclick="toggleConfiguracionCuenta()"
                     class="inline-flex items-center gap-2 bg-[#e11d48] hover:bg-red-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow">
                     <i class="fas fa-cog text-xs transition-transform duration-300" id="icono-config"></i>
-                    <span id="texto-btn-config">Configurar cuenta</span>
+                    <span id="texto-btn-config">{{ __('general.perfil.configurar_cuenta') }}</span>
                 </button>
             </div>
 
@@ -286,11 +286,11 @@
             if (abierto) {
                 seccion.classList.add('hidden');
                 icono.classList.remove('rotate-90');
-                texto.textContent = 'Configurar cuenta';
+                texto.textContent = @json(__('general.perfil.configurar_cuenta'));
             } else {
                 seccion.classList.remove('hidden');
                 icono.classList.add('rotate-90');
-                texto.textContent = 'Ocultar configuración';
+                texto.textContent = @json(__('general.perfil.ocultar_config'));
                 seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
@@ -305,20 +305,20 @@
         if (!file.type.startsWith('image/')) {
             Swal.fire({
                 icon: 'error',
-                title: 'Error',
-                text: 'Por favor, selecciona una imagen válida (JPG, PNG, GIF)',
+                title: __t('js.perfil.err_titulo'),
+                text: __t('js.perfil.err_imagen_invalida'),
                 confirmButtonColor: '#1e3a5f'
             });
             input.value = '';
             return;
         }
-        
+
         // Validar tamaño (máximo 2MB)
         if (file.size > 2 * 1024 * 1024) {
             Swal.fire({
                 icon: 'error',
-                title: 'Error',
-                text: 'La imagen no debe superar los 2MB',
+                title: __t('js.perfil.err_titulo'),
+                text: __t('js.perfil.err_imagen_size'),
                 confirmButtonColor: '#1e3a5f'
             });
             input.value = '';
@@ -395,12 +395,12 @@
                 
                 Swal.fire({
                     icon: 'success',
-                    title: '¡Foto actualizada!',
+                    title: __t('js.perfil.foto_ok_titulo'),
                     timer: 1500,
                     showConfirmButton: false
                 });
             } else {
-                throw new Error(data.message || 'Error al subir la foto');
+                throw new Error(data.message || __t('js.perfil.err_subir'));
             }
         })
         .catch(error => {
@@ -413,8 +413,8 @@
             
             Swal.fire({
                 icon: 'error',
-                title: 'Error',
-                text: 'No se pudo subir la imagen. Intenta nuevamente.',
+                title: __t('js.perfil.err_titulo'),
+                text: __t('js.perfil.err_subir'),
                 confirmButtonColor: '#d33'
             });
         });
