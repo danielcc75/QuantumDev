@@ -24,9 +24,9 @@
         {{-- Encabezado --}}
         <div class="mb-6 md:mb-8">
             <h2 class="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-[#1e3a5f] to-[#e11d48] bg-clip-text text-transparent">
-                Publicar Portafolio
+                {{ __('general.portafolio.titulo') }}
             </h2>
-            <p class="text-sm text-gray-500 mt-2">Controla la visibilidad de tu portafolio y publica el contenido que quieres mostrar</p>
+            <p class="text-sm text-gray-500 mt-2">{{ __('general.portafolio.subtitulo') }}</p>
             <div class="mt-3 h-1 w-20 rounded-full bg-gradient-to-r from-[#1e3a5f] to-[#e11d48]"></div>
         </div>
 
@@ -38,12 +38,12 @@
             </div>
             <div class="min-w-0 flex-1">
                 <p class="text-sm font-semibold text-gray-800">
-                    Tienes <span id="aviso-sin-publicar-count">{{ $itemsSinPublicar }}</span> elemento(s) sin publicar
+                    {!! __('general.portafolio.aviso_sin_publicar', ['n' => '<span id="aviso-sin-publicar-count">' . $itemsSinPublicar . '</span>']) !!}
                 </p>
-                <p class="text-xs text-gray-500 mt-0.5">Actualiza tu publicación para mostrarlos en tu portafolio público.</p>
+                <p class="text-xs text-gray-500 mt-0.5">{{ __('general.portafolio.aviso_sin_publicar_sub') }}</p>
                 <button type="button" onclick="editarPublicacion()"
                     class="mt-2 inline-flex items-center gap-2 bg-gradient-to-r from-[#1e3a5f] to-[#e11d48] hover:opacity-90 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow">
-                    Actualizar ahora
+                    {{ __('general.portafolio.aviso_btn') }}
                 </button>
             </div>
         </div>
@@ -57,8 +57,8 @@
                     <i class="fas fa-eye text-[#1e3a5f]"></i>
                 </div>
                 <div>
-                    <h3 class="font-bold text-gray-800 text-base">Visibilidad del perfil</h3>
-                    <p class="text-xs text-gray-500">Controla quién puede ver tu portafolio</p>
+                    <h3 class="font-bold text-gray-800 text-base">{{ __('general.portafolio.visibilidad_titulo') }}</h3>
+                    <p class="text-xs text-gray-500">{{ __('general.portafolio.visibilidad_sub') }}</p>
                 </div>
             </div>
 
@@ -73,16 +73,16 @@
                 </div>
                 <div class="min-w-0 flex-1">
                     <p id="label-visibilidad" class="text-sm font-bold text-gray-800">
-                        {{ $esPublico ? 'Perfil público' : 'Perfil privado' }}
+                        {{ $esPublico ? __('general.portafolio.perfil_publico') : __('general.portafolio.perfil_privado') }}
                     </p>
                     <p id="desc-visibilidad" class="text-xs text-gray-500 mt-0.5">
-                        {{ $esPublico ? 'Cualquier persona puede ver tu portafolio' : 'Solo tú puedes ver tu portafolio' }}
+                        {{ $esPublico ? __('general.portafolio.desc_publico') : __('general.portafolio.desc_privado') }}
                     </p>
                     <span id="badge-visibilidad"
                           class="inline-flex items-center gap-1.5 mt-2 text-xs font-semibold px-2.5 py-1 rounded-full
                                  {{ $esPublico ? 'bg-[#1e3a5f]/10 text-[#1e3a5f]' : 'bg-gray-200 text-gray-600' }}">
                         <span class="w-1.5 h-1.5 rounded-full {{ $esPublico ? 'bg-[#1e3a5f]' : 'bg-gray-500' }}"></span>
-                        {{ $esPublico ? 'Público' : 'Privado' }}
+                        {{ $esPublico ? __('general.portafolio.badge_publico') : __('general.portafolio.badge_privado') }}
                     </span>
                 </div>
             </div>
@@ -99,8 +99,8 @@
                     <div class="w-11 h-11 mx-auto rounded-xl bg-white/15 flex items-center justify-center mb-3">
                         <i class="fas fa-upload"></i>
                     </div>
-                    <p class="font-bold text-sm">Publicar</p>
-                    <p class="text-[11px] text-white/70 mt-0.5">Hacer visible</p>
+                    <p class="font-bold text-sm">{{ __('general.portafolio.accion_publicar') }}</p>
+                    <p class="text-[11px] text-white/70 mt-0.5">{{ __('general.portafolio.accion_publicar_sub') }}</p>
                 </button>
 
                 {{-- Actualizar (re-abrir modal) --}}
@@ -112,8 +112,8 @@
                     <div class="w-11 h-11 mx-auto rounded-xl bg-white/20 flex items-center justify-center mb-3">
                         <i class="fas fa-arrows-rotate"></i>
                     </div>
-                    <p class="font-bold text-sm">Actualizar</p>
-                    <p class="text-[11px] text-white/80 mt-0.5">Sincronizar</p>
+                    <p class="font-bold text-sm">{{ __('general.portafolio.accion_actualizar') }}</p>
+                    <p class="text-[11px] text-white/80 mt-0.5">{{ __('general.portafolio.accion_actualizar_sub') }}</p>
                 </button>
 
                 {{-- Ocultar (público → privado) --}}
@@ -125,8 +125,8 @@
                     <div class="w-11 h-11 mx-auto rounded-xl bg-white/15 flex items-center justify-center mb-3">
                         <i class="fas fa-eye-slash"></i>
                     </div>
-                    <p class="font-bold text-sm">Ocultar</p>
-                    <p class="text-[11px] text-white/70 mt-0.5">Privado</p>
+                    <p class="font-bold text-sm">{{ __('general.portafolio.accion_ocultar') }}</p>
+                    <p class="text-[11px] text-white/70 mt-0.5">{{ __('general.portafolio.accion_ocultar_sub') }}</p>
                 </button>
 
             </div>
@@ -163,14 +163,14 @@
         if (icon) {
             icon.className = 'fas text-white ' + (esPublico ? 'fa-globe' : 'fa-lock');
         }
-        if (label) label.textContent = esPublico ? 'Perfil público' : 'Perfil privado';
-        if (desc)  desc.textContent  = esPublico ? 'Cualquier persona puede ver tu portafolio' : 'Solo tú puedes ver tu portafolio';
+        if (label) label.textContent = esPublico ? __t('js.portafolio.perfil_publico') : __t('js.portafolio.perfil_privado');
+        if (desc)  desc.textContent  = esPublico ? __t('js.portafolio.desc_publico')   : __t('js.portafolio.desc_privado');
         if (badge) {
             badge.className = 'inline-flex items-center gap-1.5 mt-2 text-xs font-semibold px-2.5 py-1 rounded-full ' +
                 (esPublico ? 'bg-[#1e3a5f]/10 text-[#1e3a5f]' : 'bg-gray-200 text-gray-600');
             badge.innerHTML =
                 '<span class="w-1.5 h-1.5 rounded-full ' + (esPublico ? 'bg-[#1e3a5f]' : 'bg-gray-500') + '"></span>' +
-                (esPublico ? 'Público' : 'Privado');
+                (esPublico ? __t('js.portafolio.badge_publico') : __t('js.portafolio.badge_privado'));
         }
 
         const setEnabled = (btn, enabled) => {
@@ -218,10 +218,10 @@
     window.accionOcultar = function () {
         window.confirmar({
             tipo: 'primary',
-            titulo: '¿Ocultar tu portafolio?',
-            mensaje: 'Tu portafolio dejará de ser visible para otros usuarios.',
-            textoConfirmar: 'Sí, ocultar',
-            textoCancelar: 'Cancelar',
+            titulo: __t('js.portafolio.ocultar_titulo'),
+            mensaje: __t('js.portafolio.ocultar_msg'),
+            textoConfirmar: __t('js.portafolio.ocultar_si'),
+            textoCancelar: __t('js.portafolio.cancelar'),
             onConfirm: function () {
                 fetch('{{ route("cuenta.visibilidad") }}', {
                     method: 'PUT',
@@ -234,27 +234,27 @@
                         actualizarUIVisibilidad('privado');
                         window.confirmar({
                             tipo: 'success',
-                            titulo: '¡Listo!',
-                            mensaje: 'Tu portafolio ahora es privado.',
+                            titulo: __t('js.portafolio.ocultar_ok_titulo'),
+                            mensaje: __t('js.portafolio.ocultar_ok_msg'),
                             ocultarBotones: true,
                             autoCerrarMs: 2000
                         });
                     } else {
                         window.confirmar({
                             tipo: 'danger',
-                            titulo: 'Error',
-                            mensaje: res.message ?? 'No se pudo cambiar la visibilidad.',
+                            titulo: __t('js.portafolio.err_titulo'),
+                            mensaje: res.message ?? __t('js.portafolio.ocultar_err'),
                             soloConfirmar: true,
-                            textoConfirmar: 'Entendido'
+                            textoConfirmar: __t('js.portafolio.entendido')
                         });
                     }
                 })
                 .catch(() => window.confirmar({
                     tipo: 'danger',
-                    titulo: 'Error de conexión',
-                    mensaje: 'No se pudo conectar al servidor.',
+                    titulo: __t('js.portafolio.conexion_titulo'),
+                    mensaje: __t('js.portafolio.conexion_msg'),
                     soloConfirmar: true,
-                    textoConfirmar: 'Entendido'
+                    textoConfirmar: __t('js.portafolio.entendido')
                 }));
             }
         });

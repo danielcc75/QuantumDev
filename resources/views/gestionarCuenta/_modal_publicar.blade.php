@@ -11,23 +11,23 @@
                         <i class="fas fa-rocket text-[#1e3a5f]"></i>
                     </div>
                     <div class="min-w-0">
-                        <h2 class="text-lg sm:text-xl font-bold text-[#1e3a5f] truncate">Portafolio Principal</h2>
-                        <p class="text-xs text-gray-500">Selecciona el contenido a publicar</p>
+                        <h2 class="text-lg sm:text-xl font-bold text-[#1e3a5f] truncate">{{ __('general.cuenta.modal.titulo') }}</h2>
+                        <p class="text-xs text-gray-500">{{ __('general.cuenta.modal.subtitulo') }}</p>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                     <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#1e3a5f]/20 bg-[#1e3a5f]/5">
-                        <span class="text-[10px] uppercase tracking-wide text-[#1e3a5f]/70 font-semibold">Progreso</span>
+                        <span class="text-[10px] uppercase tracking-wide text-[#1e3a5f]/70 font-semibold">{{ __('general.cuenta.modal.progreso') }}</span>
                         <span id="mp-progreso" class="text-sm font-bold text-[#1e3a5f]">0%</span>
                     </div>
                     <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 bg-gray-50">
-                        <span class="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Seleccionados</span>
+                        <span class="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">{{ __('general.cuenta.modal.seleccionados') }}</span>
                         <span id="mp-contador" class="text-sm font-bold text-gray-800">0/0</span>
                     </div>
                     <button id="mp-publicar"
                         class="inline-flex items-center gap-2 bg-[#e11d48] hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors duration-200">
-                        <i class="fas fa-rocket text-xs"></i> Publicar
+                        <i class="fas fa-rocket text-xs"></i> {{ __('general.cuenta.modal.btn_publicar') }}
                     </button>
                     <button id="mp-cerrar" type="button"
                         class="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition">
@@ -41,12 +41,12 @@
                 <div class="flex gap-1 overflow-x-auto -mb-px scrollbar-thin">
                     @php
                         $mpTabs = [
-                            ['id' => 'todo',        'label' => 'Todo',       'icon' => 'fa-chart-line'],
-                            ['id' => 'tecnicas',    'label' => 'Técnicas',   'icon' => 'fa-code'],
-                            ['id' => 'blandas',     'label' => 'Blandas',    'icon' => 'fa-handshake'],
-                            ['id' => 'experiencia', 'label' => 'Experiencia','icon' => 'fa-briefcase'],
-                            ['id' => 'educacion',   'label' => 'Educación',  'icon' => 'fa-graduation-cap'],
-                            ['id' => 'proyectos',   'label' => 'Proyectos',  'icon' => 'fa-folder-open'],
+                            ['id' => 'todo',        'label' => __('general.cuenta.modal.tab_todo'),        'icon' => 'fa-chart-line'],
+                            ['id' => 'tecnicas',    'label' => __('general.cuenta.modal.tab_tecnicas'),    'icon' => 'fa-code'],
+                            ['id' => 'blandas',     'label' => __('general.cuenta.modal.tab_blandas'),     'icon' => 'fa-handshake'],
+                            ['id' => 'experiencia', 'label' => __('general.cuenta.modal.tab_experiencia'),'icon' => 'fa-briefcase'],
+                            ['id' => 'educacion',   'label' => __('general.cuenta.modal.tab_educacion'),   'icon' => 'fa-graduation-cap'],
+                            ['id' => 'proyectos',   'label' => __('general.cuenta.modal.tab_proyectos'),   'icon' => 'fa-folder-open'],
                         ];
                     @endphp
 
@@ -66,15 +66,15 @@
 
                 {{-- Encabezado de sección + acciones --}}
                 <div class="flex items-center justify-between mb-4 gap-3">
-                    <h3 id="mp-titulo-seccion" class="text-base sm:text-lg font-semibold text-[#1e3a5f]">Habilidades Técnicas</h3>
+                    <h3 id="mp-titulo-seccion" class="text-base sm:text-lg font-semibold text-[#1e3a5f]">{{ __('general.cuenta.modal.titulo_default') }}</h3>
                     <div class="flex gap-2 flex-shrink-0">
                         <button type="button" id="mp-todos"
                             class="text-xs font-medium px-3 py-1.5 rounded-lg border border-[#1e3a5f]/30 text-[#1e3a5f] hover:bg-[#1e3a5f]/5 transition">
-                            Seleccionar todas
+                            {{ __('general.cuenta.modal.sel_todas') }}
                         </button>
                         <button type="button" id="mp-ninguno"
                             class="text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
-                            Deseleccionar todas
+                            {{ __('general.cuenta.modal.desel_todas') }}
                         </button>
                     </div>
                 </div>
@@ -84,8 +84,8 @@
                     {{-- Header tabla --}}
                     <div id="mp-lista-header" class="grid grid-cols-[auto_1fr_auto] gap-3 px-4 py-2.5 bg-gray-50 text-[11px] font-semibold uppercase tracking-wide text-gray-500 border-b border-gray-100">
                         <span class="w-5"></span>
-                        <span id="mp-col-nombre">Habilidad</span>
-                        <span id="mp-col-detalle">Nivel</span>
+                        <span id="mp-col-nombre">{{ __('general.cuenta.modal.col_nombre') }}</span>
+                        <span id="mp-col-detalle">{{ __('general.cuenta.modal.col_detalle') }}</span>
                     </div>
                     <div id="mp-lista-body" class="divide-y divide-gray-100"></div>
                 </div>
@@ -95,14 +95,14 @@
                     <div class="w-14 h-14 mx-auto rounded-full bg-gray-100 flex items-center justify-center mb-3">
                         <i class="fas fa-inbox text-xl text-gray-400"></i>
                     </div>
-                    <p class="text-sm text-gray-600 font-medium">No tienes elementos en esta sección</p>
-                    <p class="text-xs text-gray-400 mt-1">Agrégalos desde tu dashboard antes de publicar</p>
+                    <p class="text-sm text-gray-600 font-medium">{{ __('general.cuenta.modal.vacio_titulo') }}</p>
+                    <p class="text-xs text-gray-400 mt-1">{{ __('general.cuenta.modal.vacio_sub') }}</p>
                 </div>
 
                 {{-- Cargando --}}
                 <div id="mp-cargando" class="text-center py-10">
                     <i class="fas fa-spinner fa-spin text-2xl text-[#1e3a5f]/60"></i>
-                    <p class="text-sm text-gray-500 mt-2">Cargando contenido...</p>
+                    <p class="text-sm text-gray-500 mt-2">{{ __('general.cuenta.modal.cargando') }}</p>
                 </div>
             </div>
 
@@ -113,11 +113,11 @@
                         <i class="fas fa-globe text-[#1e3a5f] text-sm"></i>
                     </div>
                     <div class="min-w-0">
-                        <p class="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">URL pública</p>
+                        <p class="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">{{ __('general.cuenta.modal.url_publica') }}</p>
                         <div class="flex items-center gap-2">
                             <a id="mp-url" href="#" target="_blank"
                                class="text-sm text-[#1e3a5f] hover:text-[#e11d48] truncate max-w-xs sm:max-w-md">—</a>
-                            <button type="button" id="mp-copiar" class="text-gray-400 hover:text-[#1e3a5f] transition" title="Copiar URL">
+                            <button type="button" id="mp-copiar" class="text-gray-400 hover:text-[#1e3a5f] transition" title="{{ __('general.cuenta.modal.copiar_url') }}">
                                 <i class="far fa-copy text-xs"></i>
                             </button>
                         </div>
@@ -125,7 +125,7 @@
                 </div>
                 <button type="button" id="mp-vista-previa"
                    class="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-xl border border-[#1e3a5f]/30 text-[#1e3a5f] hover:bg-[#1e3a5f]/5 transition">
-                    <i class="fas fa-eye text-xs"></i> Vista previa
+                    <i class="fas fa-eye text-xs"></i> {{ __('general.cuenta.modal.vista_previa') }}
                 </button>
             </div>
         </div>

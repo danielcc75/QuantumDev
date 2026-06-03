@@ -28,11 +28,11 @@
     let tabActual = 'todo';
 
     const seccionesMeta = {
-        tecnicas:    { titulo: 'Habilidades Técnicas', col1: 'Habilidad',  col2: 'Nivel'    },
-        blandas:     { titulo: 'Habilidades Blandas',  col1: 'Habilidad',  col2: ''         },
-        experiencia: { titulo: 'Experiencia Laboral',  col1: 'Cargo',      col2: 'Empresa'  },
-        educacion:   { titulo: 'Formación Académica',  col1: 'Título',     col2: 'Detalle'  },
-        proyectos:   { titulo: 'Proyectos',            col1: 'Proyecto',   col2: 'Resumen'  },
+        tecnicas:    { titulo: __t('js.cuenta.publicar.sec_titulo_tecnicas'),    col1: __t('js.cuenta.publicar.col_habilidad'), col2: __t('js.cuenta.publicar.col_nivel')   },
+        blandas:     { titulo: __t('js.cuenta.publicar.sec_titulo_blandas'),     col1: __t('js.cuenta.publicar.col_habilidad'), col2: ''                                  },
+        experiencia: { titulo: __t('js.cuenta.publicar.sec_titulo_experiencia'), col1: __t('js.cuenta.publicar.col_cargo'),     col2: __t('js.cuenta.publicar.col_empresa') },
+        educacion:   { titulo: __t('js.cuenta.publicar.sec_titulo_educacion'),   col1: __t('js.cuenta.publicar.col_titulo'),    col2: __t('js.cuenta.publicar.col_detalle') },
+        proyectos:   { titulo: __t('js.cuenta.publicar.sec_titulo_proyectos'),   col1: __t('js.cuenta.publicar.col_proyecto'),  col2: __t('js.cuenta.publicar.col_resumen') },
     };
 
     function nivelClase(nivel) {
@@ -76,7 +76,7 @@
             mostrarTab('todo');
         } catch (e) {
             cargando.classList.add('hidden');
-            listaBody.innerHTML = `<div class="p-6 text-center text-sm text-red-500">No se pudo cargar el contenido.</div>`;
+            listaBody.innerHTML = `<div class="p-6 text-center text-sm text-red-500">${__t('js.cuenta.publicar.err_carga')}</div>`;
         }
     };
 
@@ -126,7 +126,7 @@
         });
 
         const meta = tab === 'todo'
-            ? { titulo: 'Todo el contenido', col1: 'Elemento', col2: 'Sección' }
+            ? { titulo: __t('js.cuenta.publicar.todo_titulo'), col1: __t('js.cuenta.publicar.todo_col_elemento'), col2: __t('js.cuenta.publicar.todo_col_seccion') }
             : seccionesMeta[tab];
         titulo.textContent = meta.titulo;
         colNombre.textContent = meta.col1;
@@ -153,8 +153,11 @@
             let detalleHtml = '';
             if (tab === 'todo') {
                 const seccionLabel = {
-                    tecnicas: 'Técnica', blandas: 'Blanda', experiencia: 'Experiencia',
-                    educacion: 'Educación', proyectos: 'Proyecto'
+                    tecnicas:    __t('js.cuenta.publicar.lbl_tecnicas'),
+                    blandas:     __t('js.cuenta.publicar.lbl_blandas'),
+                    experiencia: __t('js.cuenta.publicar.lbl_experiencia'),
+                    educacion:   __t('js.cuenta.publicar.lbl_educacion'),
+                    proyectos:   __t('js.cuenta.publicar.lbl_proyectos'),
                 }[it._seccion];
                 detalleHtml = `<span class="text-xs px-2 py-0.5 rounded-full bg-[#1e3a5f]/10 text-[#1e3a5f]">${seccionLabel}</span>`;
             } else if (it._seccion === 'tecnicas') {
@@ -233,7 +236,7 @@
 
         const textoOriginal = btnVista.innerHTML;
         btnVista.disabled = true;
-        btnVista.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i> Cargando...';
+        btnVista.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i> ' + __t('js.cuenta.publicar.cargando');
 
         fetch('{{ route("cuenta.portafolio.preview") }}', {
             method: 'POST',
@@ -248,10 +251,10 @@
             if (!res.ok || !res.portafolio) {
                 window.confirmar({
                     tipo: 'danger',
-                    titulo: 'No se pudo cargar la vista previa',
-                    mensaje: res.message || 'Ocurrió un error inesperado.',
+                    titulo: __t('js.cuenta.publicar.preview_err_titulo'),
+                    mensaje: res.message || __t('js.cuenta.publicar.preview_err_msg'),
                     soloConfirmar: true,
-                    textoConfirmar: 'Entendido'
+                    textoConfirmar: __t('js.cuenta.publicar.entendido')
                 });
                 return;
             }
@@ -264,10 +267,10 @@
             btnVista.innerHTML = textoOriginal;
             window.confirmar({
                 tipo: 'danger',
-                titulo: 'Error de conexión',
-                mensaje: 'No se pudo obtener la vista previa.',
+                titulo: __t('js.cuenta.publicar.conexion_titulo'),
+                mensaje: __t('js.cuenta.publicar.conexion_preview'),
                 soloConfirmar: true,
-                textoConfirmar: 'Entendido'
+                textoConfirmar: __t('js.cuenta.publicar.entendido')
             });
         });
     });
@@ -279,7 +282,7 @@
         });
 
         btnPublicar.disabled = true;
-        btnPublicar.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i> Publicando...';
+        btnPublicar.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i> ' + __t('js.cuenta.publicar.publicando');
 
         fetch('{{ route("cuenta.portafolio.publicar") }}', {
             method: 'PUT',
@@ -290,7 +293,7 @@
         .then(r => r.json())
         .then(res => {
             btnPublicar.disabled = false;
-            btnPublicar.innerHTML = '<i class="fas fa-rocket text-xs"></i> Publicar';
+            btnPublicar.innerHTML = '<i class="fas fa-rocket text-xs"></i> ' + __t('js.cuenta.publicar.publicar');
             if (res.ok) {
                 cerrarModal();
                 if (typeof window.aplicarVisibilidadPublica === 'function') {
@@ -315,44 +318,38 @@
                 }
                 window.confirmar({
                     tipo: 'success',
-                    titulo: '¡Portafolio publicado!',
-                    mensaje: 'Tu perfil ahora es público con el contenido seleccionado.',
+                    titulo: __t('js.cuenta.publicar.publicado_titulo'),
+                    mensaje: __t('js.cuenta.publicar.publicado_msg'),
                     ocultarBotones: true,
                     autoCerrarMs: 2200
                 });
             } else if (res.code === 'perfil_incompleto') {
                 window.confirmar({
                     tipo: 'info',
-                    titulo: 'Tu perfil aún está vacío',
-                    mensajeHtml: `
-                        <p class="text-xs text-gray-500 leading-relaxed mb-2">Para publicar tu portafolio, primero debes registrar al menos una de estas cosas:</p>
-                        <ul class="text-xs text-gray-600 text-left inline-block mt-1 space-y-1">
-                            <li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> Una <strong>biografía</strong></li>
-                            <li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> Un <strong>proyecto</strong></li>
-                            <li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> Una <strong>experiencia laboral</strong></li>
-                        </ul>`,
+                    titulo: __t('js.cuenta.publicar.perfil_inc_titulo'),
+                    mensajeHtml: __t('js.cuenta.publicar.perfil_inc_html'),
                     soloConfirmar: true,
-                    textoConfirmar: 'Entendido'
+                    textoConfirmar: __t('js.cuenta.publicar.entendido')
                 });
             } else {
                 window.confirmar({
                     tipo: 'danger',
-                    titulo: 'Error',
-                    mensaje: res.message ?? 'No se pudo publicar.',
+                    titulo: __t('js.cuenta.publicar.err_titulo'),
+                    mensaje: res.message ?? __t('js.cuenta.publicar.err_publicar'),
                     soloConfirmar: true,
-                    textoConfirmar: 'Entendido'
+                    textoConfirmar: __t('js.cuenta.publicar.entendido')
                 });
             }
         })
         .catch(() => {
             btnPublicar.disabled = false;
-            btnPublicar.innerHTML = '<i class="fas fa-rocket text-xs"></i> Publicar';
+            btnPublicar.innerHTML = '<i class="fas fa-rocket text-xs"></i> ' + __t('js.cuenta.publicar.publicar');
             window.confirmar({
                 tipo: 'danger',
-                titulo: 'Error de conexión',
-                mensaje: 'No se pudo conectar al servidor.',
+                titulo: __t('js.cuenta.publicar.conexion_titulo'),
+                mensaje: __t('js.cuenta.publicar.conexion_msg'),
                 soloConfirmar: true,
-                textoConfirmar: 'Entendido'
+                textoConfirmar: __t('js.cuenta.publicar.entendido')
             });
         });
     });
