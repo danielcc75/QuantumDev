@@ -803,6 +803,8 @@ return [
                 'perfil_inc_html'     => '<p class="text-xs text-gray-500 leading-relaxed mb-2">To publish your portfolio, you must first register at least one of these things:</p><ul class="text-xs text-gray-600 text-left inline-block mt-1 space-y-1"><li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> A <strong>biography</strong></li><li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> A <strong>project</strong></li><li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> A <strong>work experience</strong></li></ul>',
                 'err_titulo'          => 'Error',
                 'err_publicar'        => 'Could not publish.',
+                'sin_sel_titulo'      => 'Nothing selected',
+                'sin_sel_msg'         => 'You must select at least one item (project, experience, skill or education) to publish your portfolio.',
             ],
         ],
         'port_publico' => [
@@ -811,6 +813,7 @@ return [
             'anios_plural'      => ':n years',
             'cat_otras'         => 'Others',
             'proyectos_rel'     => 'Related projects',
+            'referencias'       => 'References',
             'actual'            => 'Current',
             'actualidad'        => 'Present',
             'estado_en_curso'   => 'In progress',

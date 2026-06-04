@@ -212,6 +212,7 @@
                         ${formatRangoFecha(e.fecha_ini, e.fecha_fin, e.trabajo_actual)}
                     </p>
                     ${e.descripcion ? `<p class="text-sm text-gray-600 leading-relaxed mt-3">${escapeHtml(e.descripcion)}</p>` : ''}
+                    ${e.referencias ? `<div class="mt-3"><p class="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1"><i class="fas fa-user-check text-[#1e3a5f]/60 mr-1"></i>${__t('js.port_publico.referencias')}</p><p class="text-sm text-gray-600 leading-relaxed">${escapeHtml(e.referencias)}</p></div>` : ''}
                     ${proysHtml}
                 </div>`;
             }
@@ -259,6 +260,7 @@
                             <span class="text-[10px] font-semibold uppercase tracking-wider ${estado.bg} ${estado.text} px-2 py-0.5 rounded-full whitespace-nowrap">${estado.label}</span>
                         </div>
                         ${pr.descripcion ? `<p class="text-xs text-gray-600 leading-relaxed">${escapeHtml(pr.descripcion)}</p>` : ''}
+                        ${pr.referencias ? `<div><p class="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-0.5"><i class="fas fa-user-check text-[#1e3a5f]/60 mr-1"></i>${__t('js.port_publico.referencias')}</p><p class="text-xs text-gray-600 leading-relaxed">${escapeHtml(pr.referencias)}</p></div>` : ''}
                         <p class="text-xs text-gray-500 inline-flex items-center gap-1.5 self-start bg-[#1e3a5f]/8 border border-[#1e3a5f]/15 px-2.5 py-1 rounded-full">
                             <i class="far fa-calendar text-[#1e3a5f]"></i>
                             ${formatRangoFecha(pr.fecha_ini, pr.fecha_fin, false)}

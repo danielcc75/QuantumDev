@@ -331,6 +331,14 @@
                     soloConfirmar: true,
                     textoConfirmar: __t('js.cuenta.publicar.entendido')
                 });
+            } else if (res.code === 'sin_seleccion') {
+                window.confirmar({
+                    tipo: 'info',
+                    titulo: __t('js.cuenta.publicar.sin_sel_titulo'),
+                    mensaje: __t('js.cuenta.publicar.sin_sel_msg'),
+                    soloConfirmar: true,
+                    textoConfirmar: __t('js.cuenta.publicar.entendido')
+                });
             } else {
                 window.confirmar({
                     tipo: 'danger',

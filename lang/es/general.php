@@ -803,6 +803,8 @@ return [
                 'perfil_inc_html'     => '<p class="text-xs text-gray-500 leading-relaxed mb-2">Para publicar tu portafolio, primero debes registrar al menos una de estas cosas:</p><ul class="text-xs text-gray-600 text-left inline-block mt-1 space-y-1"><li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> Una <strong>biografía</strong></li><li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> Un <strong>proyecto</strong></li><li><i class="fas fa-check text-[#1e3a5f] mr-1"></i> Una <strong>experiencia laboral</strong></li></ul>',
                 'err_titulo'          => 'Error',
                 'err_publicar'        => 'No se pudo publicar.',
+                'sin_sel_titulo'      => 'No seleccionaste nada',
+                'sin_sel_msg'         => 'Debes seleccionar al menos un elemento (proyecto, experiencia, habilidad o formación) para publicar tu portafolio.',
             ],
         ],
         'port_publico' => [
@@ -811,6 +813,7 @@ return [
             'anios_plural'      => ':n años',
             'cat_otras'         => 'Otras',
             'proyectos_rel'     => 'Proyectos relacionados',
+            'referencias'       => 'Referencias',
             'actual'            => 'Actual',
             'actualidad'        => 'Actualidad',
             'estado_en_curso'   => 'En curso',

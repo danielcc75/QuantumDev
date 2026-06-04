@@ -132,6 +132,21 @@ class PortafolioController extends Controller
             ], 422);
         }
 
+        // Debe seleccionar al menos un elemento para mostrar en el portafolio público
+        $totalSeleccionado = count($request->input('tecnicas', []))
+            + count($request->input('blandas', []))
+            + count($request->input('experiencia', []))
+            + count($request->input('educacion', []))
+            + count($request->input('proyectos', []));
+
+        if ($totalSeleccionado === 0) {
+            return response()->json([
+                'ok' => false,
+                'code' => 'sin_seleccion',
+                'message' => 'Debes seleccionar al menos un elemento para publicar tu portafolio.',
+            ], 422);
+        }
+
         try {
             DB::transaction(function () use ($request, $perfil) {
                 $tecnicas    = $request->input('tecnicas', []);
@@ -289,6 +304,7 @@ class PortafolioController extends Controller
                     'cargo'          => $e->cargo,
                     'empresa'        => $e->empresa,
                     'descripcion'    => $e->descripcion,
+                    'referencias'    => $e->referencias ?? null,
                     'fecha_ini'      => $e->fecha_ini,
                     'fecha_fin'      => $e->fecha_fin,
                     'trabajo_actual' => (bool) $e->trabajo_actual,
@@ -306,6 +322,7 @@ class PortafolioController extends Controller
                 'id_proyecto' => $pr->id_proyecto,
                 'nombre'      => $pr->nombre,
                 'descripcion' => $pr->descripcion,
+                'referencias' => $pr->referencias ?? null,
                 'url_link'    => $pr->url_link,
                 'fecha_ini'   => $pr->fecha_ini,
                 'fecha_fin'   => $pr->fecha_fin,
