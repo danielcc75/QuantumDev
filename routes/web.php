@@ -300,14 +300,6 @@ Route::get('/novedades/list', [NotificationController::class, 'obtenerNovedades'
 Route::post('/novedades/marcar-vista', [NotificationController::class, 'marcarNovedadVista'])->name('novedades.marcar-vista');
 
 //MANEJO DE LOS EMAILS
-Route::get('/test-mail', function () {
-
-    Mail::to('jhonatan1075894@gmail.com')
-        ->send(new TestMail());
-
-    return 'Correo enviado';
-});
-
 Route::get('/forgot-password', [AuthWebController::class, 'forgotPassword'])
     ->name('password.forgot');
 
