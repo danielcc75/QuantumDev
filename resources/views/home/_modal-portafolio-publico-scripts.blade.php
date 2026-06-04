@@ -130,7 +130,7 @@
                         ? `<img src="${escapeHtml(g.imagen)}" alt="${escapeHtml(g.categoria || '')}" class="h-7 w-7 rounded-full object-cover border border-[#1e3a5f]/15" onerror="this.style.display='none'">`
                         : `<span class="h-7 w-7 rounded-full bg-[#1e3a5f]/10 text-[#1e3a5f] flex items-center justify-center text-xs"><i class="fas fa-layer-group"></i></span>`
                     }
-                    <span class="font-semibold text-[#1e3a5f] text-sm">${escapeHtml(g.categoria || 'Otras')}</span>
+                    <span class="font-semibold text-[#1e3a5f] text-sm">${escapeHtml(g.categoria || __t('js.port_publico.cat_otras'))}</span>
                     <span class="text-xs text-gray-400">(${items.length})</span>
                 `;
                 grupoLi.appendChild(header);
@@ -141,7 +141,9 @@
                     const sub = document.createElement('li');
                     sub.className = 'flex items-start gap-2.5 text-sm text-gray-700';
                     const anios = h.anios_experiencia || 0;
-                    const aniosTxt = anios === 0 ? 'Menos de 1 año' : `${anios} ${anios === 1 ? 'año' : 'años'}`;
+                    const aniosTxt = anios === 0
+                        ? __t('js.port_publico.menos_de_un_anio')
+                        : __t(anios === 1 ? 'js.port_publico.anios_singular' : 'js.port_publico.anios_plural', { n: anios });
                     sub.innerHTML = `
                         <span class="mt-1.5 w-2 h-2 rounded-full bg-gradient-to-br from-[#1e3a5f] to-[#e11d48] ring-2 ring-[#1e3a5f]/15 flex-shrink-0"></span>
                         <div class="min-w-0 flex-1">
@@ -184,7 +186,7 @@
                 const proysHtml = proys.length ? `
                     <div class="mt-3 pt-3 border-t border-gray-100">
                         <p class="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-2">
-                            <i class="fas fa-folder text-[#1e3a5f]/60 mr-1"></i> Proyectos relacionados
+                            <i class="fas fa-folder text-[#1e3a5f]/60 mr-1"></i> ${__t('js.port_publico.proyectos_rel')}
                         </p>
                         <div class="flex flex-wrap gap-1.5">
                             ${proys.map(pr => pr.url_link
@@ -202,7 +204,7 @@
                             <p class="text-sm font-semibold text-[#1e3a5f] mt-0.5 flex items-center gap-1.5"><i class="fas fa-building text-xs opacity-70"></i>${escapeHtml(e.empresa)}</p>
                         </div>
                         ${e.trabajo_actual
-                            ? '<span class="text-[10px] font-semibold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full whitespace-nowrap flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>Actual</span>'
+                            ? `<span class="text-[10px] font-semibold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full whitespace-nowrap flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>${__t('js.port_publico.actual')}</span>`
                             : ''}
                     </div>
                     <p class="text-xs text-gray-500 mt-2 inline-flex items-center gap-1.5 bg-[#1e3a5f]/8 border border-[#1e3a5f]/15 px-2.5 py-1 rounded-full">
@@ -237,10 +239,10 @@
         );
 
         const ESTADO_LABELS = {
-            en_progreso: { label: 'En curso',     bg: 'bg-[#1e3a5f]/10', text: 'text-[#1e3a5f]' },
-            completado:  { label: 'Completado',   bg: 'bg-emerald-50',   text: 'text-emerald-700' },
-            pendiente:   { label: 'Pendiente',    bg: 'bg-gray-100',     text: 'text-gray-600' },
-            cancelado:   { label: 'Cancelado',    bg: 'bg-red-50',       text: 'text-[#e11d48]' },
+            en_progreso: { label: __t('js.port_publico.estado_en_curso'),   bg: 'bg-[#1e3a5f]/10', text: 'text-[#1e3a5f]' },
+            completado:  { label: __t('js.port_publico.estado_completado'), bg: 'bg-emerald-50',   text: 'text-emerald-700' },
+            pendiente:   { label: __t('js.port_publico.estado_pendiente'),  bg: 'bg-gray-100',     text: 'text-gray-600' },
+            cancelado:   { label: __t('js.port_publico.estado_cancelado'),  bg: 'bg-red-50',       text: 'text-[#e11d48]' },
         };
         renderTimeline(
             'mp_proyectos', 'mp_proyectos_empty',
@@ -262,7 +264,7 @@
                             ${formatRangoFecha(pr.fecha_ini, pr.fecha_fin, false)}
                         </p>
                         ${tags.length ? `<div class="flex flex-wrap gap-1.5 mt-1">${tags.slice(0, 6).map(t => `<span class="text-[11px] font-medium text-[#1e3a5f] bg-[#1e3a5f]/8 border border-[#1e3a5f]/15 px-2 py-0.5 rounded-full">${escapeHtml(t)}</span>`).join('')}${tags.length > 6 ? `<span class="text-[11px] font-medium bg-[#1e3a5f]/8 text-[#e11d48] border border-[#1e3a5f]/15 px-2 py-0.5 rounded-full">+${tags.length - 6}</span>` : ''}</div>` : ''}
-                        ${pr.url_link ? `<a href="${pr.url_link}" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-[#1e3a5f] hover:text-[#e11d48] transition mt-auto pt-2 inline-flex items-center gap-1.5 self-start"><i class="fas fa-external-link-alt text-[10px]"></i> Ver proyecto</a>` : ''}
+                        ${pr.url_link ? `<a href="${pr.url_link}" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-[#1e3a5f] hover:text-[#e11d48] transition mt-auto pt-2 inline-flex items-center gap-1.5 self-start"><i class="fas fa-external-link-alt text-[10px]"></i> ${__t('js.port_publico.ver_proyecto')}</a>` : ''}
                     </div>
                 </div>`;
             }
@@ -315,14 +317,15 @@
 
     function formatRangoFecha(ini, fin, actual) {
         if (!ini) return '';
+        const meses = (window.__lang?.js?.dashboard?.meses_corto)
+            || ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
         const f = (s) => {
             const d = new Date(s + 'T12:00:00');
             if (isNaN(d.getTime())) return '';
-            const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
             return `${meses[d.getMonth()]} ${d.getFullYear()}`;
         };
         const ini2 = f(ini);
-        const fin2 = actual ? 'Actualidad' : (fin ? f(fin) : '—');
+        const fin2 = actual ? __t('js.port_publico.actualidad') : (fin ? f(fin) : '—');
         return `${ini2} – ${fin2}`;
     }
 

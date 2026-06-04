@@ -13,7 +13,7 @@
 
             {{-- Banner de vista previa (se muestra solo en modo preview) --}}
             <div id="mp_preview_banner" class="hidden absolute top-0 inset-x-0 z-10 bg-amber-400 text-amber-950 text-xs font-semibold py-1.5 px-4 text-center tracking-wide">
-                <i class="fas fa-eye mr-1"></i> Vista previa — así verán tu portafolio
+                <i class="fas fa-eye mr-1"></i> {{ __('general.port_publico.preview_banner') }}
             </div>
 
             {{-- ============ SIDEBAR ============ --}}
@@ -64,11 +64,11 @@
                     <div id="mp_links" class="flex flex-wrap gap-2 mt-5"></div>
 
                     <nav class="mt-7 flex flex-col gap-1 text-sm font-medium">
-                        <a href="#mp_sec_sobre"        class="mp-nav group px-4 py-2.5 rounded-xl hover:bg-white/15 transition flex items-center justify-between"><span class="flex items-center gap-2.5"><i class="fas fa-user text-xs opacity-80"></i>Sobre mí</span><i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-70 transition"></i></a>
-                        <a href="#mp_sec_habilidades"  class="mp-nav group px-4 py-2.5 rounded-xl hover:bg-white/15 transition flex items-center justify-between"><span class="flex items-center gap-2.5"><i class="fas fa-code text-xs opacity-80"></i>Habilidades</span><i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-70 transition"></i></a>
-                        <a href="#mp_sec_proyectos"    class="mp-nav group px-4 py-2.5 rounded-xl hover:bg-white/15 transition flex items-center justify-between"><span class="flex items-center gap-2.5"><i class="fas fa-folder-open text-xs opacity-80"></i>Proyectos</span><i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-70 transition"></i></a>
-                        <a href="#mp_sec_experiencia"  class="mp-nav group px-4 py-2.5 rounded-xl hover:bg-white/15 transition flex items-center justify-between"><span class="flex items-center gap-2.5"><i class="fas fa-briefcase text-xs opacity-80"></i>Experiencia</span><i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-70 transition"></i></a>
-                        <a href="#mp_sec_educacion"    class="mp-nav group px-4 py-2.5 rounded-xl hover:bg-white/15 transition flex items-center justify-between"><span class="flex items-center gap-2.5"><i class="fas fa-graduation-cap text-xs opacity-80"></i>Educación</span><i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-70 transition"></i></a>
+                        <a href="#mp_sec_sobre"        class="mp-nav group px-4 py-2.5 rounded-xl hover:bg-white/15 transition flex items-center justify-between"><span class="flex items-center gap-2.5"><i class="fas fa-user text-xs opacity-80"></i>{{ __('general.port_publico.sec_sobre') }}</span><i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-70 transition"></i></a>
+                        <a href="#mp_sec_habilidades"  class="mp-nav group px-4 py-2.5 rounded-xl hover:bg-white/15 transition flex items-center justify-between"><span class="flex items-center gap-2.5"><i class="fas fa-code text-xs opacity-80"></i>{{ __('general.port_publico.sec_habilidades') }}</span><i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-70 transition"></i></a>
+                        <a href="#mp_sec_proyectos"    class="mp-nav group px-4 py-2.5 rounded-xl hover:bg-white/15 transition flex items-center justify-between"><span class="flex items-center gap-2.5"><i class="fas fa-folder-open text-xs opacity-80"></i>{{ __('general.port_publico.sec_proyectos') }}</span><i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-70 transition"></i></a>
+                        <a href="#mp_sec_experiencia"  class="mp-nav group px-4 py-2.5 rounded-xl hover:bg-white/15 transition flex items-center justify-between"><span class="flex items-center gap-2.5"><i class="fas fa-briefcase text-xs opacity-80"></i>{{ __('general.port_publico.sec_experiencia') }}</span><i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-70 transition"></i></a>
+                        <a href="#mp_sec_educacion"    class="mp-nav group px-4 py-2.5 rounded-xl hover:bg-white/15 transition flex items-center justify-between"><span class="flex items-center gap-2.5"><i class="fas fa-graduation-cap text-xs opacity-80"></i>{{ __('general.port_publico.sec_educacion') }}</span><i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-70 transition"></i></a>
                     </nav>
                 </div>
             </aside>
@@ -81,7 +81,7 @@
                         <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[#1e3a5f] to-[#e11d48] text-white shadow-md">
                             <i class="fas fa-user"></i>
                         </span>
-                        <h3 class="text-2xl font-extrabold text-[#1e3a5f] tracking-tight">Sobre mí</h3>
+                        <h3 class="text-2xl font-extrabold text-[#1e3a5f] tracking-tight">{{ __('general.port_publico.sec_sobre') }}</h3>
                         <span class="flex-1 h-px bg-gradient-to-r from-[#e11d48]/30 to-transparent ml-2"></span>
                     </div>
 
@@ -92,7 +92,7 @@
                                 <i class="fas fa-star"></i>
                             </div>
                             <p id="mp_stat_anios" class="relative text-2xl font-extrabold text-[#1e3a5f]">0</p>
-                            <p class="relative text-xs text-gray-500 mt-0.5">Años</p>
+                            <p class="relative text-xs text-gray-500 mt-0.5">{{ __('general.port_publico.stat_anios') }}</p>
                         </div>
                         <div class="group relative bg-gradient-to-br from-[#1e3a5f]/8 to-white border border-[#1e3a5f]/15 rounded-2xl p-4 text-center shadow-sm hover:shadow-md hover:-translate-y-0.5 transition overflow-hidden">
                             <div class="absolute -top-6 -right-6 w-16 h-16 rounded-full bg-[#1e3a5f]/15 group-hover:scale-110 transition"></div>
@@ -100,7 +100,7 @@
                                 <i class="fas fa-th-large"></i>
                             </div>
                             <p id="mp_stat_proy" class="relative text-2xl font-extrabold text-[#1e3a5f]">0</p>
-                            <p class="relative text-xs text-gray-500 mt-0.5">Proyectos</p>
+                            <p class="relative text-xs text-gray-500 mt-0.5">{{ __('general.port_publico.stat_proyectos') }}</p>
                         </div>
                         <div class="group relative bg-gradient-to-br from-[#e11d48]/5 to-white border border-[#e11d48]/15 rounded-2xl p-4 text-center shadow-sm hover:shadow-md hover:-translate-y-0.5 transition overflow-hidden">
                             <div class="absolute -top-6 -right-6 w-16 h-16 rounded-full bg-[#e11d48]/15 group-hover:scale-110 transition"></div>
@@ -108,7 +108,7 @@
                                 <i class="fas fa-user-tie"></i>
                             </div>
                             <p id="mp_stat_empresas" class="relative text-2xl font-extrabold text-[#1e3a5f]">0</p>
-                            <p class="relative text-xs text-gray-500 mt-0.5">Empresas</p>
+                            <p class="relative text-xs text-gray-500 mt-0.5">{{ __('general.port_publico.stat_empresas') }}</p>
                         </div>
                     </div>
 
@@ -123,7 +123,7 @@
                         <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[#1e3a5f] to-[#e11d48] text-white shadow-md">
                             <i class="fas fa-code"></i>
                         </span>
-                        <h3 class="text-2xl font-extrabold text-[#1e3a5f] tracking-tight">Habilidades</h3>
+                        <h3 class="text-2xl font-extrabold text-[#1e3a5f] tracking-tight">{{ __('general.port_publico.sec_habilidades') }}</h3>
                         <span class="flex-1 h-px bg-gradient-to-r from-[#e11d48]/30 to-transparent ml-2"></span>
                     </div>
 
@@ -131,18 +131,18 @@
                         <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition">
                             <h4 class="font-bold text-[#1e3a5f] mb-3 flex items-center gap-2">
                                 <span class="w-2 h-2 rounded-full bg-gradient-to-br from-[#1e3a5f] to-[#e11d48]"></span>
-                                Técnicas
+                                {{ __('general.port_publico.tecnicas') }}
                             </h4>
                             <ul id="mp_habilidades_tecnicas" class="space-y-2 text-sm text-gray-700"></ul>
-                            <p id="mp_habilidades_tecnicas_empty" class="text-sm text-gray-400 italic hidden">Sin habilidades registradas.</p>
+                            <p id="mp_habilidades_tecnicas_empty" class="text-sm text-gray-400 italic hidden">{{ __('general.port_publico.vacio_tecnicas') }}</p>
                         </div>
                         <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition">
                             <h4 class="font-bold text-[#1e3a5f] mb-3 flex items-center gap-2">
                                 <span class="w-2 h-2 rounded-full bg-gradient-to-br from-[#e11d48] to-[#1e3a5f]"></span>
-                                Blandas
+                                {{ __('general.port_publico.blandas') }}
                             </h4>
                             <ul id="mp_habilidades_blandas" class="space-y-2 text-sm text-gray-700"></ul>
-                            <p id="mp_habilidades_blandas_empty" class="text-sm text-gray-400 italic hidden">Sin habilidades blandas.</p>
+                            <p id="mp_habilidades_blandas_empty" class="text-sm text-gray-400 italic hidden">{{ __('general.port_publico.vacio_blandas') }}</p>
                         </div>
                     </div>
                 </section>
@@ -152,11 +152,11 @@
                         <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[#1e3a5f] to-[#e11d48] text-white shadow-md">
                             <i class="fas fa-folder-open"></i>
                         </span>
-                        <h3 class="text-2xl font-extrabold text-[#1e3a5f] tracking-tight">Proyectos</h3>
+                        <h3 class="text-2xl font-extrabold text-[#1e3a5f] tracking-tight">{{ __('general.port_publico.sec_proyectos') }}</h3>
                         <span class="flex-1 h-px bg-gradient-to-r from-[#1e3a5f]/30 to-transparent ml-2"></span>
                     </div>
                     <div id="mp_proyectos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-                    <p id="mp_proyectos_empty" class="text-sm text-gray-400 italic hidden">No hay proyectos publicados.</p>
+                    <p id="mp_proyectos_empty" class="text-sm text-gray-400 italic hidden">{{ __('general.port_publico.vacio_proyectos') }}</p>
                 </section>
 
                 <section id="mp_sec_experiencia" class="px-6 sm:px-10 py-10 scroll-mt-4 border-t border-gray-100 bg-gradient-to-b from-white to-[#e11d48]/5">
@@ -164,11 +164,11 @@
                         <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[#e11d48] to-[#1e3a5f] text-white shadow-md">
                             <i class="fas fa-briefcase"></i>
                         </span>
-                        <h3 class="text-2xl font-extrabold text-[#1e3a5f] tracking-tight">Experiencia</h3>
+                        <h3 class="text-2xl font-extrabold text-[#1e3a5f] tracking-tight">{{ __('general.port_publico.sec_experiencia') }}</h3>
                         <span class="flex-1 h-px bg-gradient-to-r from-[#e11d48]/30 to-transparent ml-2"></span>
                     </div>
                     <div id="mp_experiencias" class="relative pl-6 flex flex-col gap-4 before:content-[''] before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-[#1e3a5f]/40 before:via-[#e11d48]/40 before:to-transparent"></div>
-                    <p id="mp_experiencias_empty" class="text-sm text-gray-400 italic hidden">No hay experiencia laboral registrada.</p>
+                    <p id="mp_experiencias_empty" class="text-sm text-gray-400 italic hidden">{{ __('general.port_publico.vacio_experiencias') }}</p>
                 </section>
 
                 <section id="mp_sec_educacion" class="px-6 sm:px-10 py-10 scroll-mt-4 border-t border-gray-100">
@@ -176,11 +176,11 @@
                         <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[#1e3a5f] to-[#e11d48] text-white shadow-md">
                             <i class="fas fa-graduation-cap"></i>
                         </span>
-                        <h3 class="text-2xl font-extrabold text-[#1e3a5f] tracking-tight">Educación</h3>
+                        <h3 class="text-2xl font-extrabold text-[#1e3a5f] tracking-tight">{{ __('general.port_publico.sec_educacion') }}</h3>
                         <span class="flex-1 h-px bg-gradient-to-r from-[#1e3a5f]/30 to-transparent ml-2"></span>
                     </div>
                     <div id="mp_formacion" class="relative pl-6 flex flex-col gap-4 before:content-[''] before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-[#1e3a5f]/40 before:via-[#e11d48]/40 before:to-transparent"></div>
-                    <p id="mp_formacion_empty" class="text-sm text-gray-400 italic hidden">No hay formación académica registrada.</p>
+                    <p id="mp_formacion_empty" class="text-sm text-gray-400 italic hidden">{{ __('general.port_publico.vacio_formacion') }}</p>
                 </section>
 
             </div>
