@@ -37,7 +37,7 @@
                     <p class="text-xs text-gray-500">Exporta toda la base de datos</p>
                 </div>
             </div>
-            <p class="text-sm text-gray-600 mb-4">Genera un volcado completo con <code>pg_dump</code>. Incluye esquema y todos los datos.</p>
+            <p class="text-sm text-gray-600 mb-4">Exporta todos los registros de la base de datos como sentencias <code>INSERT</code>. Las tablas deben existir al restaurar.</p>
             <form action="{{ route('admin.backup.create') }}" method="POST">
                 @csrf
                 <button type="submit"
@@ -169,6 +169,24 @@
                                    title="Descargar">
                                     <i class="fas fa-download"></i>
                                 </a>
+                                <form action="{{ route('admin.backup.restore') }}"
+                                      method="POST" class="inline"
+                                      data-confirm-type="warning"
+                                      data-confirm-title="Restaurar backup"
+                                      data-confirm-button="Sí, restaurar"
+                                      @if(str_starts_with($backup['name'], 'backup_completo_'))
+                                        data-confirm="Esto BORRARÁ todos los datos actuales y los reemplazará por los del respaldo «{{ $backup['name'] }}». Esta acción no se puede deshacer. ¿Continuar?"
+                                      @else
+                                        data-confirm="Se insertarán o actualizarán los registros del respaldo «{{ $backup['name'] }}». El resto de los datos se conservará. ¿Continuar?"
+                                      @endif>
+                                    @csrf
+                                    <input type="hidden" name="file" value="{{ $backup['name'] }}">
+                                    <button type="submit"
+                                        class="text-amber-600 hover:text-amber-900 bg-amber-100 hover:bg-amber-200 p-2 rounded-lg transition"
+                                        title="Restaurar">
+                                        <i class="fas fa-undo"></i>
+                                    </button>
+                                </form>
                                 <form action="{{ route('admin.backup.destroy') }}"
                                       method="POST" class="inline"
                                       data-confirm="¿Eliminar el backup «{{ $backup['name'] }}»?">

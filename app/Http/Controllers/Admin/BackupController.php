@@ -95,12 +95,10 @@ class BackupController extends Controller
                     foreach ($rows as $row) {
                         $data    = (array) $row;
                         $columns = implode(', ', array_map(fn($c) => '"' . $c . '"', array_keys($data)));
-                        $values  = implode(', ', array_map(function ($v) {
-                            if ($v === null) {
-                                return 'NULL';
-                            }
-                            return "'" . str_replace("'", "''", (string) $v) . "'";
-                        }, array_values($data)));
+                        $values  = implode(', ', array_map(
+                            fn($v) => $this->formatSqlValue($v),
+                            array_values($data)
+                        ));
 
                         $sql .= "INSERT INTO \"{$tableName}\" ({$columns}) VALUES ({$values});\n";
                     }
@@ -192,12 +190,10 @@ class BackupController extends Controller
                 foreach ($rows as $row) {
                     $data    = (array) $row;
                     $columns = implode(', ', array_map(fn($c) => '"' . $c . '"', array_keys($data)));
-                    $values  = implode(', ', array_map(function ($v) {
-                        if ($v === null) {
-                            return 'NULL';
-                        }
-                        return "'" . str_replace("'", "''", (string) $v) . "'";
-                    }, array_values($data)));
+                    $values  = implode(', ', array_map(
+                        fn($v) => $this->formatSqlValue($v),
+                        array_values($data)
+                    ));
 
                     $sql .= "INSERT INTO \"{$tableName}\" ({$columns}) VALUES ({$values});\n";
                 }
@@ -264,5 +260,199 @@ class BackupController extends Controller
         }
 
         return back()->with('error', 'Backup no encontrado');
+    }
+
+    // Restaurar un backup existente
+    //  - backup_completo_* : reemplazo total (vacía las tablas y reinserta)
+    //  - backup_fechas_*   : upsert (inserta/actualiza solo esos registros)
+    public function restore(Request $request)
+    {
+        $filename = $request->input('file', '');
+
+        if (!preg_match('/^[A-Za-z0-9._-]+\.sql$/', $filename) || str_contains($filename, '..')) {
+            return back()->with('error', 'Nombre de backup inválido');
+        }
+
+        $path = storage_path('app/backups/' . $filename);
+
+        if (!file_exists($path)) {
+            return back()->with('error', 'Backup no encontrado');
+        }
+
+        // Extraer solo las sentencias INSERT del archivo
+        $lines   = preg_split('/\r\n|\r|\n/', file_get_contents($path));
+        $inserts = array_values(array_filter(
+            $lines,
+            fn($l) => str_starts_with(trim($l), 'INSERT INTO ')
+        ));
+
+        if (empty($inserts)) {
+            return back()->with('error', 'El backup no contiene registros para restaurar.');
+        }
+
+        $esCompleto = str_starts_with($filename, 'backup_completo_');
+
+        // Tablas que aparecen en el backup
+        $tablasBackup = [];
+        foreach ($inserts as $stmt) {
+            if (preg_match('/^INSERT INTO "([^"]+)"/', trim($stmt), $m)) {
+                $tablasBackup[$m[1]] = true;
+            }
+        }
+        $tablasBackup = array_keys($tablasBackup);
+
+        try {
+            DB::transaction(function () use ($inserts, $esCompleto, $tablasBackup) {
+                // Desactivar claves foráneas durante la restauración
+                DB::statement("SET session_replication_role = replica");
+
+                if ($esCompleto) {
+                    // Reemplazo total: vaciar todas las tablas de la aplicación
+                    $appTables = $this->appTables();
+                    $tablas    = array_map(fn($t) => '"' . $t . '"', $appTables);
+                    if (!empty($tablas)) {
+                        DB::unprepared('TRUNCATE TABLE ' . implode(', ', $tablas) . ' RESTART IDENTITY CASCADE');
+                    }
+
+                    foreach ($inserts as $stmt) {
+                        DB::unprepared(rtrim(trim($stmt), '; '));
+                    }
+
+                    $this->resyncSequences($appTables);
+                } else {
+                    // Upsert: insertar o actualizar cada registro según su clave primaria
+                    $pkCache = [];
+                    foreach ($inserts as $stmt) {
+                        DB::unprepared($this->toUpsert($stmt, $pkCache));
+                    }
+
+                    $this->resyncSequences($tablasBackup);
+                }
+
+                DB::statement("SET session_replication_role = DEFAULT");
+            });
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Error al restaurar el backup: ' . $e->getMessage());
+        }
+
+        $modo = $esCompleto ? 'reemplazo total' : 'inserción/actualización';
+        $this->logAdminAction(
+            'backup_restaurado',
+            "Backup restaurado: {$filename} (" . count($inserts) . " registros, {$modo})"
+        );
+
+        return back()->with('success', "Backup restaurado correctamente: {$filename} (" . count($inserts) . " registros).");
+    }
+
+    // Tablas de la aplicación (excluye las tablas internas de Laravel)
+    private function appTables(): array
+    {
+        $rows = DB::select("
+            SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema = 'public'
+              AND table_type = 'BASE TABLE'
+              AND table_name NOT IN (
+                  'migrations','password_reset_tokens','personal_access_tokens',
+                  'sessions','jobs','failed_jobs','cache','cache_locks',
+                  'job_batches','telescope_entries','telescope_entries_tags','telescope_monitoring'
+              )
+            ORDER BY table_name
+        ");
+
+        return array_map(fn($r) => $r->table_name, $rows);
+    }
+
+    // Reajusta las secuencias de autoincremento al MAX(id) tras insertar IDs explícitos
+    private function resyncSequences(array $tables): void
+    {
+        foreach ($tables as $table) {
+            $cols = DB::select("
+                SELECT column_name, pg_get_serial_sequence(?, column_name) AS seq
+                FROM information_schema.columns
+                WHERE table_schema = 'public' AND table_name = ?
+            ", [$table, $table]);
+
+            foreach ($cols as $col) {
+                if (!$col->seq) {
+                    continue; // la columna no está respaldada por una secuencia
+                }
+
+                $c = $col->column_name;
+                DB::statement("
+                    SELECT setval(
+                        ?,
+                        COALESCE((SELECT MAX(\"{$c}\") FROM \"{$table}\"), 1),
+                        (SELECT MAX(\"{$c}\") FROM \"{$table}\") IS NOT NULL
+                    )
+                ", [$col->seq]);
+            }
+        }
+    }
+
+    // Columnas que forman la clave primaria de una tabla
+    private function primaryKeyColumns(string $table): array
+    {
+        $rows = DB::select("
+            SELECT a.attname AS column_name
+            FROM pg_index i
+            JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+            WHERE i.indrelid = ?::regclass AND i.indisprimary
+        ", ['"' . $table . '"']);
+
+        return array_map(fn($r) => $r->column_name, $rows);
+    }
+
+    // Añade la cláusula ON CONFLICT a un INSERT para convertirlo en upsert
+    private function toUpsert(string $insert, array &$pkCache): string
+    {
+        $stmt = rtrim(trim($insert), '; ');
+
+        // Tabla y lista de columnas: INSERT INTO "tabla" ("c1", "c2", ...)
+        if (!preg_match('/^INSERT INTO "([^"]+)" \(([^)]*)\)/', $stmt, $m)) {
+            return $stmt; // si no se puede analizar, se ejecuta tal cual
+        }
+
+        $table = $m[1];
+        preg_match_all('/"([^"]+)"/', $m[2], $cm);
+        $cols = $cm[1];
+
+        if (!array_key_exists($table, $pkCache)) {
+            $pkCache[$table] = $this->primaryKeyColumns($table);
+        }
+        $pk = $pkCache[$table];
+
+        if (empty($pk)) {
+            return $stmt . ' ON CONFLICT DO NOTHING';
+        }
+
+        $conflict   = implode(', ', array_map(fn($c) => '"' . $c . '"', $pk));
+        $updateCols = array_values(array_diff($cols, $pk));
+
+        if (empty($updateCols)) {
+            return $stmt . " ON CONFLICT ({$conflict}) DO NOTHING";
+        }
+
+        $set = implode(', ', array_map(fn($c) => "\"{$c}\" = EXCLUDED.\"{$c}\"", $updateCols));
+
+        return $stmt . " ON CONFLICT ({$conflict}) DO UPDATE SET {$set}";
+    }
+
+    // Convierte un valor de la BD a su literal SQL para el INSERT
+    private function formatSqlValue($v): string
+    {
+        if ($v === null) {
+            return 'NULL';
+        }
+
+        if (is_bool($v)) {
+            return $v ? 'TRUE' : 'FALSE';
+        }
+
+        if (is_int($v) || is_float($v)) {
+            return (string) $v;
+        }
+
+        return "'" . str_replace("'", "''", (string) $v) . "'";
     }
 }
