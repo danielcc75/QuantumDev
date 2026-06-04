@@ -80,7 +80,11 @@
                 </div>
 
                 <div class="text-right">
-                    <a href="#" class="text-sm font-medium text-[#1e3a5f] hover:text-[#e11d48] transition">
+                    <a
+                        href="#"
+                        onclick="irARecuperarPassword(); return false;"
+                        class="text-sm font-medium text-[#1e3a5f] hover:text-[#e11d48] transition"
+                    >
                         {{ __('general.auth.login.olvido_password') }}
                     </a>
                 </div>

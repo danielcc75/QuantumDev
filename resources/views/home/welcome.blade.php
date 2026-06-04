@@ -246,6 +246,7 @@
 
     @include('auth.login')
     @include('auth.register')
+    @include('auth.modalForgotPassword')
 
     {{-- Bootstrap de traducciones para JS (debe ir antes de scripts-home) --}}
     @include('partials._translations-bootstrap')

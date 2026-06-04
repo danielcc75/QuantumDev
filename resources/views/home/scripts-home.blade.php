@@ -33,12 +33,36 @@
 
     function irALogin() {
         cerrarRegister();
+        cerrarForgotPassword();
         abrirLogin();
     }
 
     function irARegister() {
         cerrarLogin();
         abrirRegister();
+    }
+
+    function abrirForgotPassword() {
+        const modal = document.getElementById('modalForgotPassword');
+
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    }
+
+    function cerrarForgotPassword() {
+        const modal = document.getElementById('modalForgotPassword');
+
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
+    function irARecuperarPassword() {
+        cerrarLogin();
+        abrirForgotPassword();
     }
 
     document.querySelectorAll('.dropdown').forEach(dropdown => {
@@ -780,4 +804,169 @@
         // Carga inicial
         buscarPortafolios(true);
     })();
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const form = document.getElementById('forgotPasswordForm');
+
+        if (!form) return;
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const url = form.action + '?' + new URLSearchParams(new FormData(form));
+
+            const successBox = document.getElementById('forgotSuccessBox');
+            const errorBox = document.getElementById('forgotErrorBox');
+
+            successBox.classList.add('hidden');
+            errorBox.classList.add('hidden');
+
+            try {
+                const res = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await res.json();
+
+                if (data.ok) {
+                    successBox.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-green-600"></i>
+                            <span>${data.message}</span>
+                        </div>
+                    `;
+
+                    successBox.classList.remove('hidden');
+
+                    form.reset();
+
+                    setTimeout(() => {
+                        cerrarForgotPassword();
+                    }, 3000);
+
+                } else {
+                    errorBox.innerText = data.message || 'Error al enviar el correo';
+                    errorBox.classList.remove('hidden');
+                }
+
+            } catch (err) {
+                errorBox.innerText = 'Error de conexión';
+                errorBox.classList.remove('hidden');
+            }
+        });
+
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const form = document.getElementById('resetPasswordForm');
+
+        if (!form) return;
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const successBox = document.getElementById('resetSuccessBox');
+            const errorBox = document.getElementById('resetErrorBox');
+
+            successBox.classList.add('hidden');
+            errorBox.classList.add('hidden');
+
+            try {
+                const res = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                        'Accept': 'application/json'
+                    },
+                    body: new URLSearchParams(new FormData(form))
+                });
+
+                const data = await res.json();
+
+                if (data.ok) {
+
+                    successBox.innerHTML = data.message;
+                    successBox.classList.remove('hidden');
+
+                    form.reset();
+
+                    setTimeout(() => {
+                        window.location.assign(data.redirect);
+                    }, 3000);
+
+                } else {
+                    errorBox.innerText = data.message || 'Error';
+                    errorBox.classList.remove('hidden');
+                }
+
+            } catch (err) {
+                errorBox.innerText = 'Error de conexión';
+                errorBox.classList.remove('hidden');
+            }
+        });
+
+    });
+    
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const form = document.getElementById('resetPasswordForm');
+
+        if (!form) return;
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const url = form.action;
+
+            const successBox = document.getElementById('resetSuccessBox');
+            const errorBox = document.getElementById('resetErrorBox');
+
+            successBox.classList.add('hidden');
+            errorBox.classList.add('hidden');
+
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                    },
+                    body: new URLSearchParams(new FormData(form))
+                });
+
+                const data = await res.json();
+
+                if (data.ok) {
+                    successBox.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-green-600"></i>
+                            <span>${data.message}</span>
+                        </div>
+                    `;
+
+                    successBox.classList.remove('hidden');
+
+                    form.reset();
+
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 3000);
+
+                } else {
+                    errorBox.innerText = data.message || 'Error al actualizar contraseña';
+                    errorBox.classList.remove('hidden');
+                }
+
+            } catch (err) {
+                errorBox.innerText = 'Error de conexión';
+                errorBox.classList.remove('hidden');
+            }
+        });
+
+    });
 </script>

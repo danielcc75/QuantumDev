@@ -14,6 +14,8 @@ use App\Http\Controllers\LocaleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NotificationController; 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TestMail;
 
 // =========================
 // LOCALE SWITCHER (MULTILINGUALIDAD)
@@ -296,3 +298,21 @@ Route::post('/notificaciones/marcar-todas', [NotificationController::class, 'mar
 // NOVEDADES (moderación, proyectos ocultos, etc)
 Route::get('/novedades/list', [NotificationController::class, 'obtenerNovedades'])->name('novedades.list');
 Route::post('/novedades/marcar-vista', [NotificationController::class, 'marcarNovedadVista'])->name('novedades.marcar-vista');
+
+//MANEJO DE LOS EMAILS
+Route::get('/test-mail', function () {
+
+    Mail::to('jhonatan1075894@gmail.com')
+        ->send(new TestMail());
+
+    return 'Correo enviado';
+});
+
+Route::get('/forgot-password', [AuthWebController::class, 'forgotPassword'])
+    ->name('password.forgot');
+
+Route::get('/reset-password/{token}', function ($token) {
+    return view('auth.reset-password', compact('token'));
+});
+
+Route::post('/reset-password', [AuthWebController::class, 'updatePassword']);
