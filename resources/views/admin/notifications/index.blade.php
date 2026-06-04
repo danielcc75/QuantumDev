@@ -319,7 +319,19 @@
     if (formNotificacion) {
         formNotificacion.addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
+            // Validar que se haya seleccionado un usuario cuando es individual
+            const destinatario = this.querySelector('input[name="destinatario"]:checked').value;
+            if (destinatario === 'individual' && !document.getElementById('usuarioIdSeleccionadoNotificacion').value) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Campo requerido',
+                    text: 'Por favor, busca y selecciona un usuario',
+                    confirmButtonColor: '#1e3a5f'
+                });
+                return;
+            }
+
             // Mostrar loading en el botón
             const submitBtn = this.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
@@ -489,24 +501,5 @@ window.abrirModalNotificacion = function() {
     limpiarSeleccionUsuarioNotificacion();
 };
 
-// Validar que se haya seleccionado un usuario antes de enviar
-const formOriginal = document.getElementById('formNotificacion');
-if (formOriginal) {
-    formOriginal.addEventListener('submit', function(e) {
-        const destinatario = document.querySelector('input[name="destinatario"]:checked').value;
-        if (destinatario === 'individual') {
-            const usuarioId = document.getElementById('usuarioIdSeleccionadoNotificacion').value;
-            if (!usuarioId) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Campo requerido',
-                    text: 'Por favor, busca y selecciona un usuario',
-                    confirmButtonColor: '#1e3a5f'
-                });
-            }
-        }
-    });
-}
 </script>
 @endsection
