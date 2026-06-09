@@ -16,6 +16,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
+use App\Models\PasswordResetToken;
+use App\Mail\ResetPasswordMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class AuthWebController extends Controller
 {
@@ -234,5 +238,79 @@ class AuthWebController extends Controller
         }
 
         return back()->with('success', $mensaje);
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'correo_electronico' => 'required|email'
+        ]);
+
+        $usuario = Usuario::where(
+            'correo_electronico',
+            $request->correo_electronico
+        )->first();
+
+        // Por seguridad no revelamos si existe o no el correo
+        if (!$usuario) {
+            return response()->json([
+                'ok' => true,
+                'message' => 'Si el correo existe, recibirás un enlace de recuperación.'
+            ]);
+        }
+
+        $token = Str::random(64);
+
+        PasswordResetToken::updateOrCreate(
+            [
+                'email' => $usuario->correo_electronico
+            ],
+            [
+                'token' => hash('sha256', $token),
+                'created_at' => now()
+            ]
+        );
+
+        $resetUrl = url('/reset-password/' . $token);
+
+        Mail::to($usuario->correo_electronico)
+            ->send(new ResetPasswordMail($resetUrl));
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Si el correo existe, recibirás un enlace de recuperación.'
+        ]);
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'contrasenia' => 'required|min:8|confirmed'
+        ]);
+
+        $tokenData = \App\Models\PasswordResetToken::where('token', hash('sha256', $request->token))->first();
+
+        if (!$tokenData) {
+            return back()->withErrors(['token' => 'Token inválido o expirado']);
+        }
+
+        $usuario = \App\Models\Usuario::where('correo_electronico', $tokenData->email)->first();
+
+        if (!$usuario) {
+            return back()->withErrors(['email' => 'Usuario no encontrado']);
+        }
+
+        $usuario->contrasenia = \Illuminate\Support\Facades\Hash::make($request->contrasenia);
+        $usuario->save();
+
+        // eliminar token
+        $tokenData->delete();
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Contraseña actualizada correctamente',
+            'redirect' => url('/')
+        ]);
     }
 }
