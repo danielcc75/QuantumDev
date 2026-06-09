@@ -10,18 +10,18 @@ const CONFIRM_CONFIG_PERFIL = {
         titulo:    __t('js.perfil.confirm_guardar_titulo'),
         mensaje:   __t('js.perfil.confirm_guardar_msg'),
         icon:      'fas fa-save',
-        iconBg:    'bg-blue-50',
-        iconColor: 'text-blue-500',
-        btnClass:  'bg-blue-500 hover:bg-blue-600',
+        iconBg:    'bg-[#1e3a5f]/10',
+        iconColor: 'text-[#1e3a5f]',
+        btnClass:  'bg-[#1e3a5f] hover:bg-[#1e3a5f]/90',
         accion:    () => submitPerfil(),
     },
     cancelar: {
         titulo:    __t('js.perfil.confirm_cancelar_titulo'),
         mensaje:   __t('js.perfil.confirm_cancelar_msg'),
         icon:      'fas fa-times-circle',
-        iconBg:    'bg-red-50',
-        iconColor: 'text-red-500',
-        btnClass:  'bg-red-500 hover:bg-red-600',
+        iconBg:    'bg-[#1e3a5f]/10',
+        iconColor: 'text-[#1e3a5f]',
+        btnClass:  'bg-[#1e3a5f] hover:bg-[#1e3a5f]/90',
         accion:    () => cerrarModalPerfil(),
     },
 };
@@ -31,9 +31,9 @@ const EXITO_CONFIG_PERFIL = {
         titulo:    __t('js.perfil.exito_titulo'),
         mensaje:   __t('js.perfil.exito_msg'),
         icon:      'fas fa-check-circle',
-        iconBg:    'bg-green-50',
-        iconColor: 'text-green-500',
-        btnClass:  'bg-green-500 hover:bg-green-600',
+        iconBg:    'bg-[#1e3a5f]/10',
+        iconColor: 'text-[#1e3a5f]',
+        btnClass:  'bg-[#1e3a5f] hover:bg-[#1e3a5f]/90',
     }
 };
 

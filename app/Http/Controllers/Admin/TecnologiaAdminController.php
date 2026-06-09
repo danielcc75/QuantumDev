@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Traits\LogsActivity;
 use App\Models\Tecnologia;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Notification;
 use App\Models\Usuario;
 
@@ -59,9 +60,19 @@ class TecnologiaAdminController extends Controller
 
     public function store(Request $request)
     {
+        $nombre = trim($request->nombre ?? '');
+        $request->merge(['nombre' => $nombre]);
+
         $request->validate([
-            'nombre' => 'required|string|max:100',
+            'nombre' => [
+                'required', 'string', 'max:100',
+                Rule::unique('tecnologias', 'nombre')
+                    ->where(fn($q) => $q->whereNull('deleted_at')
+                        ->whereRaw('LOWER(nombre) = ?', [mb_strtolower($nombre)])),
+            ],
             'categoria' => 'required|string|max:100',
+        ], [
+            'nombre.unique' => 'Ya existe una tecnología con ese nombre.',
         ]);
 
         $tecnologia = Tecnologia::create([
@@ -89,9 +100,20 @@ class TecnologiaAdminController extends Controller
     {
         $tecnologia = Tecnologia::findOrFail($id);
 
+        $nombre = trim($request->nombre ?? '');
+        $request->merge(['nombre' => $nombre]);
+
         $request->validate([
-            'nombre' => 'required|string|max:100',
+            'nombre' => [
+                'required', 'string', 'max:100',
+                Rule::unique('tecnologias', 'nombre')
+                    ->ignore($id, 'id_tecnologia')
+                    ->where(fn($q) => $q->whereNull('deleted_at')
+                        ->whereRaw('LOWER(nombre) = ?', [mb_strtolower($nombre)])),
+            ],
             'categoria' => 'required|string|max:100',
+        ], [
+            'nombre.unique' => 'Ya existe una tecnología con ese nombre.',
         ]);
 
         $tecnologia->update([

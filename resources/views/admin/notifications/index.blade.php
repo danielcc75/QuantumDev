@@ -17,7 +17,7 @@
                 <button type="button" onclick="abrirModalNotificacion()" class="bg-[#1e3a5f] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#152c47] transition-colors">
                     <i class="fas fa-plus mr-2"></i>Nueva Notificación
                 </button>
-                <form action="{{ route('admin.notifications.limpiar') }}" method="POST" onsubmit="return confirm('¿Eliminar notificaciones antiguas (+30 días)?')">
+                <form action="{{ route('admin.notifications.limpiar') }}" method="POST" data-confirm="¿Eliminar notificaciones antiguas (+30 días)?" data-confirm-title="Limpiar notificaciones" data-confirm-button="Eliminar">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
@@ -128,7 +128,7 @@
                                 <a href="{{ route('admin.notifications.show', $notif->id_notification) }}" class="text-blue-600 bg-blue-100 p-2 rounded-lg hover:bg-blue-200 transition-colors">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <form action="{{ route('admin.notifications.destroy', $notif->id_notification) }}" method="POST" onsubmit="return confirm('¿Eliminar esta notificación?')">
+                                <form action="{{ route('admin.notifications.destroy', $notif->id_notification) }}" method="POST" data-confirm="¿Eliminar esta notificación?" data-confirm-title="Eliminar notificación" data-confirm-button="Eliminar">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 bg-red-100 p-2 rounded-lg hover:bg-red-200 transition-colors">

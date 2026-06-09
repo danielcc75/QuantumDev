@@ -9,7 +9,12 @@ const USER_ID = {{ $userId }};
 function apiFetch(url, options = {}) {
     return fetch(url, {
         ...options,
-        headers: { 'X-CSRF-TOKEN': CSRF, ...options.headers },
+        headers: {
+            'X-CSRF-TOKEN': CSRF,
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            ...options.headers,
+        },
     });
 }
 
@@ -142,10 +147,10 @@ const CONFIRM_CONFIG = {
         titulo:     __t('js.proyectos.confirm_cancelar_titulo'),
         mensaje:    __t('js.proyectos.confirm_cancelar_mensaje'),
         icon:       'fas fa-times-circle',
-        iconBg:     'bg-red-50',
-        iconColor:  'text-red-500',
-        headerColor:'bg-red-500',
-        btnClass:   'bg-red-500 hover:bg-red-600',
+        iconBg:     'bg-[#1e3a5f]/10',
+        iconColor:  'text-[#1e3a5f]',
+        headerColor:'bg-[#1e3a5f]',
+        btnClass:   'bg-[#1e3a5f] hover:bg-[#1e3a5f]/90',
         accion:     () => cerrarModalProyecto(),
     },
     editar: {
@@ -162,10 +167,10 @@ const CONFIRM_CONFIG = {
         titulo:     __t('js.proyectos.confirm_eliminar_titulo'),
         mensaje:    __t('js.proyectos.confirm_eliminar_mensaje'),
         icon:       'fas fa-trash-alt',
-        iconBg:     'bg-[#e11d48]/10',
-        iconColor:  'text-[#e11d48]',
-        headerColor:'bg-[#e11d48]',
-        btnClass:   'bg-[#e11d48] hover:bg-[#e11d48]/80',
+        iconBg:     'bg-[#1e3a5f]/10',
+        iconColor:  'text-[#1e3a5f]',
+        headerColor:'bg-[#1e3a5f]',
+        btnClass:   'bg-[#1e3a5f] hover:bg-[#1e3a5f]/90',
         accion:     null,
     },
 };
@@ -756,9 +761,9 @@ function actualizarResumenProyectos(proyecto, accion) {
                         titulo:         __t('js.sugerir.enviada_titulo'),
                         mensaje:        data.message || __t('js.sugerir.enviada_msg'),
                         icon:           'fas fa-check-circle',
-                        iconBg:         'bg-green-50',
-                        iconColor:      'text-green-500',
-                        btnClass:       'bg-green-500 hover:bg-green-600',
+                        iconBg:         'bg-[#1e3a5f]/10',
+                        iconColor:      'text-[#1e3a5f]',
+                        btnClass:       'bg-[#1e3a5f] hover:bg-[#1e3a5f]/90',
                         textoConfirmar: __t('js.sugerir.ok'),
                         soloConfirmar:  true,
                     });

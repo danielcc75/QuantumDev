@@ -1,6 +1,23 @@
 @extends('layouts.app')
 
 @section('content')
+
+@if(session('success'))
+    <div class="mb-4 bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded-lg">{{ session('success') }}</div>
+@endif
+@if(session('error'))
+    <div class="mb-4 bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-lg">{{ session('error') }}</div>
+@endif
+@if($errors->any())
+    <div class="mb-4 bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-lg">
+        <ul class="list-disc list-inside text-sm">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <div class="bg-white rounded-xl shadow-lg overflow-hidden">
     <div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-200 flex justify-between items-center">
         <div>

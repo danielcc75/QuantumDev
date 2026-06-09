@@ -95,7 +95,10 @@
                             </button>
                             
                             @if($usuario->estado == 'activo')
-                                <form action="{{ route('admin.usuarios.toggle-estado', $usuario->id_usuario) }}" method="POST" class="inline">
+                                <form action="{{ route('admin.usuarios.toggle-estado', $usuario->id_usuario) }}" method="POST" class="inline"
+                                      data-confirm="¿Suspender al usuario «{{ $usuario->nombre }} {{ $usuario->apellido }}»? No podrá iniciar sesión."
+                                      data-confirm-title="Suspender usuario"
+                                      data-confirm-button="Suspender">
                                     @csrf
                                     <button type="submit" class="text-orange-600 bg-orange-100 p-2 rounded-lg hover:bg-orange-200" title="Suspender usuario">
                                         <i class="fas fa-ban"></i>

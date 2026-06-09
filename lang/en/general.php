@@ -157,6 +157,7 @@ return [
 
     'proyectos' => [
         'titulo'             => 'Project Management',
+        'duplicado'          => 'You already have a project with that name.',
         'subtitulo'          => 'Manage your personal projects and control what you show to the world',
         'btn_nuevo'          => 'New Project',
         'stat_total'         => 'Total Projects',
@@ -220,6 +221,7 @@ return [
 
     'habilidades' => [
         'titulo'             => 'Technical Skills',
+        'duplicado'          => 'You already have a skill with that name.',
         'subtitulo'          => 'Manage your technical skills and control what you show to the world',
         'btn_nueva'          => 'New Skill',
         'stat_total'         => 'Total Skills',

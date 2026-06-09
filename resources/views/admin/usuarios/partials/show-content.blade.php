@@ -199,7 +199,10 @@
                 <h2 class="text-xl font-bold text-gray-800 mb-4">Gestión de cuenta</h2>
                 <div class="space-y-2">
                     @if($usuario->estado == 'activo')
-                        <form action="{{ route('admin.usuarios.toggle-estado', $usuario->id_usuario) }}" method="POST">
+                        <form action="{{ route('admin.usuarios.toggle-estado', $usuario->id_usuario) }}" method="POST"
+                              data-confirm="¿Suspender al usuario «{{ $usuario->nombre }} {{ $usuario->apellido }}»? No podrá iniciar sesión."
+                              data-confirm-title="Suspender usuario"
+                              data-confirm-button="Suspender">
                             @csrf
                             <button type="submit" class="w-full text-left text-gray-700 hover:bg-gray-50 p-3 rounded-lg transition flex items-center gap-3">
                                 <i class="fas fa-ban text-orange-500 w-5"></i>

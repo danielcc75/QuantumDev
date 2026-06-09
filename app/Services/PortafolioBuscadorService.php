@@ -117,6 +117,7 @@ class PortafolioBuscadorService
         $categoriaTec = trim((string) ($filtros['categoria_tec'] ?? ''));
         if ($categoriaTec !== '') {
             $nombresDeCat = DB::table('tecnologias')
+                ->whereNull('deleted_at')
                 ->where('categoria', $categoriaTec)
                 ->pluck('nombre')
                 ->all();

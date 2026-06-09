@@ -105,7 +105,7 @@
                 <i class="fas fa-arrow-left mr-2"></i>Volver
             </a>
             <form action="{{ route('admin.notifications.destroy', $notificacion->id_notification) }}" method="POST"
-                  onsubmit="return confirm('¿Eliminar esta notificación?')">
+                  data-confirm="¿Eliminar esta notificación?" data-confirm-title="Eliminar notificación" data-confirm-button="Eliminar">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors">

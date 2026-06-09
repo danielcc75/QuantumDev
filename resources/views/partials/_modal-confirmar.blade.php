@@ -17,10 +17,10 @@
 --}}
 <div id="gcfModal" class="fixed inset-0 bg-black bg-opacity-60 z-[100] hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
-        <div id="gcfHeader" class="h-1.5 w-full bg-red-500"></div>
+        <div id="gcfHeader" class="h-1.5 w-full bg-[#1e3a5f]"></div>
         <div class="px-6 pt-6 pb-4 text-center">
-            <div id="gcfIconWrap" class="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-red-50">
-                <i id="gcfIcon" class="fas fa-exclamation-triangle text-2xl text-red-500"></i>
+            <div id="gcfIconWrap" class="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-[#1e3a5f]/10">
+                <i id="gcfIcon" class="fas fa-exclamation-triangle text-2xl text-[#1e3a5f]"></i>
             </div>
             <h4 id="gcfTitle" class="text-base font-bold text-[#1e3a5f] mb-1.5">¿Estás seguro?</h4>
             <p id="gcfMessage" class="text-xs text-gray-500 leading-relaxed">Esta acción no se puede deshacer.</p>
@@ -31,7 +31,7 @@
                 Cancelar
             </button>
             <button type="button" id="gcfBtnConfirm"
-                class="flex-1 px-4 py-2.5 text-sm text-white rounded-xl font-medium transition bg-red-500 hover:bg-red-600">
+                class="flex-1 px-4 py-2.5 text-sm text-white rounded-xl font-medium transition bg-[#1e3a5f] hover:bg-[#1e3a5f]/90">
                 Confirmar
             </button>
         </div>
@@ -44,8 +44,8 @@
     if (!modal) return;
 
     const presets = {
-        danger:  { header: 'bg-red-500',          iconBg: 'bg-red-50',          iconColor: 'text-red-500',          icon: 'fas fa-trash-alt',           btn: 'bg-red-500 hover:bg-red-600' },
-        warning: { header: 'bg-yellow-500',       iconBg: 'bg-yellow-50',       iconColor: 'text-yellow-500',       icon: 'fas fa-exclamation-triangle',btn: 'bg-yellow-500 hover:bg-yellow-600' },
+        danger:  { header: 'bg-[#1e3a5f]',        iconBg: 'bg-[#1e3a5f]/10',    iconColor: 'text-[#1e3a5f]',        icon: 'fas fa-trash-alt',           btn: 'bg-[#1e3a5f] hover:bg-[#1e3a5f]/90' },
+        warning: { header: 'bg-[#1e3a5f]',        iconBg: 'bg-[#1e3a5f]/10',    iconColor: 'text-[#1e3a5f]',        icon: 'fas fa-exclamation-triangle',btn: 'bg-[#1e3a5f] hover:bg-[#1e3a5f]/90' },
         success: { header: 'bg-[#1e3a5f]',        iconBg: 'bg-[#1e3a5f]/10',    iconColor: 'text-[#1e3a5f]',        icon: 'fas fa-check-circle',        btn: 'bg-[#1e3a5f] hover:bg-[#1e3a5f]/90' },
         info:    { header: 'bg-blue-500',         iconBg: 'bg-blue-50',         iconColor: 'text-blue-500',         icon: 'fas fa-info-circle',         btn: 'bg-blue-500 hover:bg-blue-600' },
         primary: { header: 'bg-[#1e3a5f]',        iconBg: 'bg-[#1e3a5f]/10',    iconColor: 'text-[#1e3a5f]',        icon: 'fas fa-question-circle',     btn: 'bg-[#1e3a5f] hover:bg-[#1e3a5f]/90' },

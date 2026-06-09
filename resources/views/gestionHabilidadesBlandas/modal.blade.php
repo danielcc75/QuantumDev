@@ -288,9 +288,9 @@
                         titulo:         __t('js.sugerir.enviada_titulo'),
                         mensaje:        data.message || __t('js.sugerir.enviada_msg'),
                         icon:           'fas fa-check-circle',
-                        iconBg:         'bg-green-50',
-                        iconColor:      'text-green-500',
-                        btnClass:       'bg-green-500 hover:bg-green-600',
+                        iconBg:         'bg-[#1e3a5f]/10',
+                        iconColor:      'text-[#1e3a5f]',
+                        btnClass:       'bg-[#1e3a5f] hover:bg-[#1e3a5f]/90',
                         textoConfirmar: __t('js.sugerir.ok'),
                         soloConfirmar:  true,
                     });

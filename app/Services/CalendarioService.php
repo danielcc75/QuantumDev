@@ -114,6 +114,7 @@ class CalendarioService
     private function cargarNovedadesSistema(array &$eventos, Carbon $desde, Carbon $hasta): void
     {
         $tecnologias = DB::table('tecnologias')
+            ->whereNull('deleted_at')
             ->whereBetween('created_at', [$desde->copy()->startOfDay(), $hasta->copy()->endOfDay()])
             ->get();
         foreach ($tecnologias as $t) {
@@ -128,6 +129,7 @@ class CalendarioService
         }
 
         $categorias = DB::table('categoria')
+            ->whereNull('deleted_at')
             ->whereBetween('created_at', [$desde->copy()->startOfDay(), $hasta->copy()->endOfDay()])
             ->get();
         foreach ($categorias as $c) {
