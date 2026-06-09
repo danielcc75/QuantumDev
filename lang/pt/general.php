@@ -157,6 +157,7 @@ return [
 
     'proyectos' => [
         'titulo'             => 'Gestão de Projetos',
+        'duplicado'          => 'Você já tem um projeto com esse nome.',
         'subtitulo'          => 'Gerencie seus projetos pessoais e controle o que mostra ao mundo',
         'btn_nuevo'          => 'Novo Projeto',
         'stat_total'         => 'Total de Projetos',
@@ -220,6 +221,7 @@ return [
 
     'habilidades' => [
         'titulo'             => 'Habilidades Técnicas',
+        'duplicado'          => 'Você já tem uma habilidade com esse nome.',
         'subtitulo'          => 'Gerencie suas habilidades técnicas e controle o que mostra ao mundo',
         'btn_nueva'          => 'Nova Habilidade',
         'stat_total'         => 'Total de Habilidades',

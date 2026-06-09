@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Traits\LogsActivity;
 use App\Models\Categoria;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Notification;
 use App\Models\Usuario;
 
@@ -21,8 +22,13 @@ class CategoriaAdminController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nombre' => 'required|string|max:100|unique:categoria,nombre',
+            'nombre' => [
+                'required', 'string', 'max:100',
+                Rule::unique('categoria', 'nombre')->whereNull('deleted_at'),
+            ],
             'imagen' => 'required|url|max:250',
+        ], [
+            'nombre.unique' => 'Ya existe una categoría con ese nombre.',
         ]);
 
         $categoria = Categoria::create($validated);
@@ -50,8 +56,15 @@ class CategoriaAdminController extends Controller
         $categoria = Categoria::findOrFail($id);
 
         $validated = $request->validate([
-            'nombre' => 'required|string|max:100|unique:categoria,nombre,' . $id . ',id_categoria',
+            'nombre' => [
+                'required', 'string', 'max:100',
+                Rule::unique('categoria', 'nombre')
+                    ->ignore($id, 'id_categoria')
+                    ->whereNull('deleted_at'),
+            ],
             'imagen' => 'required|url|max:250',
+        ], [
+            'nombre.unique' => 'Ya existe una categoría con ese nombre.',
         ]);
 
         $categoria->update($validated);

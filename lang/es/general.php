@@ -157,6 +157,7 @@ return [
 
     'proyectos' => [
         'titulo'             => 'Gestión de Proyectos',
+        'duplicado'          => 'Ya tienes un proyecto registrado con ese nombre.',
         'subtitulo'          => 'Administra tus proyectos personales y controla lo que muestras al mundo',
         'btn_nuevo'          => 'Nuevo Proyecto',
         'stat_total'         => 'Total Proyectos',
@@ -220,6 +221,7 @@ return [
 
     'habilidades' => [
         'titulo'             => 'Habilidades Técnicas',
+        'duplicado'          => 'Ya tienes una habilidad registrada con ese nombre.',
         'subtitulo'          => 'Administra tus habilidades técnicas y controla lo que muestras al mundo',
         'btn_nueva'          => 'Nueva Habilidad',
         'stat_total'         => 'Total Habilidades',

@@ -67,6 +67,7 @@ class PerfilWebController extends Controller
             'correo_electronico' => 'required|email|unique:usuario,correo_electronico,' . $usuario->id_usuario . ',id_usuario',
 
             'biografia' => 'nullable|string',
+            'titulo_profesional' => 'nullable|string|max:100',
             'ubicacion' => 'nullable|string|max:100',
             'foto_perfil' => 'nullable|string|max:255',
 
@@ -101,6 +102,7 @@ class PerfilWebController extends Controller
         $usuario->save();
 
         $perfil->biografia = $request->biografia;
+        $perfil->titulo_profesional = $request->titulo_profesional;
         $perfil->ubicacion = $request->ubicacion;
         $perfil->foto_perfil = $request->foto_perfil;
         $perfil->save();

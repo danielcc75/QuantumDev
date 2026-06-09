@@ -233,8 +233,18 @@
             <div>
                 <h3 class="font-semibold mb-2">{{ __('general.home.footer.contacto') }}</h3>
                 <p class="text-gray-300 text-sm">{{ $configSitio?->nombre_empresa ?? 'QuantumDev' }}</p>
-                <p class="text-gray-300 text-sm">{{ __('general.home.footer.email_label') }}: {{ $configSitio?->email_contacto ?? 'contacto@quantumdev.dev' }}</p>
-                <p class="text-gray-300 text-sm">{{ __('general.home.footer.tel_label') }}: {{ $configSitio?->telefono ?? '+591 700 123 456' }}</p>
+                @php
+                    $emailContacto = $configSitio?->email_contacto ?? 'contacto@quantumdev.dev';
+                    $telContacto   = $configSitio?->telefono ?? '+591 700 123 456';
+                @endphp
+                <p class="text-gray-300 text-sm">
+                    {{ __('general.home.footer.email_label') }}:
+                    <a href="mailto:{{ $emailContacto }}" class="hover:text-white transition-all-soft">{{ $emailContacto }}</a>
+                </p>
+                <p class="text-gray-300 text-sm">
+                    {{ __('general.home.footer.tel_label') }}:
+                    <a href="tel:{{ preg_replace('/[^0-9+]/', '', $telContacto) }}" class="hover:text-white transition-all-soft">{{ $telContacto }}</a>
+                </p>
             </div>
 
         </div>

@@ -67,6 +67,9 @@
     <!-- barra superior -->
     @include('_dashboard-header')
 
+    <!-- mensajes flash (éxito / error / validación) -->
+    @include('partials._flash')
+
     <!-- overlay para sidebars móviles -->
     <div id="sidebar-overlay"
         class="fixed inset-0 bg-black/50 z-30 hidden"></div>

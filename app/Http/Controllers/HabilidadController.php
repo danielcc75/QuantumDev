@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Habilidad;
 use App\Models\Categoria;
 use App\Models\Usuario;
@@ -23,18 +24,30 @@ class HabilidadController extends Controller
     // =========================
     public function store(Request $request)
     {
-        $request->validate([
-            'nombreHabilidad'   => 'required|string|max:100',
-            'categoria'         => 'required|exists:categoria,id_categoria',
-            'anosExperiencia'   => 'required|integer|min:0',
-            'descripcion'       => 'required|string|min:0|max:500',
-        ]);
-
         $usuario = Usuario::with('perfil')->find(session('usuario_id'));
 
         if (!$usuario || !$usuario->perfil) {
             return back()->with('error', 'Usuario o perfil inválido');
         }
+
+        $idPerfil = $usuario->perfil->id_perfil;
+        $nombre   = trim($request->nombreHabilidad ?? '');
+        $request->merge(['nombreHabilidad' => $nombre]);
+
+        $request->validate([
+            'nombreHabilidad'   => [
+                'required', 'string', 'max:100',
+                Rule::unique('habilidades', 'nombre')
+                    ->where(fn($q) => $q->where('id_perfil', $idPerfil)
+                        ->whereNull('deleted_at')
+                        ->whereRaw('LOWER(nombre) = ?', [mb_strtolower($nombre)])),
+            ],
+            'categoria'         => 'required|exists:categoria,id_categoria',
+            'anosExperiencia'   => 'required|integer|min:0',
+            'descripcion'       => 'required|string|min:0|max:500',
+        ], [
+            'nombreHabilidad.unique' => __('general.habilidades.duplicado'),
+        ]);
 
         Habilidad::create([
             'nombre'             => $request->nombreHabilidad,
@@ -65,14 +78,26 @@ class HabilidadController extends Controller
     // =========================
     public function update(Request $request, $id)
     {
+        $habilidad = Habilidad::findOrFail($id);
+
+        $nombre = trim($request->nombreHabilidad ?? '');
+        $request->merge(['nombreHabilidad' => $nombre]);
+
         $request->validate([
-            'nombreHabilidad'   => 'required|string|max:100',
+            'nombreHabilidad'   => [
+                'required', 'string', 'max:100',
+                Rule::unique('habilidades', 'nombre')
+                    ->ignore($id, 'id_habilidad')
+                    ->where(fn($q) => $q->where('id_perfil', $habilidad->id_perfil)
+                        ->whereNull('deleted_at')
+                        ->whereRaw('LOWER(nombre) = ?', [mb_strtolower($nombre)])),
+            ],
             'categoria'         => 'required|exists:categoria,id_categoria',
             'anosExperiencia'   => 'required|integer|min:0',
             'descripcion'       => 'required|string|min:0|max:500',
+        ], [
+            'nombreHabilidad.unique' => __('general.habilidades.duplicado'),
         ]);
-
-        $habilidad = Habilidad::findOrFail($id);
 
         $habilidad->update([
             'nombre'             => $request->nombreHabilidad,

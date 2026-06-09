@@ -118,23 +118,16 @@ class HabilidadBlandaController extends Controller
     {
         $habilidad = HabilidadBlanda::findOrFail($id);
 
-        $estaUsada = PerfilHabilidadBlanda::where('id_habilidad_blanda', $id)->exists();
+        // No se elimina físicamente: solo se desactiva para preservar la
+        // integridad de los perfiles que ya la seleccionaron.
+        $habilidad->estado = 'inactivo';
+        $habilidad->save();
 
-        if ($estaUsada) {
-            return redirect()
-                ->back()
-            ->with('active_tab', 'blandas')
-                ->with('error', 'no se puede eliminar porque esta habilidad ya fue seleccionada por usuarios. puedes desactivarla.');
-        }
-
-        $nombreBlanda = $habilidad->nombre;
-        $habilidad->delete();
-
-        $this->logAdminAction('habilidad_blanda_eliminada', "Habilidad blanda: «{$nombreBlanda}»");
+        $this->logAdminAction('habilidad_blanda_desactivada', "Habilidad blanda: «{$habilidad->nombre}»");
         return redirect()
             ->back()
             ->with('active_tab', 'blandas')
-            ->with('success', 'habilidad blanda eliminada correctamente');
+            ->with('success', 'habilidad blanda desactivada correctamente');
     }
 
     public function guardarSeleccionUsuario(Request $request)

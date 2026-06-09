@@ -6,6 +6,7 @@ use App\Models\Perfil;
 use App\Models\Proyecto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class ProyectoController extends Controller
 {
@@ -20,17 +21,28 @@ class ProyectoController extends Controller
             return response()->json(['success' => false, 'message' => 'No autenticado'], 401);
         }
 
-        $request->validate([
-            'nombre'    => 'required|string|max:100',
-            'fecha_ini' => 'required|date',
-            'fecha_fin' => 'nullable|date|after_or_equal:fecha_ini',
-            'estado'    => 'in:pendiente,en_progreso,completado,cancelado',
-        ]);
-
         $perfil = Perfil::where('id_usuario', session('usuario_id'))->first();
         if (!$perfil) {
             return response()->json(['success' => false, 'message' => 'Perfil no encontrado'], 404);
         }
+
+        $nombre = trim($request->nombre ?? '');
+        $request->merge(['nombre' => $nombre]);
+
+        $request->validate([
+            'nombre'    => [
+                'required', 'string', 'max:100',
+                Rule::unique('proyectos', 'nombre')
+                    ->where(fn($q) => $q->where('id_perfil', $perfil->id_perfil)
+                        ->whereNull('deleted_at')
+                        ->whereRaw('LOWER(nombre) = ?', [mb_strtolower($nombre)])),
+            ],
+            'fecha_ini' => 'required|date',
+            'fecha_fin' => 'nullable|date|after_or_equal:fecha_ini',
+            'estado'    => 'in:pendiente,en_progreso,completado,cancelado',
+        ], [
+            'nombre.unique' => __('general.proyectos.duplicado'),
+        ]);
 
         $proyecto = Proyecto::create([
             'id_perfil'      => $perfil->id_perfil,
@@ -68,8 +80,19 @@ class ProyectoController extends Controller
             return response()->json(['error' => 'No autorizado'], 403);
         }
 
+        if ($request->has('nombre')) {
+            $request->merge(['nombre' => trim($request->nombre ?? '')]);
+        }
+
         $request->validate([
-            'nombre'         => 'sometimes|string|max:100',
+            'nombre'         => [
+                'sometimes', 'string', 'max:100',
+                Rule::unique('proyectos', 'nombre')
+                    ->ignore($proyecto->id_proyecto, 'id_proyecto')
+                    ->where(fn($q) => $q->where('id_perfil', $proyecto->id_perfil)
+                        ->whereNull('deleted_at')
+                        ->whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($request->nombre ?? ''))])),
+            ],
             'descripcion'    => 'nullable|string',
             'url_link'       => 'nullable|url',
             'referencias'    => 'nullable|string',
