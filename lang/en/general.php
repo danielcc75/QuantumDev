@@ -929,4 +929,47 @@ return [
         'pt' => ['nativo' => 'Português', 'ingles' => 'Portuguese'],
     ],
 
+    'forgot' => [
+        'titulo' => 'Reset Password',
+        'subtitulo' => 'Enter your email address and we will send you a link to reset your password.',
+        'correo' => 'Email address',
+        'correo_placeholder' => 'example@email.com',
+        'btn_enviar' => 'Send link',
+        'recordaste' => 'Remembered your password?',
+        'iniciar_sesion' => 'Sign in',
+    ],
+
+    'forgot_js' => [
+        'error_correo' => 'Error sending the email.',
+        'error_conexion' => 'Connection error.',
+        'error_actualizar' => 'Error updating the password.',
+    ],
+
+    'forgot_backend' => [
+        'correo_enviado' => 'If the email exists, you will receive a recovery link.',
+        'token_invalido' => 'Invalid or expired token.',
+        'usuario_no_encontrado' => 'User not found.',
+        'password_actualizada' => 'Password updated successfully.',
+    ],
+
+    'forgot_mail' => [
+        'subject' => 'Password Recovery',
+        'title' => 'Password Recovery',
+        'intro' => 'We received a request to reset your password.',
+        'click' => 'Click the following link:',
+        'button' => 'Reset Password',
+        'footer' => 'If you did not request this change, you can ignore this email.',
+    ],
+
+    'reset_password' => [
+        'title' => 'Reset Password',
+        'subtitle' => 'Enter your new password',
+        'new_password' => 'New Password',
+        'confirm_password' => 'Confirm Password',
+        'update_button' => 'Update Password',
+        'success' => 'Password updated successfully',
+        'error' => 'Error updating password',
+        'success_title' => 'Success!',
+        'redirecting' => 'Redirecting to login...',
+    ],
 ];

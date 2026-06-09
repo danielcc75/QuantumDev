@@ -7,22 +7,25 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\App;
 
 class ResetPasswordMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public string $resetUrl;
+    public string $mailLocale;
 
-    public function __construct(string $resetUrl)
+    public function __construct(string $resetUrl, string $mailLocale)
     {
         $this->resetUrl = $resetUrl;
+        $this->mailLocale = $mailLocale;
     }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Recuperación de contraseña'
+            subject: __('general.forgot_mail.subject')
         );
     }
 

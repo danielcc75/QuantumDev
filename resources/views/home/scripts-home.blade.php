@@ -807,166 +807,128 @@
 
     document.addEventListener('DOMContentLoaded', function () {
 
-        const form = document.getElementById('forgotPasswordForm');
+        const forgotForm = document.getElementById('forgotPasswordForm');
 
-        if (!form) return;
+        if (forgotForm) {
 
-        form.addEventListener('submit', async function (e) {
-            e.preventDefault();
+            forgotForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
 
-            const url = form.action + '?' + new URLSearchParams(new FormData(form));
+                const url = forgotForm.action + '?' + new URLSearchParams(new FormData(forgotForm));
 
-            const successBox = document.getElementById('forgotSuccessBox');
-            const errorBox = document.getElementById('forgotErrorBox');
+                const successBox = document.getElementById('forgotSuccessBox');
+                const errorBox = document.getElementById('forgotErrorBox');
 
-            successBox.classList.add('hidden');
-            errorBox.classList.add('hidden');
+                successBox.classList.add('hidden');
+                errorBox.classList.add('hidden');
 
-            try {
-                const res = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json'
+                try {
+
+                    const res = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    const data = await res.json();
+
+                    if (data.ok) {
+
+                        successBox.innerHTML = `
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-check-circle text-green-600"></i>
+                                <span>${data.message}</span>
+                            </div>
+                        `;
+
+                        successBox.classList.remove('hidden');
+
+                        forgotForm.reset();
+
+                        setTimeout(() => {
+                            cerrarForgotPassword();
+                        }, 3000);
+
+                    } else {
+
+                        errorBox.innerText = data.message || "{{ __('general.forgot_js.error_correo') }}";
+                        errorBox.classList.remove('hidden');
+
                     }
-                });
 
-                const data = await res.json();
+                } catch (err) {
 
-                if (data.ok) {
-                    successBox.innerHTML = `
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-check-circle text-green-600"></i>
-                            <span>${data.message}</span>
-                        </div>
-                    `;
-
-                    successBox.classList.remove('hidden');
-
-                    form.reset();
-
-                    setTimeout(() => {
-                        cerrarForgotPassword();
-                    }, 3000);
-
-                } else {
-                    errorBox.innerText = data.message || 'Error al enviar el correo';
+                    errorBox.innerText = "{{ __('general.forgot_js.error_conexion') }}";
                     errorBox.classList.remove('hidden');
+
                 }
 
-            } catch (err) {
-                errorBox.innerText = 'Error de conexión';
-                errorBox.classList.remove('hidden');
-            }
-        });
+            });
 
-    });
+        }
 
-    document.addEventListener('DOMContentLoaded', function () {
 
-        const form = document.getElementById('resetPasswordForm');
+        const resetForm = document.getElementById('resetPasswordForm');
 
-        if (!form) return;
+        if (resetForm) {
 
-        form.addEventListener('submit', async function (e) {
-            e.preventDefault();
+            resetForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
 
-            const successBox = document.getElementById('resetSuccessBox');
-            const errorBox = document.getElementById('resetErrorBox');
+                const successBox = document.getElementById('resetSuccessBox');
+                const errorBox = document.getElementById('resetErrorBox');
 
-            successBox.classList.add('hidden');
-            errorBox.classList.add('hidden');
+                successBox.classList.add('hidden');
+                errorBox.classList.add('hidden');
 
-            try {
-                const res = await fetch(form.action, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                        'Accept': 'application/json'
-                    },
-                    body: new URLSearchParams(new FormData(form))
-                });
+                try {
 
-                const data = await res.json();
+                    const res = await fetch(resetForm.action, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                        },
+                        body: new URLSearchParams(new FormData(resetForm))
+                    });
 
-                if (data.ok) {
+                    const data = await res.json();
 
-                    successBox.innerHTML = data.message;
-                    successBox.classList.remove('hidden');
+                    if (data.ok) {
 
-                    form.reset();
+                        successBox.innerHTML = `
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-check-circle text-green-600"></i>
+                                <span>${data.message}</span>
+                            </div>
+                        `;
 
-                    setTimeout(() => {
-                        window.location.assign(data.redirect);
-                    }, 3000);
+                        successBox.classList.remove('hidden');
 
-                } else {
-                    errorBox.innerText = data.message || 'Error';
+                        resetForm.reset();
+
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 3000);
+
+                    } else {
+
+                        errorBox.innerText = data.message || "{{ __('general.forgot_js.error_actualizar') }}";
+                        errorBox.classList.remove('hidden');
+
+                    }
+
+                } catch (err) {
+
+                    errorBox.innerText = "{{ __('general.forgot_js.error_conexion') }}";
                     errorBox.classList.remove('hidden');
+
                 }
 
-            } catch (err) {
-                errorBox.innerText = 'Error de conexión';
-                errorBox.classList.remove('hidden');
-            }
-        });
+            });
 
-    });
-    
-    document.addEventListener('DOMContentLoaded', function () {
-
-        const form = document.getElementById('resetPasswordForm');
-
-        if (!form) return;
-
-        form.addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            const url = form.action;
-
-            const successBox = document.getElementById('resetSuccessBox');
-            const errorBox = document.getElementById('resetErrorBox');
-
-            successBox.classList.add('hidden');
-            errorBox.classList.add('hidden');
-
-            try {
-                const res = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-                    },
-                    body: new URLSearchParams(new FormData(form))
-                });
-
-                const data = await res.json();
-
-                if (data.ok) {
-                    successBox.innerHTML = `
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-check-circle text-green-600"></i>
-                            <span>${data.message}</span>
-                        </div>
-                    `;
-
-                    successBox.classList.remove('hidden');
-
-                    form.reset();
-
-                    setTimeout(() => {
-                        window.location.href = data.redirect;
-                    }, 3000);
-
-                } else {
-                    errorBox.innerText = data.message || 'Error al actualizar contraseña';
-                    errorBox.classList.remove('hidden');
-                }
-
-            } catch (err) {
-                errorBox.innerText = 'Error de conexión';
-                errorBox.classList.remove('hidden');
-            }
-        });
+        }
 
     });
 </script>

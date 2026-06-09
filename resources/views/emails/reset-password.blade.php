@@ -1,17 +1,19 @@
-<h2>Recuperación de contraseña</h2>
-
-<p>Recibimos una solicitud para restablecer tu contraseña.</p>
+<h2>{{ __('general.forgot_mail.title') }}</h2>
 
 <p>
-    Haz clic en el siguiente enlace:
+    {{ __('general.forgot_mail.intro') }}
+</p>
+
+<p>
+    {{ __('general.forgot_mail.click') }}
 </p>
 
 <p>
     <a href="{{ $resetUrl }}">
-        Restablecer contraseña
+        {{ __('general.forgot_mail.button') }}
     </a>
 </p>
 
 <p>
-    Si no solicitaste este cambio, puedes ignorar este correo.
+    {{ __('general.forgot_mail.footer') }}
 </p>

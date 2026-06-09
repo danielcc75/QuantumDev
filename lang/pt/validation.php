@@ -114,4 +114,7 @@ return [
             'rule-name' => 'custom-message',
         ],
     ],
+    'attributes' => [
+        'correo_electronico' => 'e-mail',
+    ],
 ];

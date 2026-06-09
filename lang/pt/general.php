@@ -929,4 +929,47 @@ return [
         'pt' => ['nativo' => 'Português', 'ingles' => 'Portuguese'],
     ],
 
+    'forgot' => [
+        'titulo' => 'Recuperar senha',
+        'subtitulo' => 'Digite seu endereço de e-mail e enviaremos um link para redefinir sua senha.',
+        'correo' => 'E-mail',
+        'correo_placeholder' => 'exemplo@email.com',
+        'btn_enviar' => 'Enviar link',
+        'recordaste' => 'Lembrou sua senha?',
+        'iniciar_sesion' => 'Entrar',
+    ],
+
+    'forgot_js' => [
+        'error_correo' => 'Erro ao enviar o e-mail.',
+        'error_conexion' => 'Erro de conexão.',
+        'error_actualizar' => 'Erro ao atualizar a senha.',
+    ],
+
+    'forgot_backend' => [
+        'correo_enviado' => 'Se o e-mail existir, você receberá um link de recuperação.',
+        'token_invalido' => 'Token inválido ou expirado.',
+        'usuario_no_encontrado' => 'Usuário não encontrado.',
+        'password_actualizada' => 'Senha atualizada com sucesso.',
+    ],
+
+    'forgot_mail' => [
+        'subject' => 'Recuperação de senha',
+        'title' => 'Recuperação de senha',
+        'intro' => 'Recebemos uma solicitação para redefinir sua senha.',
+        'click' => 'Clique no link abaixo:',
+        'button' => 'Redefinir senha',
+        'footer' => 'Se você não solicitou esta alteração, pode ignorar este e-mail.',
+    ],
+
+    'reset_password' => [
+        'title' => 'Redefinir senha',
+        'subtitle' => 'Digite sua nova senha',
+        'new_password' => 'Nova senha',
+        'confirm_password' => 'Confirmar senha',
+        'update_button' => 'Atualizar senha',
+        'success' => 'Senha atualizada com sucesso',
+        'error' => 'Erro ao atualizar a senha',
+        'success_title' => 'Sucesso!',
+        'redirecting' => 'Redirecionando para o login...',
+    ],
 ];

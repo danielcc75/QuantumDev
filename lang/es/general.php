@@ -929,4 +929,47 @@ return [
         'pt' => ['nativo' => 'Português',  'ingles' => 'Portuguese'],
     ],
 
+    'forgot' => [
+        'titulo' => 'Recuperar contraseña',
+        'subtitulo' => 'Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.',
+        'correo' => 'Correo electrónico',
+        'correo_placeholder' => 'ejemplo@correo.com',
+        'btn_enviar' => 'Enviar enlace',
+        'recordaste' => '¿Recordaste tu contraseña?',
+        'iniciar_sesion' => 'Iniciar sesión',
+    ],
+
+    'forgot_js' => [
+        'error_correo' => 'Error al enviar el correo.',
+        'error_conexion' => 'Error de conexión.',
+        'error_actualizar' => 'Error al actualizar la contraseña.',
+    ],
+
+    'forgot_backend' => [
+        'correo_enviado' => 'If the email exists, you will receive a recovery link.',
+        'token_invalido' => 'Invalid or expired token.',
+        'usuario_no_encontrado' => 'User not found.',
+        'password_actualizada' => 'Password updated successfully.',
+    ],
+
+    'forgot_mail' => [
+        'subject' => 'Recuperación de contraseña',
+        'title' => 'Recuperación de contraseña',
+        'intro' => 'Recibimos una solicitud para restablecer tu contraseña.',
+        'click' => 'Haz clic en el siguiente enlace:',
+        'button' => 'Restablecer contraseña',
+        'footer' => 'Si no solicitaste este cambio, puedes ignorar este correo.',
+    ],
+
+    'reset_password' => [
+        'title' => 'Restablecer contraseña',
+        'subtitle' => 'Ingresa tu nueva contraseña',
+        'new_password' => 'Nueva contraseña',
+        'confirm_password' => 'Confirmar contraseña',
+        'update_button' => 'Actualizar contraseña',
+        'success' => 'Contraseña actualizada correctamente',
+        'error' => 'Error al actualizar contraseña',
+        'success_title' => '¡Éxito!',
+        'redirecting' => 'Redirigiendo al inicio de sesión...',
+    ],
 ];

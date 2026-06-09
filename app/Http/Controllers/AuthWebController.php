@@ -255,7 +255,7 @@ class AuthWebController extends Controller
         if (!$usuario) {
             return response()->json([
                 'ok' => true,
-                'message' => 'Si el correo existe, recibirás un enlace de recuperación.'
+                'message' => __('general.forgot_backend.correo_enviado')
             ]);
         }
 
@@ -274,11 +274,16 @@ class AuthWebController extends Controller
         $resetUrl = url('/reset-password/' . $token);
 
         Mail::to($usuario->correo_electronico)
-            ->send(new ResetPasswordMail($resetUrl));
+            ->send(
+                new ResetPasswordMail(
+                    $resetUrl,
+                    app()->getLocale()
+                )
+            );
 
         return response()->json([
             'ok' => true,
-            'message' => 'Si el correo existe, recibirás un enlace de recuperación.'
+            'message' => __('general.forgot_backend.correo_enviado')
         ]);
     }
 
@@ -289,16 +294,26 @@ class AuthWebController extends Controller
             'contrasenia' => 'required|min:8|confirmed'
         ]);
 
-        $tokenData = \App\Models\PasswordResetToken::where('token', hash('sha256', $request->token))->first();
+        $tokenData = \App\Models\PasswordResetToken::where(
+            'token',
+            hash('sha256', $request->token)
+        )->first();
 
         if (!$tokenData) {
-            return back()->withErrors(['token' => 'Token inválido o expirado']);
+            return back()->withErrors([
+                'token' => __('general.forgot_backend.token_invalido')
+            ]);
         }
 
-        $usuario = \App\Models\Usuario::where('correo_electronico', $tokenData->email)->first();
+        $usuario = \App\Models\Usuario::where(
+            'correo_electronico',
+            $tokenData->email
+        )->first();
 
         if (!$usuario) {
-            return back()->withErrors(['email' => 'Usuario no encontrado']);
+            return back()->withErrors([
+                'email' => __('general.forgot_backend.usuario_no_encontrado')
+            ]);
         }
 
         $usuario->contrasenia = \Illuminate\Support\Facades\Hash::make($request->contrasenia);
@@ -309,7 +324,7 @@ class AuthWebController extends Controller
 
         return response()->json([
             'ok' => true,
-            'message' => 'Contraseña actualizada correctamente',
+            'message' => __('general.forgot_backend.password_actualizada'),
             'redirect' => url('/')
         ]);
     }
