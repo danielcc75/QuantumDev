@@ -53,30 +53,6 @@
                             </div>
                     </div>
                 </div>
-
-                <div class="bg-gray-50 rounded-xl p-4 right-sidebar-item">
-                    <h3 class="font-semibold text-gray-800 mb-3">{{ __('general.dashboard.sidebar.enlaces_rapidos') }}</h3>
-                    <ul class="space-y-2 text-sm">
-                        <li>
-                            <a href="#" class="text-blue-600 hover:underline flex items-center">
-                                <i class="fas fa-external-link-alt mr-2 text-xs"></i>
-                                {{ __('general.dashboard.sidebar.mi_portafolio_publico') }}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="text-blue-600 hover:underline flex items-center">
-                                <i class="fas fa-bookmark mr-2 text-xs"></i>
-                                {{ __('general.dashboard.sidebar.articulos_guardados') }}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="text-blue-600 hover:underline flex items-center">
-                                <i class="fas fa-bullhorn mr-2 text-xs"></i>
-                                {{ __('general.dashboard.sidebar.novedades_sistema') }}
-                            </a>
-                        </li>
-                    </ul>
-                </div>
             </div>
         </aside>
 
