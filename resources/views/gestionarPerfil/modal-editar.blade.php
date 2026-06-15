@@ -65,7 +65,7 @@
 
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('general.perfil.modal.telefono') }}</label>
-                        <input type="text" id="edit_telefono" name="telefono"
+                        <input type="number" id="edit_telefono" name="telefono"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                             placeholder="{{ __('general.perfil.modal.telefono_ph') }}">
                     </div>

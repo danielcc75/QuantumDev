@@ -57,7 +57,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-                    <input type="text" name="telefono" maxlength="30" required
+                    <input type="number" name="telefono" maxlength="30" required
                         value="{{ old('telefono', $config->telefono) }}"
                         class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#1e3a5f] focus:outline-none">
                 </div>

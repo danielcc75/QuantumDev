@@ -74,7 +74,7 @@
                         <i class="fas fa-phone text-[#1e3a5f] text-xs"></i>
                         Teléfono
                     </label>
-                    <input type="text" name="telefono" id="telefono" 
+                    <input type="number" name="telefono" id="telefono" 
                         placeholder="+591 700 00000" 
                         class="{{ $inputClass }}">
                     <p class="error-telefono text-sm text-red-600 hidden mt-1"></p>

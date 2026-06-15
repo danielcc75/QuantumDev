@@ -67,7 +67,7 @@
                         <i class="fas fa-phone text-[#1e3a5f] text-xs"></i>
                         {{ __('general.auth.register.telefono') }}
                     </label>
-                    <input id="registerTelefono" type="text" name="telefono" value="{{ old('telefono') }}" placeholder="{{ __('general.auth.register.telefono_placeholder') }}" class="{{ $inputClass }}">
+                    <input id="registerTelefono" type="number" name="telefono" value="{{ old('telefono') }}" placeholder="{{ __('general.auth.register.telefono_placeholder') }}" class="{{ $inputClass }}">
                     <p id="registerTelefonoError" class="hidden mt-1 text-sm text-red-600"></p>
                 </div>
 
