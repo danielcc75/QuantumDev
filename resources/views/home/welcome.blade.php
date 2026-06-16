@@ -254,6 +254,7 @@
         </div>
     </footer>
 
+    @include('partials._flash')
     @include('auth.login')
     @include('auth.register')
     @include('auth.modalForgotPassword')

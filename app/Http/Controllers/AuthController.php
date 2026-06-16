@@ -20,7 +20,15 @@ class AuthController extends Controller
 
     public function callbackGithub()
     {
-        $githubUser = Socialite::driver('github')->user();
+        if (request()->has('error')) {
+            return redirect('/');
+        }
+
+        try {
+            $githubUser = Socialite::driver('github')->user();
+        } catch (\Exception $e) {
+            return redirect('/');
+        }
 
         $nombreCompleto = $githubUser->name ?? $githubUser->nickname;
 
@@ -57,7 +65,15 @@ class AuthController extends Controller
 
     public function callbackGoogle()
     {
-        $googleUser = Socialite::driver('google')->user();
+        if (request()->has('error')) {
+            return redirect('/');
+        }
+
+        try {
+            $googleUser = Socialite::driver('google')->user();
+        } catch (\Exception $e) {
+            return redirect('/');
+        }
 
         $nombreCompleto = $googleUser->name;
 
