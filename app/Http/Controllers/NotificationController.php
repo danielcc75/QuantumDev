@@ -71,6 +71,7 @@ class NotificationController extends Controller
         }
         
         $notificaciones = Notification::where('id_usuario', session('usuario_id'))
+            ->where('leido', false)
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get()
@@ -227,6 +228,7 @@ class NotificationController extends Controller
         
         // 3. Notificaciones del sistema (de la tabla notifications)
         $notificaciones = Notification::where('id_usuario', session('usuario_id'))
+            ->where('leido', false)
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();

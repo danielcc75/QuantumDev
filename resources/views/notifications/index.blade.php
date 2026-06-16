@@ -127,12 +127,24 @@
                 </div>
 
                 @forelse($notificaciones as $notif)
-                    <div class="bg-white rounded-xl shadow-md p-4 mb-3 border-l-4
-                        @if($notif->tipo == 'info') border-blue-500
-                        @elseif($notif->tipo == 'success') border-green-500
-                        @elseif($notif->tipo == 'warning') border-yellow-500
-                        @else border-red-500 @endif
-                        {{ !$notif->leido ? 'bg-blue-50' : '' }}">
+                    @php
+                        $notifJson = json_encode([
+                            'id'      => $notif->id_notification,
+                            'titulo'  => $notif->titulo,
+                            'mensaje' => $notif->mensaje,
+                            'tipo'    => $notif->tipo,
+                            'url'     => $notif->url,
+                            'hace'    => $notif->created_at->diffForHumans(),
+                            'leido'   => (bool) $notif->leido,
+                        ], JSON_HEX_APOS | JSON_HEX_TAG);
+                    @endphp
+                    <div onclick='abrirModalNotifObj({{ $notifJson }}, this)'
+                         class="bg-white rounded-xl shadow-md p-4 mb-3 border-l-4 cursor-pointer hover:shadow-lg transition-shadow
+                            @if($notif->tipo == 'info') border-blue-500
+                            @elseif($notif->tipo == 'success') border-green-500
+                            @elseif($notif->tipo == 'warning') border-yellow-500
+                            @else border-red-500 @endif
+                            {{ !$notif->leido ? 'bg-blue-50' : '' }}">
 
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
@@ -151,24 +163,12 @@
                                         <span class="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">{{ __('general.dashboard.notifications.badge_nueva') }}</span>
                                     @endif
                                 </div>
-                                <p class="text-gray-600 text-sm mb-2">{{ $notif->mensaje }}</p>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-xs text-gray-400">{{ $notif->created_at->diffForHumans() }}</span>
-                                    @if(!$notif->leido)
-                                        <form action="{{ route('notifications.marcar', $notif->id_notification) }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="text-xs text-blue-500 hover:underline">
-                                                {{ __('general.dashboard.notifications.marcar_leida') }}
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
+                                <p class="text-gray-600 text-sm mb-2 line-clamp-2">{{ $notif->mensaje }}</p>
+                                <span class="text-xs text-gray-400">{{ $notif->created_at->diffForHumans() }}</span>
                             </div>
-                            @if($notif->url)
-                                <a href="{{ $notif->url }}" class="ml-3 text-blue-500 hover:text-blue-700">
-                                    <i class="fas fa-arrow-right"></i>
-                                </a>
-                            @endif
+                            <div class="ml-3 text-gray-400 flex-shrink-0">
+                                <i class="fas fa-chevron-right text-sm"></i>
+                            </div>
                         </div>
                     </div>
                 @empty

@@ -503,6 +503,7 @@
 const btnNotif = document.getElementById('btn-notificaciones');
 const menuNotif = document.getElementById('notificaciones-menu');
 let notifAbierto = false;
+let _notifCache = {};
 
 function escapeHtml(text) {
     const div = document.createElement('div');
@@ -534,16 +535,18 @@ function cargarNotificaciones() {
             } else {
                 let html = '';
                 data.notificaciones.forEach(notif => {
+                    _notifCache[notif.id] = notif;
+
                     let tipoIcon = '';
                     if (notif.tipo === 'info') tipoIcon = 'fa-info-circle text-blue-500';
                     else if (notif.tipo === 'success') tipoIcon = 'fa-check-circle text-green-500';
                     else if (notif.tipo === 'warning') tipoIcon = 'fa-exclamation-triangle text-yellow-500';
                     else tipoIcon = 'fa-times-circle text-red-500';
-                    
+
                     const fondoClass = !notif.leido ? 'bg-blue-50' : 'bg-white';
-                    
+
                     html += `
-                        <div onclick="marcarLeida(${notif.id}, '${notif.url || ''}', this)" 
+                        <div onclick="abrirModalNotif(${notif.id}, this)"
                              class="p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition ${fondoClass}">
                             <div class="flex gap-3">
                                 <div class="flex-shrink-0">
@@ -554,7 +557,7 @@ function cargarNotificaciones() {
                                     <p class="text-xs text-gray-500 truncate">${escapeHtml(notif.mensaje)}</p>
                                     <p class="text-xs text-gray-400 mt-1">${notif.hace}</p>
                                 </div>
-                                ${!notif.leido ? '<div class="flex-shrink-0"><span class="w-2 h-2 bg-blue-500 rounded-full block"></span></div>' : ''}
+                                ${!notif.leido ? '<div class="flex-shrink-0"><span class="w-2 h-2 bg-blue-500 rounded-full block mt-1"></span></div>' : ''}
                             </div>
                         </div>
                     `;
@@ -564,10 +567,7 @@ function cargarNotificaciones() {
         });
 }
 
-function marcarLeida(id, url, elemento) {
-    if (elemento && elemento.classList.contains('marcando')) return;
-    if (elemento) elemento.classList.add('marcando', 'opacity-50');
-    
+function _marcarComoLeida(id, notif, elemento) {
     fetch('{{ route("notifications.marcar-leida") }}', {
         method: 'POST',
         headers: {
@@ -575,31 +575,69 @@ function marcarLeida(id, url, elemento) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ id: id })
-    }).then(() => {
-        if (elemento) {
-            elemento.classList.remove('bg-blue-50');
-            elemento.classList.add('bg-white');
-            const badgeAzul = elemento.querySelector('.w-2.h-2.bg-blue-500');
-            if (badgeAzul) badgeAzul.remove();
+    }).then(response => {
+        if (!response.ok) {
+            if (notif) notif.leido = false;
+            return;
         }
-        
-        if (url && url !== '') {
-            window.location.href = url;
-        } else {
-            actualizarContadorNotificaciones();
-            if (notifAbierto) cargarNotificaciones();
+        actualizarContadorNotificaciones();
+        if (elemento) {
+            elemento.style.transition = 'opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease, margin 0.3s ease, padding 0.3s ease';
+            elemento.style.opacity = '0';
+            elemento.style.transform = 'translateX(12px)';
+            elemento.style.overflow = 'hidden';
+            setTimeout(() => {
+                elemento.style.maxHeight = '0';
+                elemento.style.marginBottom = '0';
+                elemento.style.paddingTop = '0';
+                elemento.style.paddingBottom = '0';
+            }, 280);
+            setTimeout(() => elemento.remove(), 580);
         }
     }).catch(error => {
+        if (notif) notif.leido = false;
         console.error('Error:', error);
-        if (elemento) elemento.classList.remove('opacity-50');
-    }).finally(() => {
-        if (elemento) {
-            elemento.classList.remove('marcando');
-            setTimeout(() => {
-                if (elemento) elemento.classList.remove('opacity-50');
-            }, 300);
-        }
     });
+}
+
+function abrirModalNotif(id, elemento) {
+    const notif = _notifCache[id];
+    if (!notif) return;
+
+    if (!notif.leido) {
+        notif.leido = true;
+        _marcarComoLeida(id, notif, elemento);
+    }
+
+    const iconMap = {
+        info:    { icon: 'fa-info-circle',           color: '#3b82f6', bg: '#eff6ff' },
+        success: { icon: 'fa-check-circle',          color: '#22c55e', bg: '#f0fdf4' },
+        warning: { icon: 'fa-exclamation-triangle',  color: '#f59e0b', bg: '#fffbeb' },
+        error:   { icon: 'fa-times-circle',          color: '#ef4444', bg: '#fef2f2' },
+    };
+    const meta = iconMap[notif.tipo] || iconMap.info;
+
+    document.getElementById('modal-notif-icon').className = `fas ${meta.icon} text-2xl`;
+    document.getElementById('modal-notif-icon').style.color = meta.color;
+    document.getElementById('modal-notif-header').style.backgroundColor = meta.bg;
+    document.getElementById('modal-notif-titulo').textContent  = notif.titulo;
+    document.getElementById('modal-notif-mensaje').textContent = notif.mensaje;
+    document.getElementById('modal-notif-fecha').textContent   = notif.hace;
+
+    const modal = document.getElementById('modal-notif-detalle');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function abrirModalNotifObj(notifObj, elemento) {
+    _notifCache[notifObj.id] = notifObj;
+    abrirModalNotif(notifObj.id, elemento);
+}
+
+function cerrarModalNotif() {
+    const modal = document.getElementById('modal-notif-detalle');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
 }
 
 function actualizarContadorNotificaciones() {
@@ -643,4 +681,35 @@ if (btnNotif) {
 actualizarContadorNotificaciones();
 setInterval(actualizarContadorNotificaciones, 30000);
 
+// Cerrar modal con Escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') cerrarModalNotif();
+});
+
     </script>
+
+<!-- Modal de detalle de notificación -->
+<div id="modal-notif-detalle"
+     class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/50 backdrop-blur-sm"
+     onclick="if(event.target===this) cerrarModalNotif()">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden animate-fade-in">
+        <div id="modal-notif-header" class="px-6 py-4 flex items-start gap-3">
+            <i id="modal-notif-icon" class="fas fa-info-circle text-2xl mt-0.5"></i>
+            <h2 id="modal-notif-titulo" class="font-bold text-gray-800 text-lg flex-1 leading-snug"></h2>
+            <button onclick="cerrarModalNotif()"
+                    class="text-gray-400 hover:text-gray-600 transition ml-2 flex-shrink-0">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="px-6 pb-2">
+            <p id="modal-notif-mensaje" class="text-gray-600 text-sm leading-relaxed whitespace-pre-line"></p>
+            <p id="modal-notif-fecha" class="text-xs text-gray-400 mt-4"></p>
+        </div>
+        <div class="px-6 py-4 flex gap-3 justify-end border-t border-gray-100 mt-2">
+            <button onclick="cerrarModalNotif()"
+                    class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>

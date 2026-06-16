@@ -105,50 +105,18 @@ function cargarNovedades() {
             if (novedad.tipo === 'portafolio_oculto') bgClass = 'bg-red-50';
             else if (novedad.tipo === 'nota_moderacion') bgClass = 'bg-yellow-50';
             else if (novedad.tipo === 'notificacion' && !novedad.leido) bgClass = 'bg-blue-50';
-            
+
             html += `
-                <div class="flex items-start space-x-3 pb-3 border-b border-gray-200 ${bgClass} p-2 rounded-lg transition cursor-pointer"
-                     data-tipo="${novedad.tipo || ''}"
-                     data-id="${novedad.id_entidad || ''}"
-                     data-url="${novedad.url || ''}">
+                <div class="flex items-start space-x-3 pb-3 border-b border-gray-200 ${bgClass} p-2 rounded-lg">
                     <i class="${novedad.icono || 'fas fa-bell'} ${novedad.color || 'text-gray-500'} mt-1 text-sm"></i>
                     <div class="flex-1">
                         <p class="font-medium text-gray-800 text-sm">${escapeHtml(novedad.titulo || __t('js.dashboard.sin_titulo'))}</p>
                         <p class="text-xs text-gray-500">${escapeHtml(novedad.detalle || '')}</p>
                     </div>
-                    ${novedad.tipo === 'notificacion' && !novedad.leido ? '<span class="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2"></span>' : ''}
                 </div>
             `;
         });
         container.innerHTML = html;
-        
-        document.querySelectorAll('[data-tipo]').forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const tipo = this.dataset.tipo;
-                const id = this.dataset.id;
-                const url = this.dataset.url;
-                
-                if (tipo === 'notificacion' && id) {
-                    fetch('{{ route("novedades.marcar-vista") }}', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ tipo: tipo, id: id })
-                    }).then(() => {
-                        if (url) {
-                            window.location.href = url;
-                        } else {
-                            cargarNovedades();
-                        }
-                    }).catch(err => console.error('Error:', err));
-                } else if (url) {
-                    window.location.href = url;
-                }
-            });
-        });
     })
     .catch(error => {
         console.error('Error:', error);
